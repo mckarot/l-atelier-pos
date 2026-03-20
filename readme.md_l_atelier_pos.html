@@ -1,0 +1,37 @@
+# L'Atelier POS - Système de Gestion de Restaurant
+
+Ce projet est un système complet de POS (Point of Sale) et KDS (Kitchen Display System) pour restaurant, conçu avec une esthétique "Industrial Chic".
+
+## Technologies utilisées
+- **React** (Vite)
+- **Tailwind CSS** (Styling)
+- **Dexie.js** (Persistance locale IndexedDB)
+- **Framer Motion** (Animations & Micro-interactions)
+- **Lucide React** (Icônes)
+
+## Structure du projet
+- `/src/components` : Composants modulaires (OrderCard, MenuCard, ActionButton, StatusBadge).
+- `/src/views` : Les 4 interfaces principales (Client, Serveur, Cuisine, Admin).
+- `/src/db` : Configuration de la base de données et fonctions de seed.
+- `/src/theme` : Jetons de design et configuration Tailwind.
+
+## Installation et Lancement
+
+1. Installez les dépendances :
+   ```bash
+   npm install
+   ```
+
+2. Lancez le serveur de développement :
+   ```bash
+   npm run dev
+   ```
+
+3. Ouvrez votre navigateur sur `http://localhost:5173`.
+
+## Fonctionnalités
+- Commande client avec panier dynamique.
+- KDS en temps réel avec suivi du temps.
+- Plan de salle interactif pour les serveurs.
+- Dashboard admin avec KPIs financiers.
+- Mode Hors-ligne (Offline-first) grâce à Dexie.js.

@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="fr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>L'Atelier POS - KDS Flux Temps-Réel</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Inter:wght@300;400;500;600;700&amp;family=JetBrains+Mono:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "outline": "#a08e7a",
+                        "secondary-fixed-dim": "#ffb690",
+                        "on-primary-container": "#613b00",
+                        "surface-container-low": "#1c1b1b",
+                        "on-tertiary-container": "#004f20",
+                        "surface-container-lowest": "#0e0e0e",
+                        "on-tertiary": "#003915",
+                        "surface-container-highest": "#353534",
+                        "inverse-on-surface": "#313030",
+                        "primary-fixed": "#ffddb8",
+                        "surface-bright": "#3a3939",
+                        "on-surface": "#e5e2e1",
+                        "tertiary": "#51e77b",
+                        "error": "#ffb4ab",
+                        "tertiary-fixed-dim": "#4ae176",
+                        "secondary-fixed": "#ffdbca",
+                        "surface-container-high": "#2a2a2a",
+                        "tertiary-container": "#2bca62",
+                        "primary-fixed-dim": "#ffb95f",
+                        "primary": "#ffc174",
+                        "on-tertiary-fixed": "#002109",
+                        "surface-container": "#201f1f",
+                        "on-tertiary-fixed-variant": "#005321",
+                        "surface": "#131313",
+                        "on-primary-fixed": "#2a1700",
+                        "on-secondary-container": "#4a1c00",
+                        "on-secondary-fixed": "#341100",
+                        "outline-variant": "#534434",
+                        "error-container": "#93000a",
+                        "primary-container": "#f59e0b",
+                        "on-primary": "#472a00",
+                        "surface-tint": "#ffb95f",
+                        "inverse-surface": "#e5e2e1",
+                        "background": "#131313",
+                        "surface-variant": "#353534",
+                        "tertiary-fixed": "#6bff8f",
+                        "secondary-container": "#ec6a06",
+                        "on-error": "#690005",
+                        "on-error-container": "#ffdad6",
+                        "on-secondary": "#552100",
+                        "on-background": "#e5e2e1",
+                        "on-surface-variant": "#d8c3ad",
+                        "surface-dim": "#131313",
+                        "on-secondary-fixed-variant": "#783200",
+                        "secondary": "#ffb690",
+                        "on-primary-fixed-variant": "#653e00",
+                        "inverse-primary": "#855300"
+                    },
+                    fontFamily: {
+                        "headline": ["Space Grotesk"],
+                        "body": ["Inter"],
+                        "label": ["Inter"],
+                        "mono": ["JetBrains Mono"]
+                    },
+                    borderRadius: { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" },
+                },
+            },
+        }
+    </script>
+<style>
+        @keyframes pulse-border {
+            0%, 100% { border-color: transparent; box-shadow: 0 0 0 0 rgba(255, 193, 116, 0); }
+            50% { border-color: #FFC174; box-shadow: 0 0 12px 2px rgba(255, 193, 116, 0.3); }
+        }
+        .animate-pulse-border {
+            animation: pulse-border 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+            border-width: 2px;
+        }
+        .view-fade-in {
+            animation: fadeIn 300ms ease-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        ::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1C1B1B;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #353534;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body selection:bg-primary/30 antialiased overflow-hidden">
+<!-- SideNavBar (Shared Component) -->
+<aside class="fixed left-0 top-0 h-full flex flex-col py-6 bg-[#1C1B1B] w-64 shadow-[8px_0_24px_rgba(0,0,0,0.4)] z-50">
+<div class="px-6 mb-8 flex items-center gap-3">
+<div class="w-10 h-10 rounded-xl bg-primary-container flex items-center justify-center text-on-primary-container shadow-lg">
+<span class="material-symbols-outlined text-2xl" data-icon="restaurant">restaurant</span>
+</div>
+<div>
+<p class="text-[#F5F0EB] font-bold font-headline tracking-tight">Chef d'Atelier</p>
+<p class="text-on-surface-variant text-[10px] uppercase tracking-widest font-mono">Service Midi</p>
+</div>
+</div>
+<nav class="flex-1 px-3 space-y-2">
+<!-- Nav Item: Menu -->
+<a class="flex items-center gap-4 text-[#F5F0EB]/60 px-4 py-3 hover:text-[#F5F0EB] hover:bg-[#353534]/50 transition-all duration-300 rounded-lg group active:scale-95 active:translate-x-1" href="#">
+<span class="material-symbols-outlined" data-icon="restaurant_menu">restaurant_menu</span>
+<span class="font-['Inter'] text-sm font-medium">Menu</span>
+</a>
+<!-- Nav Item: Commandes (Active) -->
+<a class="flex items-center gap-4 bg-[#353534] text-[#FFC174] rounded-lg px-4 py-3 border-l-4 border-[#FFC174] transition-all duration-300 active:scale-95 active:translate-x-1" href="#">
+<span class="material-symbols-outlined" data-icon="receipt_long">receipt_long</span>
+<span class="font-['Inter'] text-sm font-medium">Commandes</span>
+</a>
+<!-- Nav Item: Tables -->
+<a class="flex items-center gap-4 text-[#F5F0EB]/60 px-4 py-3 hover:text-[#F5F0EB] hover:bg-[#353534]/50 transition-all duration-300 rounded-lg group active:scale-95 active:translate-x-1" href="#">
+<span class="material-symbols-outlined" data-icon="table_restaurant">table_restaurant</span>
+<span class="font-['Inter'] text-sm font-medium">Tables</span>
+</a>
+<!-- Nav Item: Tableau de bord -->
+<a class="flex items-center gap-4 text-[#F5F0EB]/60 px-4 py-3 hover:text-[#F5F0EB] hover:bg-[#353534]/50 transition-all duration-300 rounded-lg group active:scale-95 active:translate-x-1" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-['Inter'] text-sm font-medium">Tableau de bord</span>
+</a>
+<!-- Nav Item: Paramètres -->
+<a class="flex items-center gap-4 text-[#F5F0EB]/60 px-4 py-3 hover:text-[#F5F0EB] hover:bg-[#353534]/50 transition-all duration-300 rounded-lg group active:scale-95 active:translate-x-1" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-['Inter'] text-sm font-medium">Paramètres</span>
+</a>
+</nav>
+<div class="mt-auto px-4 py-4 space-y-4">
+<button class="w-full bg-primary-container text-on-primary-container font-bold py-3 rounded-lg flex items-center justify-center gap-2 shadow-lg active:scale-95 transition-transform hover:brightness-105">
+<span class="material-symbols-outlined text-xl" data-icon="add">add</span>
+<span class="text-xs uppercase tracking-widest font-headline">Nouvelle Commande</span>
+</button>
+<div class="flex border-t border-outline-variant/10 pt-4 gap-2">
+<button class="flex-1 flex flex-col items-center gap-1 text-on-surface-variant hover:text-primary transition-colors py-2">
+<span class="material-symbols-outlined" data-icon="dark_mode">dark_mode</span>
+<span class="text-[10px] uppercase font-mono">Thème</span>
+</button>
+<button class="flex-1 flex flex-col items-center gap-1 text-error/60 hover:text-error transition-colors py-2">
+<span class="material-symbols-outlined" data-icon="emergency_home">emergency_home</span>
+<span class="text-[10px] uppercase font-mono">Urgence</span>
+</button>
+</div>
+</div>
+</aside>
+<!-- Main Canvas -->
+<main class="ml-64 min-h-screen flex flex-col">
+<!-- TopAppBar (Shared Component) -->
+<header class="flex justify-between items-center w-full px-8 h-20 bg-[#131313] sticky top-0 z-40">
+<div class="flex items-center gap-6">
+<h1 class="font-['Space_Grotesk'] font-bold text-xl uppercase tracking-[0.2em] text-[#FFC174]">KDS - Flux Temps-Réel</h1>
+<div class="h-6 w-[1px] bg-outline-variant/30"></div>
+<div class="flex gap-4">
+<span class="flex items-center gap-2 px-3 py-1 bg-surface-container-highest rounded text-[11px] font-mono text-tertiary">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary animate-pulse"></span>
+                        SYNC: LIVE
+                    </span>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2 px-4 py-2 bg-surface-container-low rounded-lg">
+<span class="material-symbols-outlined text-primary text-sm" data-icon="timer">timer</span>
+<span class="font-mono text-sm font-bold tracking-tighter">12:44:02</span>
+</div>
+<div class="flex items-center gap-1">
+<button class="p-3 text-[#F5F0EB] opacity-60 hover:opacity-100 hover:bg-[#353534] transition-all rounded-lg active:scale-95">
+<span class="material-symbols-outlined" data-icon="sync">sync</span>
+</button>
+<button class="p-3 text-[#F5F0EB] opacity-60 hover:opacity-100 hover:bg-[#353534] transition-all rounded-lg active:scale-95">
+<span class="material-symbols-outlined" data-icon="light_mode">light_mode</span>
+</button>
+<div class="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center text-[#F5F0EB] border border-outline-variant/20 ml-2">
+<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
+</div>
+</div>
+</div>
+</header>
+<!-- KDS View Grid -->
+<div class="flex-1 p-6 grid grid-cols-4 gap-6 overflow-hidden view-fade-in">
+<!-- Column: NOUVEAU -->
+<div class="flex flex-col h-full bg-surface-container-lowest/50 rounded-xl">
+<div class="p-4 border-b border-outline-variant/10 flex justify-between items-center">
+<div class="flex items-center gap-3">
+<span class="w-2 h-2 rounded-full bg-primary"></span>
+<h2 class="font-headline font-bold text-sm tracking-widest uppercase">Nouveau</h2>
+</div>
+<span class="font-mono text-xs px-2 py-0.5 bg-surface-container-high rounded text-on-surface-variant">03</span>
+</div>
+<div class="flex-1 overflow-y-auto p-4 space-y-4">
+<!-- Alert Order Card -->
+<div class="bg-surface-container-highest rounded-xl p-4 shadow-xl border-l-4 border-primary animate-pulse-border transition-transform active:scale-[0.98] cursor-pointer group">
+<div class="flex justify-between items-start mb-3">
+<div>
+<h3 class="font-headline font-bold text-lg text-primary tracking-tight">#2481</h3>
+<p class="text-[10px] font-mono uppercase text-on-surface-variant">Table 12 • 2 pers.</p>
+</div>
+<div class="text-right">
+<p class="font-mono font-bold text-secondary text-lg">01:12</p>
+<p class="text-[8px] uppercase tracking-tighter text-on-surface-variant">Attente</p>
+</div>
+</div>
+<div class="space-y-2 mb-4 border-t border-outline-variant/10 pt-3">
+<div class="flex justify-between items-center group/item">
+<span class="text-sm font-medium"><span class="text-primary font-bold mr-2">2x</span> Burger d'Atelier</span>
+<span class="material-symbols-outlined text-on-surface-variant text-sm opacity-0 group-hover/item:opacity-100 transition-opacity" data-icon="info">info</span>
+</div>
+<div class="flex justify-between items-center group/item">
+<span class="text-sm font-medium"><span class="text-primary font-bold mr-2">1x</span> Frites Maison (XL)</span>
+</div>
+<p class="text-[11px] text-on-primary-fixed bg-primary/20 px-2 py-1 rounded italic">Sans oignons sur les burgers</p>
+</div>
+<button class="w-full h-12 bg-primary-container/20 hover:bg-primary-container text-primary hover:text-on-primary-container transition-all duration-200 rounded-lg font-bold text-xs uppercase tracking-widest active:scale-95 flex items-center justify-center gap-2">
+                            PRENDRE <span class="material-symbols-outlined text-lg" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+<!-- Regular Order Card -->
+<div class="bg-surface-container-high rounded-xl p-4 shadow-md transition-all hover:bg-surface-container-highest active:scale-[0.98] cursor-pointer group">
+<div class="flex justify-between items-start mb-3">
+<div>
+<h3 class="font-headline font-bold text-lg text-on-surface tracking-tight">#2480</h3>
+<p class="text-[10px] font-mono uppercase text-on-surface-variant">Emporter • Anna L.</p>
+</div>
+<div class="text-right">
+<p class="font-mono font-bold text-on-surface-variant text-lg">04:45</p>
+</div>
+</div>
+<div class="space-y-2 mb-4 border-t border-outline-variant/10 pt-3">
+<div class="flex justify-between items-center">
+<span class="text-sm font-medium"><span class="text-on-surface-variant font-bold mr-2">1x</span> Salade César</span>
+</div>
+</div>
+<button class="w-full h-12 bg-surface-container-highest hover:bg-primary-container hover:text-on-primary-container transition-all duration-200 rounded-lg font-bold text-xs uppercase tracking-widest active:scale-95">
+                            PRENDRE
+                        </button>
+</div>
+</div>
+</div>
+<!-- Column: PRÉPARATION -->
+<div class="flex flex-col h-full bg-surface-container-lowest/50 rounded-xl">
+<div class="p-4 border-b border-outline-variant/10 flex justify-between items-center">
+<div class="flex items-center gap-3">
+<span class="w-2 h-2 rounded-full bg-tertiary"></span>
+<h2 class="font-headline font-bold text-sm tracking-widest uppercase text-tertiary">Préparation</h2>
+</div>
+<span class="font-mono text-xs px-2 py-0.5 bg-surface-container-high rounded text-on-surface-variant">02</span>
+</div>
+<div class="flex-1 overflow-y-auto p-4 space-y-4">
+<!-- Preparation Card (Delayed) -->
+<div class="bg-surface-container-highest rounded-xl p-4 shadow-xl border-l-4 border-error transition-all active:scale-[0.98] cursor-pointer">
+<div class="flex justify-between items-start mb-3">
+<div>
+<h3 class="font-headline font-bold text-lg text-on-surface tracking-tight">#2478</h3>
+<p class="text-[10px] font-mono uppercase text-on-surface-variant">Table 05 • 4 pers.</p>
+</div>
+<div class="text-right">
+<p class="font-mono font-bold text-error text-lg animate-pulse">14:22</p>
+<p class="text-[8px] uppercase tracking-tighter text-error">RETARD</p>
+</div>
+</div>
+<div class="space-y-2 mb-4 border-t border-outline-variant/10 pt-3">
+<div class="flex justify-between items-center opacity-40">
+<span class="text-sm font-medium line-through">2x Boissons (Servi)</span>
+<span class="material-symbols-outlined text-tertiary text-sm" data-icon="check_circle" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<div class="flex justify-between items-center">
+<span class="text-sm font-medium"><span class="text-tertiary font-bold mr-2">4x</span> Steak Frites (Saignant)</span>
+</div>
+</div>
+<div class="flex gap-2">
+<button class="flex-1 h-12 bg-surface-container rounded-lg font-bold text-xs uppercase tracking-widest active:scale-95 hover:bg-surface-variant transition-colors">
+                                RECULER
+                            </button>
+<button class="flex-[2] h-12 bg-tertiary-container text-on-tertiary-container hover:brightness-110 transition-all rounded-lg font-bold text-xs uppercase tracking-widest active:scale-95 flex items-center justify-center gap-2">
+                                PRÊT <span class="material-symbols-outlined text-lg" data-icon="done_all">done_all</span>
+</button>
+</div>
+</div>
+<!-- Preparation Card -->
+<div class="bg-surface-container-high rounded-xl p-4 shadow-md transition-all active:scale-[0.98] cursor-pointer">
+<div class="flex justify-between items-start mb-3">
+<div>
+<h3 class="font-headline font-bold text-lg text-on-surface tracking-tight">#2479</h3>
+<p class="text-[10px] font-mono uppercase text-on-surface-variant">Table 08 • 2 pers.</p>
+</div>
+<div class="text-right">
+<p class="font-mono font-bold text-on-surface text-lg">06:10</p>
+</div>
+</div>
+<div class="space-y-2 mb-4 border-t border-outline-variant/10 pt-3">
+<div class="flex justify-between items-center">
+<span class="text-sm font-medium"><span class="text-tertiary font-bold mr-2">1x</span> Pasta Truffe</span>
+</div>
+<div class="flex justify-between items-center">
+<span class="text-sm font-medium"><span class="text-tertiary font-bold mr-2">1x</span> Risotto Champignons</span>
+</div>
+</div>
+<div class="flex gap-2">
+<button class="flex-1 h-12 bg-surface-container rounded-lg font-bold text-xs uppercase tracking-widest active:scale-95 hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined text-sm" data-icon="undo">undo</span>
+</button>
+<button class="flex-[4] h-12 bg-tertiary/20 text-tertiary border border-tertiary/30 hover:bg-tertiary hover:text-on-tertiary transition-all rounded-lg font-bold text-xs uppercase tracking-widest active:scale-95">
+                                TERMINER
+                            </button>
+</div>
+</div>
+</div>
+</div>
+<!-- Column: À SERVIR -->
+<div class="flex flex-col h-full bg-surface-container-lowest/50 rounded-xl">
+<div class="p-4 border-b border-outline-variant/10 flex justify-between items-center">
+<div class="flex items-center gap-3">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+<h2 class="font-headline font-bold text-sm tracking-widest uppercase text-secondary">À Servir</h2>
+</div>
+<span class="font-mono text-xs px-2 py-0.5 bg-surface-container-high rounded text-on-surface-variant">01</span>
+</div>
+<div class="flex-1 overflow-y-auto p-4 space-y-4">
+<!-- Ready Order Card -->
+<div class="bg-[#1C1B1B] border border-outline-variant/10 rounded-xl p-4 shadow-lg transition-all active:scale-[0.98] cursor-pointer">
+<div class="flex justify-between items-start mb-3">
+<div>
+<h3 class="font-headline font-bold text-lg text-secondary tracking-tight">#2476</h3>
+<p class="text-[10px] font-mono uppercase text-on-surface-variant">Table 01 • Passe</p>
+</div>
+<div class="text-right">
+<p class="font-mono font-bold text-secondary text-lg">00:45</p>
+</div>
+</div>
+<div class="space-y-1 mb-4 opacity-60">
+<div class="flex justify-between items-center">
+<span class="text-xs">3x Tacos Carnitas</span>
+<span class="material-symbols-outlined text-xs" data-icon="check">check</span>
+</div>
+<div class="flex justify-between items-center">
+<span class="text-xs">1x Nachos Supreme</span>
+<span class="material-symbols-outlined text-xs" data-icon="check">check</span>
+</div>
+</div>
+<button class="w-full h-12 bg-secondary text-on-secondary hover:brightness-110 transition-all rounded-lg font-bold text-xs uppercase tracking-widest active:scale-95 flex items-center justify-center gap-2">
+                            SERVI <span class="material-symbols-outlined text-lg" data-icon="delivery_dining">delivery_dining</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Column: STATISTIQUES LIVES -->
+<div class="flex flex-col h-full bg-surface-container-low rounded-xl">
+<div class="p-4 border-b border-outline-variant/10 flex justify-between items-center bg-surface-container">
+<div class="flex items-center gap-3">
+<span class="w-2 h-2 rounded-full bg-on-surface-variant"></span>
+<h2 class="font-headline font-bold text-sm tracking-widest uppercase text-on-surface-variant">Insight</h2>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant text-sm" data-icon="monitoring">monitoring</span>
+</div>
+<div class="flex-1 p-4 space-y-6">
+<!-- KPI Bento Cards -->
+<div class="grid grid-cols-1 gap-4">
+<div class="bg-surface-container-highest/30 rounded-lg p-4 flex flex-col items-center justify-center text-center">
+<p class="text-[10px] uppercase font-mono text-on-surface-variant mb-1">Temps Moyen Prép.</p>
+<p class="text-3xl font-headline font-bold text-primary">08:42</p>
+<div class="mt-2 text-[9px] text-tertiary flex items-center gap-1">
+<span class="material-symbols-outlined text-[10px]" data-icon="trending_down">trending_down</span>
+                                -12% vs hier
+                            </div>
+</div>
+<div class="bg-surface-container-highest/30 rounded-lg p-4 flex flex-col items-center justify-center text-center">
+<p class="text-[10px] uppercase font-mono text-on-surface-variant mb-1">Commandes / Heure</p>
+<p class="text-3xl font-headline font-bold text-on-surface">24</p>
+<div class="w-full mt-3 h-1.5 bg-surface-container-low rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[65%]"></div>
+</div>
+</div>
+<div class="bg-surface-container-highest/30 rounded-lg p-4">
+<p class="text-[10px] uppercase font-mono text-on-surface-variant mb-3 text-center">Rush Alert</p>
+<div class="space-y-2">
+<div class="flex justify-between text-[10px] items-center">
+<span class="text-on-surface-variant">Cuisine</span>
+<span class="text-tertiary">Normal</span>
+</div>
+<div class="w-full h-1 bg-surface-container-low rounded-full overflow-hidden">
+<div class="h-full bg-tertiary w-[30%]"></div>
+</div>
+<div class="flex justify-between text-[10px] items-center mt-2">
+<span class="text-on-surface-variant">Service</span>
+<span class="text-secondary">Intense</span>
+</div>
+<div class="w-full h-1 bg-surface-container-low rounded-full overflow-hidden">
+<div class="h-full bg-secondary w-[85%]"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Recent Actions -->
+<div>
+<h4 class="text-[10px] uppercase font-bold text-on-surface-variant mb-3 px-1">Historique Récent</h4>
+<div class="space-y-3">
+<div class="flex gap-3 items-center">
+<div class="w-6 h-6 rounded bg-tertiary/10 flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined text-xs" data-icon="check">check</span>
+</div>
+<div class="flex-1 min-w-0">
+<p class="text-[11px] font-bold truncate">#2475 Servi</p>
+<p class="text-[9px] text-on-surface-variant font-mono">il y a 2 min</p>
+</div>
+</div>
+<div class="flex gap-3 items-center">
+<div class="w-6 h-6 rounded bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-xs" data-icon="restaurant">restaurant</span>
+</div>
+<div class="flex-1 min-w-0">
+<p class="text-[11px] font-bold truncate">#2481 Reçu</p>
+<p class="text-[9px] text-on-surface-variant font-mono">il y a 4 min</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="p-4 bg-surface-container-highest/40 mt-auto">
+<button class="w-full h-10 border border-outline-variant/20 rounded text-[10px] font-bold uppercase tracking-widest hover:bg-surface-container-highest transition-colors active:scale-95">
+                        VOIR ARCHIVES
+                    </button>
+</div>
+</div>
+</div>
+</main>
+<!-- Floating Global FAB (Contextual) -->
+<button class="fixed bottom-8 right-8 w-16 h-16 bg-primary text-on-primary-container rounded-xl shadow-[0_12px_32px_rgba(255,193,116,0.4)] flex items-center justify-center active:scale-95 transition-all group z-50">
+<span class="material-symbols-outlined text-3xl group-hover:rotate-90 transition-transform duration-300" data-icon="add">add</span>
+</button>
+</body></html>

@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="fr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Inter:wght@300;400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .font-headline { font-family: 'Space_Grotesk', sans-serif; }
+        .font-mono { font-family: 'JetBrains+Mono', monospace; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-panel {
+            background: rgba(53, 53, 52, 0.6);
+            backdrop-filter: blur(12px);
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "outline": "#a08e7a",
+                        "secondary-fixed-dim": "#ffb690",
+                        "on-primary-container": "#613b00",
+                        "surface-container-low": "#1c1b1b",
+                        "on-tertiary-container": "#004f20",
+                        "surface-container-lowest": "#0e0e0e",
+                        "on-tertiary": "#003915",
+                        "surface-container-highest": "#353534",
+                        "inverse-on-surface": "#313030",
+                        "primary-fixed": "#ffddb8",
+                        "surface-bright": "#3a3939",
+                        "on-surface": "#e5e2e1",
+                        "tertiary": "#51e77b",
+                        "error": "#ffb4ab",
+                        "tertiary-fixed-dim": "#4ae176",
+                        "secondary-fixed": "#ffdbca",
+                        "surface-container-high": "#2a2a2a",
+                        "tertiary-container": "#2bca62",
+                        "primary-fixed-dim": "#ffb95f",
+                        "primary": "#ffc174",
+                        "on-tertiary-fixed": "#002109",
+                        "surface-container": "#201f1f",
+                        "on-tertiary-fixed-variant": "#005321",
+                        "surface": "#131313",
+                        "on-primary-fixed": "#2a1700",
+                        "on-secondary-container": "#4a1c00",
+                        "on-secondary-fixed": "#341100",
+                        "outline-variant": "#534434",
+                        "error-container": "#93000a",
+                        "primary-container": "#f59e0b",
+                        "on-primary": "#472a00",
+                        "surface-tint": "#ffb95f",
+                        "inverse-surface": "#e5e2e1",
+                        "background": "#131313",
+                        "surface-variant": "#353534",
+                        "tertiary-fixed": "#6bff8f",
+                        "secondary-container": "#ec6a06",
+                        "on-error": "#690005",
+                        "on-error-container": "#ffdad6",
+                        "on-secondary": "#552100",
+                        "on-background": "#e5e2e1",
+                        "on-surface-variant": "#d8c3ad",
+                        "surface-dim": "#131313",
+                        "on-secondary-fixed-variant": "#783200",
+                        "secondary": "#ffb690",
+                        "on-primary-fixed-variant": "#653e00",
+                        "inverse-primary": "#855300"
+                    },
+                    fontFamily: {
+                        "headline": ["Space Grotesk"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-surface text-on-surface selection:bg-primary selection:text-on-primary">
+<!-- Side Navigation Bar -->
+<aside class="fixed left-0 top-0 h-full flex flex-col py-6 bg-[#1C1B1B] w-64 shadow-[8px_0_24px_rgba(0,0,0,0.4)] z-50">
+<div class="px-6 mb-10">
+<h1 class="text-[#F5F0EB] font-bold text-xl tracking-tight flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">analytics</span>
+                L'Atelier Admin
+            </h1>
+<div class="mt-6 flex items-center gap-3 p-3 rounded-xl bg-surface-container-highest/30">
+<div class="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center text-on-primary-container font-bold">CA</div>
+<div>
+<p class="text-sm font-bold text-on-surface">Chef d'Atelier</p>
+<p class="text-xs text-on-surface-variant">Service Midi</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 px-4 space-y-2">
+<a class="flex items-center gap-4 text-[#F5F0EB]/60 px-4 py-3 hover:text-[#F5F0EB] transition-all duration-300 hover:bg-[#353534]/50 rounded-lg active:scale-95 active:translate-x-1" href="#">
+<span class="material-symbols-outlined">restaurant_menu</span>
+<span class="font-['Inter'] text-sm font-medium">Menu</span>
+</a>
+<a class="flex items-center gap-4 text-[#F5F0EB]/60 px-4 py-3 hover:text-[#F5F0EB] transition-all duration-300 hover:bg-[#353534]/50 rounded-lg active:scale-95 active:translate-x-1" href="#">
+<span class="material-symbols-outlined">receipt_long</span>
+<span class="font-['Inter'] text-sm font-medium">Commandes</span>
+</a>
+<a class="flex items-center gap-4 text-[#F5F0EB]/60 px-4 py-3 hover:text-[#F5F0EB] transition-all duration-300 hover:bg-[#353534]/50 rounded-lg active:scale-95 active:translate-x-1" href="#">
+<span class="material-symbols-outlined">table_restaurant</span>
+<span class="font-['Inter'] text-sm font-medium">Tables</span>
+</a>
+<a class="flex items-center gap-4 bg-[#353534] text-[#FFC174] rounded-lg px-4 py-3 border-l-4 border-[#FFC174] transition-all duration-300" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-['Inter'] text-sm font-medium">Tableau de bord</span>
+</a>
+<a class="flex items-center gap-4 text-[#F5F0EB]/60 px-4 py-3 hover:text-[#F5F0EB] transition-all duration-300 hover:bg-[#353534]/50 rounded-lg active:scale-95 active:translate-x-1" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-['Inter'] text-sm font-medium">Paramètres</span>
+</a>
+</nav>
+<div class="px-4 mt-auto space-y-4">
+<button class="w-full bg-primary text-on-primary-container font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-all shadow-lg shadow-primary/10">
+<span class="material-symbols-outlined">add</span>
+                Nouvelle Commande
+            </button>
+<div class="pt-4 border-t border-outline-variant/10 space-y-1">
+<div class="flex items-center justify-between px-4 py-3 text-[#F5F0EB]/60 hover:text-[#F5F0EB] transition-all">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined">dark_mode</span>
+<span class="text-sm font-medium">Thème Sombre</span>
+</div>
+<!-- Pill Switch Toggle -->
+<div class="w-10 h-5 bg-primary-container rounded-full relative p-0.5 cursor-pointer">
+<div class="absolute right-0.5 top-0.5 bottom-0.5 w-4 bg-on-primary-container rounded-full shadow-sm"></div>
+</div>
+</div>
+<a class="flex items-center gap-4 text-error/60 px-4 py-3 hover:text-error transition-all" href="#">
+<span class="material-symbols-outlined">emergency_home</span>
+<span class="text-sm font-medium">Urgence</span>
+</a>
+</div>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="ml-64 min-h-screen">
+<!-- Top App Bar -->
+<header class="flex justify-between items-center w-full px-8 h-16 bg-[#131313] sticky top-0 z-40">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-[#FFC174]">menu</span>
+<h2 class="font-['Space_Grotesk'] font-bold text-lg uppercase tracking-wider text-[#FFC174]">Tableau de bord</h2>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex items-center bg-surface-container-high rounded-full px-4 py-1.5 gap-3 border border-outline-variant/10">
+<span class="flex h-2 w-2 rounded-full bg-tertiary"></span>
+<span class="text-xs font-mono font-medium text-tertiary">LIVE DATA</span>
+</div>
+<div class="flex items-center gap-2">
+<button class="p-2 rounded-full text-[#F5F0EB] opacity-60 hover:opacity-100 hover:bg-[#353534] transition-all active:scale-95">
+<span class="material-symbols-outlined">sync</span>
+</button>
+<button class="p-2 rounded-full text-[#F5F0EB] opacity-60 hover:opacity-100 hover:bg-[#353534] transition-all active:scale-95">
+<span class="material-symbols-outlined">light_mode</span>
+</button>
+<button class="p-2 rounded-full text-[#F5F0EB] opacity-60 hover:opacity-100 hover:bg-[#353534] transition-all active:scale-95">
+<span class="material-symbols-outlined">account_circle</span>
+</button>
+</div>
+</div>
+</header>
+<!-- Dashboard Body -->
+<div class="p-8 max-w-7xl mx-auto space-y-8 opacity-0 transition-opacity duration-300 animate-[fadeIn_0.5s_ease-out_forwards]">
+<style>
+                @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+                .animate-slide-up { animation: fadeIn 0.5s ease-out forwards; }
+            </style>
+<!-- KPI Row -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+<div class="bg-surface-container-low p-6 rounded-xl border-l-4 border-primary shadow-sm hover:shadow-md transition-all group">
+<div class="flex justify-between items-start mb-4">
+<span class="text-xs font-bold text-on-surface-variant uppercase tracking-widest">Chiffre d'Affaires</span>
+<span class="material-symbols-outlined text-primary text-xl">payments</span>
+</div>
+<div class="font-mono text-3xl font-bold text-on-surface tracking-tighter">12,450.00€</div>
+<div class="mt-2 flex items-center gap-1 text-tertiary text-xs font-bold">
+<span class="material-symbols-outlined text-sm">trending_up</span>
+                        +12.5% vs hier
+                    </div>
+</div>
+<div class="bg-surface-container-low p-6 rounded-xl border-l-4 border-secondary shadow-sm hover:shadow-md transition-all group">
+<div class="flex justify-between items-start mb-4">
+<span class="text-xs font-bold text-on-surface-variant uppercase tracking-widest">Commandes</span>
+<span class="material-symbols-outlined text-secondary text-xl">receipt</span>
+</div>
+<div class="font-mono text-3xl font-bold text-on-surface tracking-tighter">142</div>
+<div class="mt-2 flex items-center gap-1 text-tertiary text-xs font-bold">
+<span class="material-symbols-outlined text-sm">trending_up</span>
+                        +5% vs hier
+                    </div>
+</div>
+<div class="bg-surface-container-low p-6 rounded-xl border-l-4 border-tertiary shadow-sm hover:shadow-md transition-all group">
+<div class="flex justify-between items-start mb-4">
+<span class="text-xs font-bold text-on-surface-variant uppercase tracking-widest">Temps Moyen</span>
+<span class="material-symbols-outlined text-tertiary text-xl">timer</span>
+</div>
+<div class="font-mono text-3xl font-bold text-on-surface tracking-tighter">18:45</div>
+<div class="mt-2 flex items-center gap-1 text-error text-xs font-bold">
+<span class="material-symbols-outlined text-sm">trending_down</span>
+                        -2.3% vs hier
+                    </div>
+</div>
+<div class="bg-surface-container-low p-6 rounded-xl border-l-4 border-outline shadow-sm hover:shadow-md transition-all group">
+<div class="flex justify-between items-start mb-4">
+<span class="text-xs font-bold text-on-surface-variant uppercase tracking-widest">Occupation</span>
+<span class="material-symbols-outlined text-outline text-xl">group</span>
+</div>
+<div class="font-mono text-3xl font-bold text-on-surface tracking-tighter">84%</div>
+<div class="mt-2 flex items-center gap-1 text-on-surface-variant text-xs font-bold">
+<span class="material-symbols-outlined text-sm">remove</span>
+                        Stable
+                    </div>
+</div>
+</div>
+<!-- Main Charts & Activity -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+<!-- Real-time Performance Chart Area -->
+<div class="lg:col-span-2 bg-surface-container-low rounded-xl p-8 relative overflow-hidden">
+<div class="flex justify-between items-center mb-10">
+<div>
+<h3 class="font-headline text-xl font-bold text-on-surface">Flux des Ventes</h3>
+<p class="text-sm text-on-surface-variant">Performance horaire en temps réel</p>
+</div>
+<div class="flex bg-surface-container-highest p-1 rounded-lg">
+<button class="px-4 py-1.5 text-xs font-bold bg-primary text-on-primary rounded-md transition-all">Aujourd'hui</button>
+<button class="px-4 py-1.5 text-xs font-bold text-on-surface-variant hover:text-on-surface transition-all">Hier</button>
+</div>
+</div>
+<!-- SVG Chart Mockup -->
+<div class="h-64 w-full flex items-end gap-2 relative">
+<div class="absolute inset-0 flex flex-col justify-between opacity-10">
+<div class="border-t border-on-surface"></div>
+<div class="border-t border-on-surface"></div>
+<div class="border-t border-on-surface"></div>
+<div class="border-t border-on-surface"></div>
+</div>
+<div class="w-full h-full relative flex items-end px-2 gap-4">
+<div class="flex-1 bg-primary/20 hover:bg-primary/40 transition-all rounded-t-sm" style="height: 40%"></div>
+<div class="flex-1 bg-primary/20 hover:bg-primary/40 transition-all rounded-t-sm" style="height: 65%"></div>
+<div class="flex-1 bg-primary/20 hover:bg-primary/40 transition-all rounded-t-sm" style="height: 35%"></div>
+<div class="flex-1 bg-primary/20 hover:bg-primary/40 transition-all rounded-t-sm" style="height: 85%"></div>
+<div class="flex-1 bg-primary hover:bg-primary/80 transition-all rounded-t-sm" style="height: 95%"></div>
+<div class="flex-1 bg-primary/20 hover:bg-primary/40 transition-all rounded-t-sm" style="height: 70%"></div>
+<div class="flex-1 bg-primary/20 hover:bg-primary/40 transition-all rounded-t-sm" style="height: 45%"></div>
+<div class="flex-1 bg-primary/20 hover:bg-primary/40 transition-all rounded-t-sm" style="height: 25%"></div>
+</div>
+</div>
+<div class="flex justify-between mt-4 font-mono text-[10px] text-on-surface-variant uppercase tracking-widest px-2">
+<span>11:00</span>
+<span>12:00</span>
+<span>13:00</span>
+<span>14:00</span>
+<span>15:00</span>
+<span>16:00</span>
+<span>17:00</span>
+<span>18:00</span>
+</div>
+</div>
+<!-- Live Command Feed -->
+<div class="bg-surface-container-low rounded-xl p-6 flex flex-col">
+<h3 class="font-headline text-lg font-bold text-on-surface mb-6 flex items-center justify-between">
+                        Flux Live
+                        <span class="text-[10px] font-mono bg-tertiary-container/20 text-tertiary-fixed px-2 py-0.5 rounded">6 ACTIVE</span>
+</h3>
+<div class="space-y-4 flex-1 overflow-y-auto pr-2 custom-scrollbar">
+<!-- Active Item -->
+<div class="p-4 rounded-xl bg-surface-container-highest border-l-4 border-error shadow-sm">
+<div class="flex justify-between items-start mb-2">
+<span class="font-mono text-xs font-bold text-error">#2048</span>
+<span class="font-mono text-xs text-on-surface-variant">22:15m</span>
+</div>
+<div class="text-sm font-bold text-on-surface">Burger L'Atelier (x2)</div>
+<div class="text-xs text-on-surface-variant">Table 12 • Emporter</div>
+</div>
+<!-- Item -->
+<div class="p-4 rounded-xl bg-surface-container-highest/40 border-l-4 border-primary shadow-sm">
+<div class="flex justify-between items-start mb-2">
+<span class="font-mono text-xs font-bold text-primary">#2051</span>
+<span class="font-mono text-xs text-on-surface-variant">08:12m</span>
+</div>
+<div class="text-sm font-bold text-on-surface">Salade César</div>
+<div class="text-xs text-on-surface-variant">Table 04 • Sur place</div>
+</div>
+<!-- Item -->
+<div class="p-4 rounded-xl bg-surface-container-highest/40 border-l-4 border-primary shadow-sm">
+<div class="flex justify-between items-start mb-2">
+<span class="font-mono text-xs font-bold text-primary">#2052</span>
+<span class="font-mono text-xs text-on-surface-variant">04:45m</span>
+</div>
+<div class="text-sm font-bold text-on-surface">Plat du Jour (x3)</div>
+<div class="text-xs text-on-surface-variant">Table 08 • Sur place</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Secondary Bento Row -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+<!-- Inventory Alert -->
+<div class="bg-surface-container-low p-6 rounded-xl">
+<div class="flex items-center gap-3 mb-4">
+<span class="material-symbols-outlined text-error">warning</span>
+<h4 class="font-bold text-sm text-on-surface uppercase tracking-tight">Stocks Bas</h4>
+</div>
+<ul class="space-y-3">
+<li class="flex justify-between items-center">
+<span class="text-xs text-on-surface-variant">Saumon Frais</span>
+<span class="font-mono text-xs text-error font-bold">1.2 kg</span>
+</li>
+<li class="flex justify-between items-center">
+<span class="text-xs text-on-surface-variant">Pain Brioché</span>
+<span class="font-mono text-xs text-error font-bold">8 pcs</span>
+</li>
+</ul>
+</div>
+<!-- Server Performance -->
+<div class="bg-surface-container-low p-6 rounded-xl lg:col-span-2">
+<h4 class="font-bold text-sm text-on-surface uppercase tracking-tight mb-4">Performance Serveurs</h4>
+<div class="grid grid-cols-2 gap-4">
+<div class="flex items-center gap-4 bg-surface-container-highest/30 p-3 rounded-lg">
+<div class="w-8 h-8 rounded-full bg-secondary-container/20 flex items-center justify-center text-secondary font-bold text-xs">JD</div>
+<div class="flex-1">
+<div class="text-xs font-bold text-on-surface">Jean-Dupont</div>
+<div class="w-full bg-surface-container-highest h-1 rounded-full mt-1">
+<div class="bg-tertiary h-full rounded-full w-[85%]"></div>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-4 bg-surface-container-highest/30 p-3 rounded-lg">
+<div class="w-8 h-8 rounded-full bg-primary-container/20 flex items-center justify-center text-primary font-bold text-xs">ML</div>
+<div class="flex-1">
+<div class="text-xs font-bold text-on-surface">Marie-Laure</div>
+<div class="w-full bg-surface-container-highest h-1 rounded-full mt-1">
+<div class="bg-tertiary h-full rounded-full w-[92%]"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Quick Actions -->
+<div class="bg-primary/5 p-6 rounded-xl border border-primary/10 flex flex-col justify-between">
+<h4 class="font-bold text-sm text-primary uppercase tracking-tight mb-4">Actions Rapides</h4>
+<div class="flex flex-wrap gap-2">
+<button class="bg-primary-container/10 border border-primary/20 text-primary-fixed-dim text-[10px] font-bold px-3 py-1 rounded hover:bg-primary-container/20 transition-all active:scale-95">Rapport Z</button>
+<button class="bg-primary-container/10 border border-primary/20 text-primary-fixed-dim text-[10px] font-bold px-3 py-1 rounded hover:bg-primary-container/20 transition-all active:scale-95">Clôture</button>
+<button class="bg-primary-container/10 border border-primary/20 text-primary-fixed-dim text-[10px] font-bold px-3 py-1 rounded hover:bg-primary-container/20 transition-all active:scale-95">Imprimer KDS</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Floating Action Feedback (Global) -->
+<div class="fixed bottom-8 right-8 flex flex-col items-end gap-4 pointer-events-none">
+<div class="bg-surface-container-highest border border-outline-variant/20 px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 animate-slide-up pointer-events-auto">
+<span class="w-2 h-2 rounded-full bg-tertiary animate-pulse"></span>
+<span class="text-xs font-mono text-on-surface">Connexion WebSocket Stable</span>
+</div>
+</div>
+</body></html>

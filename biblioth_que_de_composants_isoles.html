@@ -1,0 +1,33 @@
+# Bibliothèque de Composants - L'Atelier POS
+
+Ce document détaille les composants isolés extraits des écrans du système de gestion de restaurant.
+
+## 1. OrderCard (Ticket de Commande)
+Utilisé dans la vue **Cuisine (KDS)** et la vue **Serveur**.
+- **Structure** : Numéro de table XXL, liste d'articles avec quantités, compteur de temps écoulé.
+- **États Temporels** : 
+  - Blanc : < 8 min
+  - Ambre (#F59E0B) : 8-15 min
+  - Rouge (#EF4444) : > 15 min
+- **Style** : Fond charcoal (#1C1B1B), bordure 1px, typographie monospace pour les temps.
+
+## 2. StatusBadge (Pastilles de Statut)
+Utilisé pour le plan de salle et les stocks.
+- **Libre/Disponible** : Vert (#10B981) - Cercle + texte.
+- **Occupé/En préparation** : Ambre (#F59E0B) - Cercle + texte.
+- **Urgent/Épuisé** : Rouge (#EF4444) - Cercle + texte.
+- **Style** : Forme pilule, texte en majuscules, police JetBrains Mono ou Space Grotesk.
+
+## 3. MenuCard (Carte de Plat)
+Utilisé dans la **Vue Client**.
+- **Image** : Ratio 16:9 avec coins arrondis (8px).
+- **Contenu** : Nom du plat (Bold), Prix (Large), Description courte.
+- **Badges Allergènes** : Icônes compactes en bas de carte.
+- **Action** : Bouton "Ajouter" intégré ou hover state.
+
+## 4. ActionButton (Boutons d'Action)
+Composant universel pour toutes les vues.
+- **Primaire** : Fond Ambre (#F59E0B), texte noir/sombre, arrondi 8px.
+- **Secondaire** : Contour ambre ou gris, texte ambre, sans fond.
+- **Destructif** : Fond rouge ou contour rouge.
+- **Interactions** : Scale 95% au clic, légère élévation au survol.

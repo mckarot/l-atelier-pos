@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="fr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Inter:wght@300;400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary-container": "#f59e0b",
+                        "on-primary-container": "#613b00",
+                        "tertiary": "#51e77b",
+                        "on-tertiary-fixed": "#002109",
+                        "background": "#131313",
+                        "on-tertiary": "#003915",
+                        "surface": "#131313",
+                        "outline": "#a08e7a",
+                        "surface-tint": "#ffb95f",
+                        "on-error": "#690005",
+                        "inverse-primary": "#855300",
+                        "on-surface-variant": "#d8c3ad",
+                        "surface-container-low": "#1c1b1b",
+                        "secondary-fixed": "#ffdbca",
+                        "secondary-container": "#ec6a06",
+                        "primary-fixed": "#ffddb8",
+                        "tertiary-container": "#2bca62",
+                        "surface-container-lowest": "#0e0e0e",
+                        "on-primary": "#472a00",
+                        "inverse-on-surface": "#313030",
+                        "on-tertiary-container": "#004f20",
+                        "surface-dim": "#131313",
+                        "surface-container-highest": "#353534",
+                        "secondary-fixed-dim": "#ffb690",
+                        "on-primary-fixed-variant": "#653e00",
+                        "error-container": "#93000a",
+                        "surface-variant": "#353534",
+                        "on-secondary-container": "#4a1c00",
+                        "surface-container": "#201f1f",
+                        "surface-bright": "#3a3939",
+                        "outline-variant": "#534434",
+                        "surface-container-high": "#2a2a2a",
+                        "on-surface": "#e5e2e1",
+                        "primary-fixed-dim": "#ffb95f",
+                        "tertiary-fixed": "#6bff8f",
+                        "on-tertiary-fixed-variant": "#005321",
+                        "tertiary-fixed-dim": "#4ae176",
+                        "on-background": "#e5e2e1",
+                        "on-error-container": "#ffdad6",
+                        "inverse-surface": "#e5e2e1",
+                        "error": "#ffb4ab",
+                        "on-secondary-fixed": "#341100",
+                        "primary": "#ffc174",
+                        "on-primary-fixed": "#2a1700",
+                        "secondary": "#ffb690",
+                        "on-secondary-fixed-variant": "#783200",
+                        "on-secondary": "#552100"
+                    },
+                    fontFamily: {
+                        "headline": ["Space Grotesk"],
+                        "body": ["Inter"],
+                        "label": ["Inter"],
+                        "mono": ["JetBrains Mono"]
+                    },
+                    borderRadius: { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" },
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3 { font-family: 'Space Grotesk', sans-serif; }
+        .mono-data { font-family: 'JetBrains Mono', monospace; }
+        .glass-panel {
+            background: rgba(53, 53, 52, 0.6);
+            backdrop-filter: blur(12px);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background min-h-screen pb-32">
+<!-- Top Navigation Anchor -->
+<header class="flex justify-between items-center w-full px-6 h-16 bg-[#131313] fixed top-0 z-50">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary" data-icon="menu">menu</span>
+<h1 class="font-['Space_Grotesk'] font-bold text-lg uppercase tracking-wider text-[#F5F0EB]">L'Atelier POS</h1>
+</div>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-[#F5F0EB] hover:bg-[#353534] p-2 rounded-lg transition-colors" data-icon="sync">sync</span>
+<span class="material-symbols-outlined text-[#F5F0EB] hover:bg-[#353534] p-2 rounded-lg transition-colors" data-icon="account_circle">account_circle</span>
+</div>
+</header>
+<main class="pt-20 px-4 md:px-8 max-w-7xl mx-auto">
+<!-- Category Header -->
+<div class="mb-8 flex justify-between items-end">
+<div>
+<p class="text-primary font-mono text-xs uppercase tracking-widest mb-1">Menu du Jour</p>
+<h2 class="text-3xl font-bold tracking-tight">Nos Grillades de l'Atelier</h2>
+</div>
+<div class="hidden md:flex gap-2">
+<span class="bg-surface-container-highest text-on-surface px-3 py-1 text-xs rounded-lg">Sans Gluten</span>
+<span class="bg-surface-container-highest text-on-surface px-3 py-1 text-xs rounded-lg">Bio</span>
+</div>
+</div>
+<!-- Menu Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<!-- MenuCard 1 -->
+<div class="bg-surface-container-low rounded-xl overflow-hidden group border-l-4 border-transparent hover:border-primary transition-all duration-300">
+<div class="aspect-video w-full overflow-hidden bg-surface-container-highest relative">
+<img alt="Entrecôte grillée" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Juicy grilled steak with rosemary on a dark plate" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDjZneX-_pasA9vbDJ0FW1IlF9itnEThKmCsom8ENKp1rSiElti5tPiGp2dyzng5hjceaYbNoI3_ZX0laUdYKy2kVfWnk0N9-syi7fUFUBUB5j38TGh3f0xNzwmloURUPluWG4lrCMy7F12OMzLvziWMWQqGhJg5EipXM_m5aOfZ2hz7TokqkXoNt3MN_yuY7OJ7v5tB9blD3KTYrwB8R7-_AVMDPXZ5zySIV0-lgHs5MX9LXAU7S3hDAuldxa3R7I2LOqKC7vOKMr-"/>
+<div class="absolute top-3 right-3 flex gap-1">
+<div class="bg-surface-container-lowest/80 backdrop-blur-md p-1.5 rounded-full" title="Contient des sulfites">
+<span class="material-symbols-outlined text-[16px] text-primary" data-icon="wine_bar">wine_bar</span>
+</div>
+</div>
+</div>
+<div class="p-5">
+<div class="flex justify-between items-start mb-2">
+<h3 class="text-xl font-bold">Entrecôte Black Angus</h3>
+<span class="mono-data text-primary font-bold">28.50€</span>
+</div>
+<p class="text-sm text-on-surface-variant line-clamp-2 mb-4">300g de viande maturée, servie avec pommes de terre grenailles et sauce au poivre maison.</p>
+<button class="w-full bg-primary-container text-on-primary-container py-3 rounded-lg font-bold flex items-center justify-center gap-2 hover:brightness-110 active:scale-95 transition-all">
+<span class="material-symbols-outlined" data-icon="add_circle">add_circle</span>
+                        Ajouter
+                    </button>
+</div>
+</div>
+<!-- MenuCard 2 -->
+<div class="bg-surface-container-low rounded-xl overflow-hidden group border-l-4 border-transparent hover:border-primary transition-all duration-300">
+<div class="aspect-video w-full overflow-hidden bg-surface-container-highest relative">
+<img alt="Burger Signature" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Gourmet double cheeseburger with melting cheddar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB-fnN370AGFA00tA8suvq4TvHxLZAfqpguShPGCAnss2XvoEOvJUumTfwud-F6MKCQPNwWmH5Q0OjzTjbUbY8hUCjoAg5XxWTjsZqDH2xNGsDdwHDN7TAlE2JPie1gotKgz4KYiK9neefa7AxIAQ3QXR0yBMGW1ZarUCZlx7suaYZ-dy3CJldaMgJvzhAIpy_rBcrbGmDPpeAo1U3Dxe1PuhZuANeSviwbA0mYdqnj-UhNX5s8ft4ym2OI_lNwPRLvMIOu6x32JQFF"/>
+<div class="absolute top-3 right-3 flex gap-1">
+<div class="bg-surface-container-lowest/80 backdrop-blur-md p-1.5 rounded-full" title="Contient du gluten">
+<span class="material-symbols-outlined text-[16px] text-primary" data-icon="bakery_dining">bakery_dining</span>
+</div>
+<div class="bg-surface-container-lowest/80 backdrop-blur-md p-1.5 rounded-full" title="Produits laitiers">
+<span class="material-symbols-outlined text-[16px] text-primary" data-icon="egg_alt">egg_alt</span>
+</div>
+</div>
+</div>
+<div class="p-5">
+<div class="flex justify-between items-start mb-2">
+<h3 class="text-xl font-bold">Le Burger Atelier</h3>
+<span class="mono-data text-primary font-bold">19.00€</span>
+</div>
+<p class="text-sm text-on-surface-variant line-clamp-2 mb-4">Pain brioché, bœuf charolais, comté affiné 18 mois, oignons caramélisés.</p>
+<button class="w-full bg-primary-container text-on-primary-container py-3 rounded-lg font-bold flex items-center justify-center gap-2 hover:brightness-110 active:scale-95 transition-all">
+<span class="material-symbols-outlined" data-icon="add_circle">add_circle</span>
+                        Ajouter
+                    </button>
+</div>
+</div>
+<!-- MenuCard 3 -->
+<div class="bg-surface-container-low rounded-xl overflow-hidden group border-l-4 border-transparent hover:border-primary transition-all duration-300">
+<div class="aspect-video w-full overflow-hidden bg-surface-container-highest relative">
+<img alt="Saumon Grillé" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Grilled salmon fillet with asparagus and lemon" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBMafJnaisEJe89yMBUwH6omREgOhhorvQjlaw8s2YOUvtKDwLrcVsvvg8HxOYbzO-fPoITspwuD6jKAE640QbJ5Bx5_xQSgyjE_yaNN-xoNq4dhHrY0L0We4SryaEJtP5UYJkvoCNkvDOlfWPW51hnkDwAAIcSfJ9FSfBObiDwBWLT4k1p7abQ2xHNfyHAqJS-2nZd7UGMGpJxTBeKFY-fgAC44Uo1Yetd7WXZuTkwkDVxmuTDwwh4Op-8oSfPhRPiSWVqFZjVMmxd"/>
+<div class="absolute top-3 right-3 flex gap-1">
+<div class="bg-surface-container-lowest/80 backdrop-blur-md p-1.5 rounded-full" title="Poisson">
+<span class="material-symbols-outlined text-[16px] text-primary" data-icon="set_meal">set_meal</span>
+</div>
+</div>
+</div>
+<div class="p-5">
+<div class="flex justify-between items-start mb-2">
+<h3 class="text-xl font-bold">Saumon à l'Unilatérale</h3>
+<span class="mono-data text-primary font-bold">24.50€</span>
+</div>
+<p class="text-sm text-on-surface-variant line-clamp-2 mb-4">Pavé de saumon frais, asperges vertes rôties, sauce hollandaise aux herbes.</p>
+<button class="w-full bg-primary-container text-on-primary-container py-3 rounded-lg font-bold flex items-center justify-center gap-2 hover:brightness-110 active:scale-95 transition-all">
+<span class="material-symbols-outlined" data-icon="add_circle">add_circle</span>
+                        Ajouter
+                    </button>
+</div>
+</div>
+</div>
+</main>
+<!-- Bottom Sheet Customization (Simulated Open) -->
+<div class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] flex items-end justify-center md:items-center">
+<div class="bg-surface-container w-full max-w-2xl rounded-t-3xl md:rounded-2xl overflow-hidden shadow-2xl">
+<div class="p-6 border-b border-outline-variant/15 flex justify-between items-center">
+<div>
+<h3 class="text-2xl font-bold">Personnalisation</h3>
+<p class="text-sm text-on-surface-variant">Entrecôte Black Angus</p>
+</div>
+<button class="p-2 bg-surface-container-highest rounded-full">
+<span class="material-symbols-outlined" data-icon="close">close</span>
+</button>
+</div>
+<div class="p-6 space-y-8 max-h-[618px] overflow-y-auto">
+<!-- Radio Options: Cooking -->
+<section>
+<h4 class="text-sm font-bold uppercase tracking-wider text-primary mb-4">Cuisson</h4>
+<div class="grid grid-cols-2 gap-3">
+<label class="relative flex items-center p-4 rounded-xl bg-surface-container-high cursor-pointer hover:bg-surface-container-highest transition-colors">
+<input checked="" class="hidden peer" name="cuisson" type="radio"/>
+<div class="w-full peer-checked:text-primary">
+<p class="font-bold">Saignant</p>
+</div>
+<span class="material-symbols-outlined text-primary opacity-0 peer-checked:opacity-100" data-icon="check_circle" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</label>
+<label class="relative flex items-center p-4 rounded-xl bg-surface-container-high cursor-pointer hover:bg-surface-container-highest transition-colors">
+<input class="hidden peer" name="cuisson" type="radio"/>
+<div class="w-full peer-checked:text-primary">
+<p class="font-bold">À point</p>
+</div>
+<span class="material-symbols-outlined text-primary opacity-0 peer-checked:opacity-100" data-icon="check_circle" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</label>
+</div>
+</section>
+<!-- Checkbox Options: Supplements -->
+<section>
+<h4 class="text-sm font-bold uppercase tracking-wider text-primary mb-4">Suppléments</h4>
+<div class="space-y-2">
+<label class="flex items-center justify-between p-4 rounded-xl bg-surface-container-high cursor-pointer hover:bg-surface-container-highest transition-colors group">
+<div class="flex items-center gap-3">
+<input class="w-5 h-5 rounded border-outline-variant bg-surface-container text-primary-container focus:ring-primary-container" type="checkbox"/>
+<span class="font-medium">Sauce béarnaise</span>
+</div>
+<span class="mono-data text-sm opacity-60">+2.50€</span>
+</label>
+<label class="flex items-center justify-between p-4 rounded-xl bg-surface-container-high cursor-pointer hover:bg-surface-container-highest transition-colors group">
+<div class="flex items-center gap-3">
+<input class="w-5 h-5 rounded border-outline-variant bg-surface-container text-primary-container focus:ring-primary-container" type="checkbox"/>
+<span class="font-medium">Oignons frits</span>
+</div>
+<span class="mono-data text-sm opacity-60">+1.50€</span>
+</label>
+</div>
+</section>
+</div>
+<div class="p-6 bg-surface-container-highest">
+<button class="w-full bg-primary py-4 rounded-xl font-bold text-on-primary text-lg shadow-lg active:scale-[0.98] transition-all">
+                    Confirmer la sélection
+                </button>
+</div>
+</div>
+</div>
+<!-- Toast Notification (Top Center) -->
+<div class="fixed top-20 left-1/2 -translate-x-1/2 z-[100] w-auto">
+<div class="glass-panel text-on-surface px-6 py-3 rounded-full flex items-center gap-3 border border-outline-variant/20 shadow-xl">
+<span class="material-symbols-outlined text-tertiary" data-icon="check_circle" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="font-medium">Entrecôte ajoutée au panier !</span>
+</div>
+</div>
+<!-- Sticky Cart Bar -->
+<footer class="fixed bottom-0 left-0 right-0 z-50 p-4 md:p-6">
+<div class="max-w-4xl mx-auto glass-panel border border-outline-variant/10 rounded-2xl p-4 flex items-center justify-between shadow-[0_-12px_40px_rgba(0,0,0,0.6)]">
+<div class="flex items-center gap-4">
+<div class="bg-primary-container/20 p-3 rounded-xl relative">
+<span class="material-symbols-outlined text-primary" data-icon="shopping_basket">shopping_basket</span>
+<span class="absolute -top-2 -right-2 bg-primary text-on-primary text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center">3</span>
+</div>
+<div class="hidden sm:block">
+<p class="text-xs text-on-surface-variant uppercase font-bold tracking-widest">Total panier</p>
+<p class="text-xl font-bold mono-data text-primary">72.00€</p>
+</div>
+</div>
+<button class="bg-primary text-on-primary px-8 py-4 rounded-xl font-bold flex items-center gap-3 group active:scale-95 transition-all shadow-xl shadow-primary/10">
+<span>Passer à l'étape suivante</span>
+<span class="material-symbols-outlined group-hover:translate-x-1 transition-transform" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+</footer>
+</body></html>

@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="fr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>L'Atelier POS - Vue Serveur</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Inter:wght@300;400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "outline": "#a08e7a",
+                        "secondary-fixed-dim": "#ffb690",
+                        "on-primary-container": "#613b00",
+                        "surface-container-low": "#1c1b1b",
+                        "on-tertiary-container": "#004f20",
+                        "surface-container-lowest": "#0e0e0e",
+                        "on-tertiary": "#003915",
+                        "surface-container-highest": "#353534",
+                        "inverse-on-surface": "#313030",
+                        "primary-fixed": "#ffddb8",
+                        "surface-bright": "#3a3939",
+                        "on-surface": "#e5e2e1",
+                        "tertiary": "#51e77b",
+                        "error": "#ffb4ab",
+                        "tertiary-fixed-dim": "#4ae176",
+                        "secondary-fixed": "#ffdbca",
+                        "surface-container-high": "#2a2a2a",
+                        "tertiary-container": "#2bca62",
+                        "primary-fixed-dim": "#ffb95f",
+                        "primary": "#ffc174",
+                        "on-tertiary-fixed": "#002109",
+                        "surface-container": "#201f1f",
+                        "on-tertiary-fixed-variant": "#005321",
+                        "surface": "#131313",
+                        "on-primary-fixed": "#2a1700",
+                        "on-secondary-container": "#4a1c00",
+                        "on-secondary-fixed": "#341100",
+                        "outline-variant": "#534434",
+                        "error-container": "#93000a",
+                        "primary-container": "#f59e0b",
+                        "on-primary": "#472a00",
+                        "surface-tint": "#ffb95f",
+                        "inverse-surface": "#e5e2e1",
+                        "background": "#131313",
+                        "surface-variant": "#353534",
+                        "tertiary-fixed": "#6bff8f",
+                        "secondary-container": "#ec6a06",
+                        "on-error": "#690005",
+                        "on-error-container": "#ffdad6",
+                        "on-secondary": "#552100",
+                        "on-background": "#e5e2e1",
+                        "on-surface-variant": "#d8c3ad",
+                        "surface-dim": "#131313",
+                        "on-secondary-fixed-variant": "#783200",
+                        "secondary": "#ffb690",
+                        "on-primary-fixed-variant": "#653e00",
+                        "inverse-primary": "#855300"
+                    },
+                    fontFamily: {
+                        "headline": ["Space Grotesk"],
+                        "body": ["Inter"],
+                        "label": ["Inter"],
+                        "mono": ["JetBrains Mono"]
+                    },
+                    borderRadius: { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" },
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .fade-in {
+            animation: fadeIn 300ms ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .pulse-ready {
+            animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse-ring {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.1); }
+        }
+        .bg-industrial-gradient {
+            background: linear-gradient(15deg, #f59e0b 0%, #ffc174 100%);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background font-body selection:bg-primary selection:text-on-primary-container overflow-hidden">
+<!-- Sidebar Navigation -->
+<aside class="fixed left-0 top-0 h-full flex flex-col py-6 bg-surface-container-low w-64 shadow-[8px_0_24px_rgba(0,0,0,0.4)] z-50">
+<div class="px-6 mb-8">
+<h1 class="text-on-surface font-headline font-bold text-xl tracking-tight">Chef d'Atelier</h1>
+<p class="text-on-surface-variant text-xs font-medium uppercase tracking-widest opacity-60">Service Midi</p>
+</div>
+<nav class="flex-1 px-3 space-y-1">
+<a class="flex items-center gap-4 text-on-surface/60 px-4 py-3 hover:text-on-surface hover:bg-surface-container-highest/50 rounded-lg transition-all duration-300 active:scale-95 active:translate-x-1" href="#">
+<span class="material-symbols-outlined" data-icon="restaurant_menu">restaurant_menu</span>
+<span class="font-label font-medium">Menu</span>
+</a>
+<a class="flex items-center gap-4 text-on-surface/60 px-4 py-3 hover:text-on-surface hover:bg-surface-container-highest/50 rounded-lg transition-all duration-300 active:scale-95 active:translate-x-1" href="#">
+<span class="material-symbols-outlined" data-icon="receipt_long">receipt_long</span>
+<span class="font-label font-medium">Commandes</span>
+</a>
+<a class="flex items-center gap-4 bg-surface-container-highest text-primary rounded-lg px-4 py-3 border-l-4 border-primary shadow-lg transition-all duration-300 active:scale-95 active:translate-x-1" href="#">
+<span class="material-symbols-outlined" data-icon="table_restaurant">table_restaurant</span>
+<span class="font-label font-medium">Tables</span>
+</a>
+<a class="flex items-center gap-4 text-on-surface/60 px-4 py-3 hover:text-on-surface hover:bg-surface-container-highest/50 rounded-lg transition-all duration-300 active:scale-95 active:translate-x-1" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-label font-medium">Tableau de bord</span>
+</a>
+<a class="flex items-center gap-4 text-on-surface/60 px-4 py-3 hover:text-on-surface hover:bg-surface-container-highest/50 rounded-lg transition-all duration-300 active:scale-95 active:translate-x-1" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-label font-medium">Paramètres</span>
+</a>
+</nav>
+<div class="mt-auto px-3 space-y-1 pt-6 border-t border-outline-variant/10">
+<div class="px-4 py-3 flex items-center justify-between text-on-surface/60">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined" data-icon="dark_mode">dark_mode</span>
+<span class="font-label font-medium">Thème</span>
+</div>
+<div class="w-10 h-5 bg-surface-container-highest rounded-full relative cursor-pointer">
+<div class="absolute right-0.5 top-0.5 w-4 h-4 bg-primary rounded-full"></div>
+</div>
+</div>
+<a class="flex items-center gap-4 text-error/80 px-4 py-3 hover:text-error hover:bg-error-container/10 rounded-lg transition-all duration-300 active:scale-95" href="#">
+<span class="material-symbols-outlined" data-icon="emergency_home">emergency_home</span>
+<span class="font-label font-medium">Urgence</span>
+</a>
+<div class="p-4 bg-surface-container-highest/30 rounded-xl mt-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-surface-container-high flex items-center justify-center border border-outline-variant/20">
+<span class="material-symbols-outlined text-primary" data-icon="account_circle">account_circle</span>
+</div>
+<div>
+<p class="text-sm font-bold text-on-surface">Jean-Marc</p>
+<p class="text-[10px] text-on-surface-variant uppercase tracking-tighter">Rang A • Zone Nord</p>
+</div>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Canvas -->
+<main class="ml-64 h-screen flex flex-col fade-in">
+<!-- TopAppBar -->
+<header class="flex justify-between items-center w-full px-8 h-16 bg-surface z-40">
+<div class="flex items-center gap-6">
+<span class="font-headline font-black text-2xl text-on-surface tracking-tighter">L'ATELIER POS</span>
+<div class="h-6 w-px bg-outline-variant/20"></div>
+<h2 class="font-headline font-bold text-lg uppercase tracking-wider text-primary">PLAN INTERACTIF</h2>
+</div>
+<div class="flex items-center gap-2">
+<button class="w-10 h-10 flex items-center justify-center rounded-lg text-on-surface/60 hover:bg-surface-container-highest hover:text-primary transition-all duration-200 active:scale-95">
+<span class="material-symbols-outlined" data-icon="sync">sync</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-lg text-on-surface/60 hover:bg-surface-container-highest hover:text-primary transition-all duration-200 active:scale-95">
+<span class="material-symbols-outlined" data-icon="light_mode">light_mode</span>
+</button>
+<div class="h-6 w-px bg-outline-variant/20 mx-2"></div>
+<button class="bg-industrial-gradient text-on-primary-container font-headline font-bold px-6 py-2 rounded-lg flex items-center gap-2 shadow-lg active:scale-95 transition-transform duration-150">
+<span class="material-symbols-outlined text-xl" data-icon="add">add</span>
+                    NOUVELLE COMMANDE
+                </button>
+</div>
+</header>
+<!-- Floor Plan Grid -->
+<section class="flex-1 p-8 overflow-hidden relative">
+<div class="absolute inset-0 bg-[radial-gradient(#353534_1px,transparent_1px)] [background-size:32px_32px] opacity-20"></div>
+<div class="h-full w-full grid grid-cols-12 grid-rows-6 gap-6 relative z-10">
+<!-- Zone Indicators -->
+<div class="col-span-12 flex items-center gap-8 mb-4">
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 rounded-full bg-surface-container-highest border border-outline-variant/30"></span>
+<span class="text-xs font-mono uppercase tracking-widest text-on-surface-variant">Libre</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 rounded-full bg-secondary shadow-[0_0_8px_rgba(255,182,144,0.4)]"></span>
+<span class="text-xs font-mono uppercase tracking-widest text-on-surface-variant">Occupée</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 rounded-full bg-tertiary pulse-ready shadow-[0_0_12px_rgba(81,231,123,0.6)]"></span>
+<span class="text-xs font-mono uppercase tracking-widest text-on-surface-variant">Prêt à servir</span>
+</div>
+</div>
+<!-- Tables (Asymmetric Bento Style) -->
+<!-- Table 01 - Occupied -->
+<div class="col-span-3 row-span-2 bg-surface-container-low p-6 rounded-xl border border-outline-variant/10 shadow-xl group hover:border-primary/40 cursor-pointer active:scale-[0.98] transition-all">
+<div class="flex justify-between items-start mb-6">
+<div class="bg-surface-container-highest px-3 py-1 rounded text-xs font-mono font-bold text-on-surface">T-01</div>
+<span class="w-3 h-3 rounded-full bg-secondary shadow-[0_0_8px_rgba(255,182,144,0.4)]"></span>
+</div>
+<div class="space-y-1">
+<p class="text-on-surface-variant text-[10px] uppercase font-bold tracking-tighter">Client</p>
+<p class="text-lg font-headline font-bold text-on-surface">M. Dupont</p>
+</div>
+<div class="mt-4 flex justify-between items-end">
+<div class="text-xs font-mono text-on-surface-variant">
+                            4 PERS. <br/>
+<span class="text-primary font-bold">42:15</span>
+</div>
+<div class="text-xl font-mono font-bold text-on-surface">124.50€</div>
+</div>
+</div>
+<!-- Table 04 - Ready to Serve (Pulse) -->
+<div class="col-span-2 row-span-2 bg-surface-container-highest p-6 rounded-xl border-2 border-tertiary/50 shadow-[0_0_30px_rgba(81,231,123,0.15)] group hover:border-tertiary cursor-pointer active:scale-[0.98] transition-all">
+<div class="flex justify-between items-start mb-6">
+<div class="bg-tertiary/20 text-tertiary px-3 py-1 rounded text-xs font-mono font-bold">T-04</div>
+<span class="w-3 h-3 rounded-full bg-tertiary pulse-ready shadow-[0_0_12px_rgba(81,231,123,0.6)]"></span>
+</div>
+<div class="space-y-1">
+<p class="text-on-surface-variant text-[10px] uppercase font-bold tracking-tighter">Statut</p>
+<p class="text-lg font-headline font-bold text-tertiary">PRÊT</p>
+</div>
+<div class="mt-4">
+<button class="w-full bg-tertiary text-on-tertiary font-bold py-2 rounded-lg text-sm active:scale-95 transition-transform">SERVIR</button>
+</div>
+</div>
+<!-- Table 02 - Free -->
+<div class="col-span-2 row-span-2 bg-surface-container-low/40 p-6 rounded-xl border border-outline-variant/5 shadow-sm group hover:bg-surface-container-low hover:border-primary/20 cursor-pointer active:scale-[0.98] transition-all">
+<div class="flex justify-between items-start mb-6">
+<div class="bg-surface-container-high px-3 py-1 rounded text-xs font-mono font-bold text-on-surface/40">T-02</div>
+<span class="w-3 h-3 rounded-full bg-surface-container-highest border border-outline-variant/30"></span>
+</div>
+<div class="h-12 flex items-center justify-center border border-dashed border-outline-variant/20 rounded-lg group-hover:border-primary/40">
+<span class="material-symbols-outlined text-on-surface/20 group-hover:text-primary transition-colors" data-icon="add">add</span>
+</div>
+<p class="mt-4 text-center text-[10px] font-mono uppercase text-on-surface/30 group-hover:text-on-surface-variant">Ouvrir Table</p>
+</div>
+<!-- Table 03 - Free -->
+<div class="col-span-2 row-span-2 bg-surface-container-low/40 p-6 rounded-xl border border-outline-variant/5 shadow-sm group hover:bg-surface-container-low hover:border-primary/20 cursor-pointer active:scale-[0.98] transition-all">
+<div class="flex justify-between items-start mb-6">
+<div class="bg-surface-container-high px-3 py-1 rounded text-xs font-mono font-bold text-on-surface/40">T-03</div>
+<span class="w-3 h-3 rounded-full bg-surface-container-highest border border-outline-variant/30"></span>
+</div>
+<div class="h-12 flex items-center justify-center border border-dashed border-outline-variant/20 rounded-lg">
+<span class="material-symbols-outlined text-on-surface/20" data-icon="add">add</span>
+</div>
+</div>
+<!-- Table 05 - Large Occupied -->
+<div class="col-span-3 row-span-3 bg-surface-container-low p-6 rounded-xl border border-outline-variant/10 shadow-xl group hover:border-primary/40 cursor-pointer active:scale-[0.98] transition-all">
+<div class="flex justify-between items-start mb-6">
+<div class="bg-surface-container-highest px-3 py-1 rounded text-xs font-mono font-bold text-on-surface">T-05</div>
+<span class="w-3 h-3 rounded-full bg-secondary shadow-[0_0_8px_rgba(255,182,144,0.4)]"></span>
+</div>
+<div class="space-y-4">
+<div class="p-4 bg-surface-container-highest/40 rounded-lg">
+<p class="text-on-surface-variant text-[10px] uppercase font-bold tracking-tighter mb-1">Items en attente</p>
+<ul class="text-xs space-y-2 text-on-surface font-medium">
+<li class="flex justify-between"><span>2x Burger Signature</span> <span class="text-on-surface-variant">Prêt</span></li>
+<li class="flex justify-between"><span>1x Salade César</span> <span class="text-primary">Cuisine</span></li>
+<li class="flex justify-between"><span>3x Soda Artisan</span> <span class="text-on-surface-variant">Servi</span></li>
+</ul>
+</div>
+<div class="flex justify-between items-center">
+<div class="text-2xl font-mono font-bold text-on-surface">248.00€</div>
+<div class="flex -space-x-2">
+<div class="w-8 h-8 rounded-full border-2 border-surface-container-low bg-surface-container-high flex items-center justify-center text-[10px] font-bold">JM</div>
+<div class="w-8 h-8 rounded-full border-2 border-surface-container-low bg-primary text-on-primary-container flex items-center justify-center text-[10px] font-bold">+2</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Table 06 - Small Occupied -->
+<div class="col-span-2 row-span-2 bg-surface-container-low p-6 rounded-xl border border-outline-variant/10 shadow-xl group hover:border-primary/40 cursor-pointer active:scale-[0.98] transition-all">
+<div class="flex justify-between items-start mb-6">
+<div class="bg-surface-container-highest px-3 py-1 rounded text-xs font-mono font-bold text-on-surface">T-06</div>
+<span class="w-3 h-3 rounded-full bg-secondary"></span>
+</div>
+<p class="text-sm font-headline font-bold text-on-surface">Comptoir 1</p>
+<div class="mt-4 text-lg font-mono font-bold text-on-surface">18.00€</div>
+</div>
+<!-- Bar Area Decoration -->
+<div class="col-span-7 row-span-2 bg-surface-container-low/20 border border-outline-variant/10 rounded-3xl flex items-center justify-center overflow-hidden">
+<div class="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]"></div>
+<div class="text-center z-10">
+<span class="material-symbols-outlined text-4xl text-on-surface/10 mb-2" data-icon="liquor">liquor</span>
+<p class="text-xs font-mono uppercase tracking-[0.4em] text-on-surface/20">Zone Bar &amp; Lounge</p>
+</div>
+</div>
+<!-- Table 07 - Free -->
+<div class="col-span-2 row-span-2 bg-surface-container-low/40 p-6 rounded-xl border border-outline-variant/5 shadow-sm group hover:bg-surface-container-low hover:border-primary/20 cursor-pointer active:scale-[0.98] transition-all">
+<div class="flex justify-between items-start mb-6">
+<div class="bg-surface-container-high px-3 py-1 rounded text-xs font-mono font-bold text-on-surface/40">T-07</div>
+<span class="w-3 h-3 rounded-full bg-surface-container-highest border border-outline-variant/30"></span>
+</div>
+</div>
+</div>
+</section>
+<!-- Stats Footer Bar -->
+<footer class="h-20 bg-surface-container-low border-t border-outline-variant/10 px-8 flex items-center justify-between">
+<div class="flex items-center gap-12">
+<div>
+<p class="text-[10px] text-on-surface-variant uppercase tracking-widest font-bold mb-1">Occupation</p>
+<div class="flex items-center gap-3">
+<div class="w-32 h-2 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[65%] shadow-[0_0_8px_rgba(255,193,116,0.4)]"></div>
+</div>
+<span class="text-sm font-mono font-bold text-on-surface">65%</span>
+</div>
+</div>
+<div class="h-8 w-px bg-outline-variant/10"></div>
+<div>
+<p class="text-[10px] text-on-surface-variant uppercase tracking-widest font-bold mb-1">Temps Moyen</p>
+<p class="text-lg font-mono font-bold text-on-surface">54<span class="text-xs font-normal text-on-surface-variant ml-1">MIN</span></p>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="flex items-center gap-2 px-4 py-2 rounded-lg bg-surface-container-highest text-on-surface hover:text-primary transition-colors min-h-[44px] active:scale-95">
+<span class="material-symbols-outlined text-xl" data-icon="filter_list">filter_list</span>
+<span class="text-sm font-bold">FILTRER</span>
+</button>
+<button class="flex items-center gap-2 px-6 py-2 rounded-lg bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20 transition-all min-h-[44px] active:scale-95">
+<span class="material-symbols-outlined text-xl" data-icon="layers">layers</span>
+<span class="text-sm font-bold uppercase">Vue Étage 2</span>
+</button>
+</div>
+</footer>
+</main>
+<!-- FAB for Quick Search (Mobile/Tablet Friendly) -->
+<button class="fixed bottom-6 right-6 w-16 h-16 rounded-2xl bg-industrial-gradient text-on-primary-container shadow-[0_8px_32px_rgba(245,158,11,0.4)] flex items-center justify-center active:scale-90 transition-transform z-50">
+<span class="material-symbols-outlined text-3xl font-bold" data-icon="search">search</span>
+</button>
+</body></html>

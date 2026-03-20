@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="fr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Inter:wght@300;400;500;600;700&amp;family=JetBrains+Mono:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "tertiary-fixed": "#6bff8f",
+                        "tertiary-container": "#2bca62",
+                        "surface-bright": "#3a3939",
+                        "error": "#ffb4ab",
+                        "on-tertiary": "#003915",
+                        "on-error-container": "#ffdad6",
+                        "on-primary-fixed-variant": "#653e00",
+                        "surface-container-low": "#1c1b1b",
+                        "secondary-fixed": "#ffdbca",
+                        "on-secondary-fixed-variant": "#783200",
+                        "surface-container": "#201f1f",
+                        "surface-container-lowest": "#0e0e0e",
+                        "on-primary-container": "#613b00",
+                        "on-tertiary-container": "#004f20",
+                        "tertiary": "#51e77b",
+                        "outline": "#a08e7a",
+                        "on-error": "#690005",
+                        "on-secondary-fixed": "#341100",
+                        "primary-container": "#f59e0b",
+                        "on-primary": "#472a00",
+                        "on-secondary": "#552100",
+                        "background": "#131313",
+                        "on-surface-variant": "#d8c3ad",
+                        "on-tertiary-fixed-variant": "#005321",
+                        "surface": "#131313",
+                        "surface-dim": "#131313",
+                        "inverse-on-surface": "#313030",
+                        "on-surface": "#e5e2e1",
+                        "surface-variant": "#353534",
+                        "secondary-container": "#ec6a06",
+                        "surface-container-highest": "#353534",
+                        "inverse-primary": "#855300",
+                        "surface-tint": "#ffb95f",
+                        "primary": "#ffc174",
+                        "on-primary-fixed": "#2a1700",
+                        "outline-variant": "#534434",
+                        "surface-container-high": "#2a2a2a",
+                        "secondary-fixed-dim": "#ffb690",
+                        "primary-fixed": "#ffddb8",
+                        "on-background": "#e5e2e1",
+                        "on-secondary-container": "#4a1c00",
+                        "inverse-surface": "#e5e2e1",
+                        "primary-fixed-dim": "#ffb95f",
+                        "on-tertiary-fixed": "#002109",
+                        "tertiary-fixed-dim": "#4ae176",
+                        "secondary": "#ffb690",
+                        "error-container": "#93000a"
+                    },
+                    fontFamily: {
+                        "headline": ["Space Grotesk"],
+                        "body": ["Inter"],
+                        "label": ["Inter"],
+                        "mono": ["JetBrains Mono"]
+                    },
+                    borderRadius: { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" },
+                },
+            },
+        }
+    </script>
+<style>
+        .glass-panel {
+            background: rgba(53, 53, 52, 0.6);
+            backdrop-filter: blur(12px);
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface font-body selection:bg-primary-container selection:text-on-primary-container">
+<!-- Top Navigation (Shell) -->
+<header class="bg-[#131313] text-[#FFC174] font-['Space_Grotesk'] font-bold text-lg uppercase tracking-wider docked full-width top-0 sticky z-50">
+<div class="flex justify-between items-center w-full px-6 h-16">
+<div class="text-2xl font-black text-[#F5F0EB] tracking-tighter">
+                L'Atelier POS
+            </div>
+<div class="flex items-center gap-6">
+<button class="text-[#FFC174] hover:bg-[#353534] transition-colors duration-200 p-2 rounded-lg">
+<span class="material-symbols-outlined">sync</span>
+</button>
+<div class="flex items-center gap-2 bg-[#1C1B1B] px-3 py-1.5 rounded-full">
+<span class="material-symbols-outlined text-sm">table_restaurant</span>
+<span class="font-mono text-sm">Table 12</span>
+</div>
+<button class="text-[#F5F0EB] hover:bg-[#353534] transition-colors duration-200 p-2 rounded-lg">
+<span class="material-symbols-outlined">account_circle</span>
+</button>
+</div>
+</div>
+</header>
+<main class="flex min-h-screen">
+<!-- Sidebar Navigation -->
+<aside class="fixed left-0 top-16 h-[calc(100vh-64px)] w-64 bg-[#1C1B1B] shadow-[8px_0_24px_rgba(0,0,0,0.4)] flex flex-col py-6 z-40 hidden md:flex">
+<nav class="flex-1 space-y-2 px-4">
+<a class="flex items-center gap-4 bg-[#353534] text-[#FFC174] rounded-lg px-4 py-3 border-l-4 border-[#FFC174] transition-all" href="#">
+<span class="material-symbols-outlined">restaurant_menu</span>
+<span class="font-['Inter'] text-sm font-medium">Menu</span>
+</a>
+<a class="flex items-center gap-4 text-[#F5F0EB]/60 px-4 py-3 hover:text-[#F5F0EB] hover:bg-[#353534]/50 transition-all" href="#">
+<span class="material-symbols-outlined">receipt_long</span>
+<span class="font-['Inter'] text-sm font-medium">Commandes</span>
+</a>
+<a class="flex items-center gap-4 text-[#F5F0EB]/60 px-4 py-3 hover:text-[#F5F0EB] hover:bg-[#353534]/50 transition-all" href="#">
+<span class="material-symbols-outlined">table_restaurant</span>
+<span class="font-['Inter'] text-sm font-medium">Tables</span>
+</a>
+<a class="flex items-center gap-4 text-[#F5F0EB]/60 px-4 py-3 hover:text-[#F5F0EB] hover:bg-[#353534]/50 transition-all" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-['Inter'] text-sm font-medium">Tableau de bord</span>
+</a>
+<a class="flex items-center gap-4 text-[#F5F0EB]/60 px-4 py-3 hover:text-[#F5F0EB] hover:bg-[#353534]/50 transition-all" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-['Inter'] text-sm font-medium">Paramètres</span>
+</a>
+</nav>
+<div class="px-4 mt-auto">
+<button class="w-full flex items-center justify-center gap-2 bg-[#FFC174] text-[#472A00] py-3 rounded-lg font-bold uppercase tracking-tight active:scale-95 transition-transform">
+<span class="material-symbols-outlined">add_circle</span>
+                    Nouvelle Commande
+                </button>
+</div>
+</aside>
+<!-- Main Content Area -->
+<section class="flex-1 md:ml-64 p-6 mb-32">
+<!-- Category Selector -->
+<div class="flex gap-4 mb-8 overflow-x-auto no-scrollbar pb-2">
+<button class="whitespace-nowrap px-6 py-2 rounded-full border-2 border-primary bg-primary text-on-primary font-bold transition-all">Tous</button>
+<button class="whitespace-nowrap px-6 py-2 rounded-full border border-outline-variant text-on-surface-variant hover:border-primary transition-all">Entrées</button>
+<button class="whitespace-nowrap px-6 py-2 rounded-full border border-outline-variant text-on-surface-variant hover:border-primary transition-all">Plats</button>
+<button class="whitespace-nowrap px-6 py-2 rounded-full border border-outline-variant text-on-surface-variant hover:border-primary transition-all">Desserts</button>
+<button class="whitespace-nowrap px-6 py-2 rounded-full border border-outline-variant text-on-surface-variant hover:border-primary transition-all">Boissons</button>
+</div>
+<!-- Menu Grid -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+<!-- Menu Card 1 -->
+<div class="group bg-surface-container-low rounded-xl overflow-hidden hover:bg-surface-container transition-colors border border-transparent hover:border-primary/20">
+<div class="aspect-video relative overflow-hidden">
+<img alt="" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="Juicy grilled entrecote steak with rosemary" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDBb2c4BO1hNJmOIsPA9RIdrAfGXxvMxEYTAjI4bnrdfS_qmoqwL-jRB54mOH4I84dsN7WyQnvf-QUob1yNWoAWj4AsIWblOFc0wZ4vE3JIMGBr4K1Rvpl2QAF26l2MTfAwAERCVWY6T-ve52rt17EXpzhRnodpYTeeFE0M5wkPCcAvwXtTodTMaEQDpzbeFwC774Oe_1S3tnqlhZ4LQ3-EMdMn67JZiMALhxd2s2FGgiO5r2SDUVjA8osq87NuWpNyaqePaK9UsTi6"/>
+<div class="absolute top-2 right-2 flex flex-col gap-2">
+<div class="bg-black/60 backdrop-blur-md p-1.5 rounded-full flex items-center justify-center" title="Gluten Free">
+<span class="material-symbols-outlined text-white text-sm">eco</span>
+</div>
+</div>
+</div>
+<div class="p-4">
+<div class="flex justify-between items-start mb-1">
+<h3 class="font-headline font-bold text-lg text-on-surface leading-tight">Entrecôte Maturée</h3>
+<span class="font-mono text-primary font-bold">28.00€</span>
+</div>
+<p class="text-sm text-on-surface-variant line-clamp-2 mb-4">Pièce de boeuf sélectionnée, maturée 30 jours, servie avec son jus corsé.</p>
+<button class="w-full py-2 flex items-center justify-center gap-2 bg-surface-container-highest text-primary rounded-lg font-semibold hover:bg-primary hover:text-on-primary transition-all active:scale-95">
+<span class="material-symbols-outlined text-lg">add_shopping_cart</span>
+                            Ajouter
+                        </button>
+</div>
+</div>
+<!-- Menu Card 2 -->
+<div class="group bg-surface-container-low rounded-xl overflow-hidden hover:bg-surface-container transition-colors border border-transparent hover:border-primary/20">
+<div class="aspect-video relative overflow-hidden">
+<img alt="" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="Gourmet artisanal burger with melted cheese" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAnJvkVMsKb4zcWzeTjF7AnTlp6NWYF5LP6bHi7VNUZCdG66qRL-wsQibqGL-RkNxlrUA8QE63VvH-HmHwDc1epM0Atlh52pQxdrzmhnOOinQ3Uzmo0oVjUYIqgyyFXHxChWdaE5AwlFX9fvEbdRylituHpydGKGURgtQ2mrslf_9-8wS97IA-CxH_Wrqv8XgFTBQfyhzG-a8wqAaOrYKdNLJIBFe-gfbnLvTfFFWwO80RTo7SknlYZCezZgd3Gcj_QEPDEItaPFH5C"/>
+<div class="absolute top-2 right-2 flex flex-col gap-2">
+<div class="bg-black/60 backdrop-blur-md p-1.5 rounded-full flex items-center justify-center" title="Contient du lactose">
+<span class="material-symbols-outlined text-white text-sm">chess</span>
+</div>
+</div>
+</div>
+<div class="p-4">
+<div class="flex justify-between items-start mb-1">
+<h3 class="font-headline font-bold text-lg text-on-surface leading-tight">Burger de l'Atelier</h3>
+<span class="font-mono text-primary font-bold">19.50€</span>
+</div>
+<p class="text-sm text-on-surface-variant line-clamp-2 mb-4">Pain brioché maison, boeuf Black Angus, cheddar affiné et oignons confits.</p>
+<button class="w-full py-2 flex items-center justify-center gap-2 bg-surface-container-highest text-primary rounded-lg font-semibold hover:bg-primary hover:text-on-primary transition-all active:scale-95">
+<span class="material-symbols-outlined text-lg">add_shopping_cart</span>
+                            Ajouter
+                        </button>
+</div>
+</div>
+<!-- Menu Card 3 -->
+<div class="group bg-surface-container-low rounded-xl overflow-hidden hover:bg-surface-container transition-colors border border-transparent hover:border-primary/20">
+<div class="aspect-video relative overflow-hidden">
+<img alt="" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="Fresh burrata salad with heirloom tomatoes" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDKXJyt_WGd2FYC73fhJFBd73-7OzoVenvgFXHN1mvtegJK9gnOLvcGGTSjP9WA7E1pPfi4PQSv2mWxI1ZBCcY0BgRvAgbY3REPYEOMWzrkKWYeqwQIR8-M4jV07b7XI88f1x0WJXrDKrDs2A2rSZ8Cq5XiBj66F4tTFtm8HE9_mnrW4_n0sm1tFNRl37jGWrGIg-6ywu62SpgLHj-uOyOEGUmONAxETIUuvBLaydmwC2BM7wYl9VoXgfzlfjLrfyk9PMG6BqAXuyR6"/>
+<div class="absolute top-2 right-2 flex flex-col gap-2">
+<div class="bg-black/60 backdrop-blur-md p-1.5 rounded-full flex items-center justify-center" title="Fruits à coque">
+<span class="material-symbols-outlined text-white text-sm">nutrition</span>
+</div>
+</div>
+</div>
+<div class="p-4">
+<div class="flex justify-between items-start mb-1">
+<h3 class="font-headline font-bold text-lg text-on-surface leading-tight">Burrata Crémeuse</h3>
+<span class="font-mono text-primary font-bold">14.00€</span>
+</div>
+<p class="text-sm text-on-surface-variant line-clamp-2 mb-4">Tomates d'antan, pesto de basilic frais et éclats de pistaches grillées.</p>
+<button class="w-full py-2 flex items-center justify-center gap-2 bg-surface-container-highest text-primary rounded-lg font-semibold hover:bg-primary hover:text-on-primary transition-all active:scale-95">
+<span class="material-symbols-outlined text-lg">add_shopping_cart</span>
+                            Ajouter
+                        </button>
+</div>
+</div>
+<!-- Menu Card 4 -->
+<div class="group bg-surface-container-low rounded-xl overflow-hidden hover:bg-surface-container transition-colors border border-transparent hover:border-primary/20">
+<div class="aspect-video relative overflow-hidden">
+<img alt="" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="Steam cooked salmon with seasonal vegetables" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBywNZY7jGrvG_vTvR93kchh7RDblmtbZkPyQFSVHGoulnjvjTR2nx9OSTSo1cN6blWlWezOgfuLX9xOeF90rPLoaRUFgFF8jplkowQwI4YSDaAkexIGbTBs-Iqp-Fx603_GzhzZPwmzEqGVvBvX3lPLN2u-3Qa7Yje4DaXUZPBFrAm86-juTeghGe919ijWduIUraG9fh9rG0PfWgklolcONwS8lS0RNyRuB4qphgWe581wget_GFy7lkiw_B83nmni7zGtLZAcMwY"/>
+<div class="absolute top-2 right-2 flex flex-col gap-2">
+<div class="bg-black/60 backdrop-blur-md p-1.5 rounded-full flex items-center justify-center" title="Gluten Free">
+<span class="material-symbols-outlined text-white text-sm">water_drop</span>
+</div>
+</div>
+</div>
+<div class="p-4">
+<div class="flex justify-between items-start mb-1">
+<h3 class="font-headline font-bold text-lg text-on-surface leading-tight">Pavé de Saumon</h3>
+<span class="font-mono text-primary font-bold">22.00€</span>
+</div>
+<p class="text-sm text-on-surface-variant line-clamp-2 mb-4">Cuit basse température, petits légumes de saison et émulsion citronnée.</p>
+<button class="w-full py-2 flex items-center justify-center gap-2 bg-surface-container-highest text-primary rounded-lg font-semibold hover:bg-primary hover:text-on-primary transition-all active:scale-95">
+<span class="material-symbols-outlined text-lg">add_shopping_cart</span>
+                            Ajouter
+                        </button>
+</div>
+</div>
+</div>
+<!-- Detail / Personalization Panel (Asymmetric Placement) -->
+<div class="mt-12 grid grid-cols-1 lg:grid-cols-5 gap-8">
+<div class="lg:col-span-3 space-y-8">
+<div class="glass-panel p-8 rounded-2xl border-l-4 border-primary">
+<h2 class="font-headline font-bold text-2xl text-on-surface mb-6 flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">restaurant</span>
+                            Personnalisation : Burger de l'Atelier
+                        </h2>
+<div class="space-y-6">
+<div>
+<h4 class="text-sm font-bold uppercase tracking-widest text-outline mb-4">Cuisson</h4>
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+<label class="relative flex items-center justify-center cursor-pointer">
+<input checked="" class="peer hidden" name="cooking" type="radio"/>
+<span class="w-full py-3 text-center rounded-lg border border-outline-variant peer-checked:bg-primary peer-checked:text-on-primary peer-checked:border-primary transition-all font-semibold">Bleu</span>
+</label>
+<label class="relative flex items-center justify-center cursor-pointer">
+<input class="peer hidden" name="cooking" type="radio"/>
+<span class="w-full py-3 text-center rounded-lg border border-outline-variant peer-checked:bg-primary peer-checked:text-on-primary peer-checked:border-primary transition-all font-semibold">Saignant</span>
+</label>
+<label class="relative flex items-center justify-center cursor-pointer">
+<input class="peer hidden" name="cooking" type="radio"/>
+<span class="w-full py-3 text-center rounded-lg border border-outline-variant peer-checked:bg-primary peer-checked:text-on-primary peer-checked:border-primary transition-all font-semibold">À Point</span>
+</label>
+<label class="relative flex items-center justify-center cursor-pointer">
+<input class="peer hidden" name="cooking" type="radio"/>
+<span class="w-full py-3 text-center rounded-lg border border-outline-variant peer-checked:bg-primary peer-checked:text-on-primary peer-checked:border-primary transition-all font-semibold">Bien Cuit</span>
+</label>
+</div>
+</div>
+<div>
+<h4 class="text-sm font-bold uppercase tracking-widest text-outline mb-4">Suppléments</h4>
+<div class="space-y-3">
+<div class="flex items-center justify-between p-4 bg-surface-container-high rounded-lg group">
+<span class="font-medium">Double Fromage</span>
+<div class="flex items-center gap-4">
+<span class="font-mono text-primary">+2.50€</span>
+<input class="w-5 h-5 rounded border-outline-variant bg-surface-container text-primary focus:ring-primary" type="checkbox"/>
+</div>
+</div>
+<div class="flex items-center justify-between p-4 bg-surface-container-high rounded-lg">
+<span class="font-medium">Bacon Croustillant</span>
+<div class="flex items-center gap-4">
+<span class="font-mono text-primary">+3.00€</span>
+<input checked="" class="w-5 h-5 rounded border-outline-variant bg-surface-container text-primary focus:ring-primary" type="checkbox"/>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Payment / Summary Panel -->
+<div class="lg:col-span-2 space-y-6">
+<div class="bg-surface-container-low p-6 rounded-2xl">
+<h2 class="font-headline font-bold text-xl mb-6">Résumé du Paiement</h2>
+<!-- Toggle Switch -->
+<div class="flex bg-surface-container-lowest p-1 rounded-lg mb-6">
+<button class="flex-1 py-2 text-sm font-bold rounded-md bg-primary text-on-primary transition-all">SUR PLACE</button>
+<button class="flex-1 py-2 text-sm font-bold text-on-surface-variant hover:text-on-surface transition-all">À EMPORTER</button>
+</div>
+<div class="space-y-4 mb-8">
+<div class="flex justify-between items-center py-2 border-b border-outline-variant/10">
+<div class="flex items-center gap-3">
+<span class="font-mono text-xs bg-surface-container-highest px-2 py-1 rounded">x1</span>
+<span class="text-sm">Burger de l'Atelier</span>
+</div>
+<span class="font-mono">19.50€</span>
+</div>
+<div class="flex justify-between items-center py-2 border-b border-outline-variant/10">
+<div class="flex items-center gap-3">
+<span class="font-mono text-xs bg-surface-container-highest px-2 py-1 rounded">x1</span>
+<span class="text-sm">Bacon Croustillant</span>
+</div>
+<span class="font-mono">3.00€</span>
+</div>
+</div>
+<div class="flex items-center justify-between mb-8">
+<span class="text-outline uppercase text-xs font-bold tracking-tighter">Total à régler</span>
+<span class="font-headline font-bold text-3xl text-primary">22.50€</span>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<button class="py-4 rounded-xl border-2 border-outline-variant flex flex-col items-center justify-center gap-1 hover:border-primary transition-all group">
+<span class="material-symbols-outlined text-outline group-hover:text-primary">credit_card</span>
+<span class="text-xs font-bold">CARTE</span>
+</button>
+<button class="py-4 rounded-xl border-2 border-outline-variant flex flex-col items-center justify-center gap-1 hover:border-primary transition-all group">
+<span class="material-symbols-outlined text-outline group-hover:text-primary">payments</span>
+<span class="text-xs font-bold">ESPÈCES</span>
+</button>
+</div>
+<button class="w-full mt-6 py-4 bg-primary text-on-primary font-black text-lg rounded-xl shadow-[0_8px_16px_rgba(245,158,11,0.3)] active:scale-[0.98] transition-all">
+                            CONFIRMER LA COMMANDE
+                        </button>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Sticky Cart Bar (Active State) -->
+<footer class="fixed bottom-0 left-0 right-0 z-50 p-4 md:pl-68 bg-gradient-to-t from-background via-background to-transparent">
+<div class="max-w-6xl mx-auto">
+<div class="glass-panel flex items-center justify-between p-4 rounded-2xl shadow-[0_-8px_32px_rgba(0,0,0,0.5)] border-t border-primary/10">
+<div class="flex items-center gap-4">
+<div class="relative">
+<div class="bg-primary text-on-primary w-8 h-8 rounded-full flex items-center justify-center font-mono font-bold text-sm shadow-lg">2</div>
+<span class="material-symbols-outlined text-primary-fixed-dim absolute -top-1 -right-1 animate-pulse">notifications</span>
+</div>
+<div>
+<p class="font-bold text-on-surface leading-none">Votre Panier</p>
+<p class="text-xs text-on-surface-variant font-mono">2 articles sélectionnés</p>
+</div>
+</div>
+<div class="flex items-center gap-8">
+<div class="hidden sm:flex flex-col items-end">
+<span class="text-[10px] uppercase font-bold tracking-widest text-outline">Sous-total</span>
+<span class="font-mono text-xl font-bold text-primary">22.50€</span>
+</div>
+<button class="bg-primary-container text-on-primary-container h-14 px-10 rounded-xl font-bold uppercase tracking-tight flex items-center gap-3 hover:scale-105 transition-transform">
+<span class="material-symbols-outlined">shopping_cart_checkout</span>
+                        Passer à l'étape suivante
+                    </button>
+</div>
+</div>
+</div>
+</footer>
+<!-- Empty State / Background Prompt (Overlay example) -->
+<!-- This would normally be visible only when cart is empty -->
+<div class="hidden fixed inset-0 z-50 bg-black/80 flex items-center justify-center backdrop-blur-sm">
+<div class="text-center p-8 glass-panel rounded-3xl max-w-sm">
+<span class="material-symbols-outlined text-6xl text-outline-variant mb-4">shopping_basket</span>
+<h3 class="font-headline text-2xl font-bold mb-2">Panier vide</h3>
+<p class="text-on-surface-variant mb-6">Explorez notre menu pour commencer votre expérience culinaire.</p>
+<button class="w-full py-3 bg-surface-container-highest rounded-xl font-bold hover:bg-primary hover:text-on-primary transition-all">Fermer</button>
+</div>
+</div>
+</body></html>

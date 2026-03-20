@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="fr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>L'Atelier POS - Vue Client</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Inter:wght@300;400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "outline": "#a08e7a",
+                        "secondary-fixed-dim": "#ffb690",
+                        "on-primary-container": "#613b00",
+                        "surface-container-low": "#1c1b1b",
+                        "on-tertiary-container": "#004f20",
+                        "surface-container-lowest": "#0e0e0e",
+                        "on-tertiary": "#003915",
+                        "surface-container-highest": "#353534",
+                        "inverse-on-surface": "#313030",
+                        "primary-fixed": "#ffddb8",
+                        "surface-bright": "#3a3939",
+                        "on-surface": "#e5e2e1",
+                        "tertiary": "#51e77b",
+                        "error": "#ffb4ab",
+                        "tertiary-fixed-dim": "#4ae176",
+                        "secondary-fixed": "#ffdbca",
+                        "surface-container-high": "#2a2a2a",
+                        "tertiary-container": "#2bca62",
+                        "primary-fixed-dim": "#ffb95f",
+                        "primary": "#ffc174",
+                        "on-tertiary-fixed": "#002109",
+                        "surface-container": "#201f1f",
+                        "on-tertiary-fixed-variant": "#005321",
+                        "surface": "#131313",
+                        "on-primary-fixed": "#2a1700",
+                        "on-secondary-container": "#4a1c00",
+                        "on-secondary-fixed": "#341100",
+                        "outline-variant": "#534434",
+                        "error-container": "#93000a",
+                        "primary-container": "#f59e0b",
+                        "on-primary": "#472a00",
+                        "surface-tint": "#ffb95f",
+                        "inverse-surface": "#e5e2e1",
+                        "background": "#131313",
+                        "surface-variant": "#353534",
+                        "tertiary-fixed": "#6bff8f",
+                        "secondary-container": "#ec6a06",
+                        "on-error": "#690005",
+                        "on-error-container": "#ffdad6",
+                        "on-secondary": "#552100",
+                        "on-background": "#e5e2e1",
+                        "on-surface-variant": "#d8c3ad",
+                        "surface-dim": "#131313",
+                        "on-secondary-fixed-variant": "#783200",
+                        "secondary": "#ffb690",
+                        "on-primary-fixed-variant": "#653e00",
+                        "inverse-primary": "#855300"
+                    },
+                    fontFamily: {
+                        "headline": ["Space Grotesk"],
+                        "body": ["Inter"],
+                        "label": ["Inter"],
+                        "mono": ["JetBrains Mono"]
+                    },
+                    borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .fade-in { animation: fadeIn 300ms ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .toast-slide-up { animation: toastSlide 3s ease-in-out forwards; }
+        @keyframes toastSlide { 
+            0% { transform: translateY(100%); opacity: 0; }
+            10% { transform: translateY(0); opacity: 1; }
+            90% { transform: translateY(0); opacity: 1; }
+            100% { transform: translateY(20px); opacity: 0; }
+        }
+        
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface font-body selection:bg-primary/30 antialiased overflow-hidden h-screen flex">
+<!-- Sidebar Navigation (SideNavBar) -->
+<aside class="fixed left-0 top-0 h-full flex flex-col py-6 bg-surface-container-low text-primary w-64 shadow-[8px_0_24px_rgba(0,0,0,0.4)] z-50">
+<div class="px-6 mb-8">
+<h1 class="text-on-surface font-bold text-xl tracking-tighter font-headline">L'Atelier</h1>
+<p class="text-[10px] uppercase tracking-widest text-on-surface/40 mt-1 font-mono">Service Client v2.4</p>
+</div>
+<nav class="flex-1 px-3 space-y-2">
+<!-- Active Tab: Menu -->
+<a class="flex items-center gap-4 bg-surface-container-highest text-primary rounded-xl px-4 py-3 border-l-4 border-primary transition-all duration-300 active:scale-95 active:translate-x-1" href="#">
+<span class="material-symbols-outlined">restaurant_menu</span>
+<span class="font-['Inter'] text-sm font-medium">Menu</span>
+</a>
+<a class="flex items-center gap-4 text-on-surface/60 px-4 py-3 hover:text-on-surface transition-all duration-300 hover:bg-surface-container-highest/50 rounded-xl active:scale-95 active:translate-x-1" href="#">
+<span class="material-symbols-outlined">receipt_long</span>
+<span class="font-['Inter'] text-sm font-medium">Commandes</span>
+</a>
+<a class="flex items-center gap-4 text-on-surface/60 px-4 py-3 hover:text-on-surface transition-all duration-300 hover:bg-surface-container-highest/50 rounded-xl active:scale-95 active:translate-x-1" href="#">
+<span class="material-symbols-outlined">table_restaurant</span>
+<span class="font-['Inter'] text-sm font-medium">Tables</span>
+</a>
+<a class="flex items-center gap-4 text-on-surface/60 px-4 py-3 hover:text-on-surface transition-all duration-300 hover:bg-surface-container-highest/50 rounded-xl active:scale-95 active:translate-x-1" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-['Inter'] text-sm font-medium">Tableau de bord</span>
+</a>
+</nav>
+<div class="px-3 mt-auto space-y-2">
+<!-- Theme Switch Integrated -->
+<button class="w-full flex items-center justify-between gap-4 text-on-surface/60 px-4 py-3 hover:text-on-surface transition-all duration-300 hover:bg-surface-container-highest/50 rounded-xl active:scale-95">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined">dark_mode</span>
+<span class="font-['Inter'] text-sm font-medium">Thème Sombre</span>
+</div>
+<div class="w-8 h-4 bg-surface-container-highest rounded-full relative">
+<div class="absolute right-0.5 top-0.5 w-3 h-3 bg-primary rounded-full"></div>
+</div>
+</button>
+<button class="w-full flex items-center gap-4 text-on-surface/60 px-4 py-3 hover:text-on-surface transition-all duration-300 hover:bg-surface-container-highest/50 rounded-xl active:scale-95">
+<span class="material-symbols-outlined">emergency_home</span>
+<span class="font-['Inter'] text-sm font-medium">Urgence</span>
+</button>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="ml-64 flex-1 flex flex-col h-full fade-in">
+<!-- Top App Bar -->
+<header class="flex justify-between items-center w-full px-8 h-20 bg-surface z-40">
+<div class="flex flex-col">
+<h2 class="font-headline font-bold text-2xl uppercase tracking-wider text-primary">La Carte</h2>
+<div class="flex items-center gap-2 mt-1">
+<span class="w-2 h-2 rounded-full bg-tertiary"></span>
+<span class="text-[10px] font-mono text-on-surface/50 uppercase">Cuisine Ouverte • Table 12</span>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex bg-surface-container-low p-1 rounded-xl">
+<button class="px-4 py-2 text-xs font-bold uppercase tracking-tighter bg-surface-container-highest text-primary rounded-lg transition-all active:scale-95">Salé</button>
+<button class="px-4 py-2 text-xs font-bold uppercase tracking-tighter text-on-surface/40 hover:text-on-surface transition-all active:scale-95">Sucré</button>
+<button class="px-4 py-2 text-xs font-bold uppercase tracking-tighter text-on-surface/40 hover:text-on-surface transition-all active:scale-95">Boissons</button>
+</div>
+<div class="flex gap-2">
+<button class="w-12 h-12 flex items-center justify-center rounded-xl bg-surface-container-high text-on-surface hover:bg-surface-container-highest transition-all active:scale-95">
+<span class="material-symbols-outlined">sync</span>
+</button>
+<button class="w-12 h-12 flex items-center justify-center rounded-xl bg-surface-container-high text-on-surface hover:bg-surface-container-highest transition-all active:scale-95">
+<span class="material-symbols-outlined">account_circle</span>
+</button>
+</div>
+</div>
+</header>
+<!-- Menu & Cart Layout -->
+<div class="flex-1 flex overflow-hidden p-8 gap-8">
+<!-- Grid Menu -->
+<section class="flex-1 overflow-y-auto no-scrollbar pb-12">
+<div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+<!-- Item Card -->
+<div class="group bg-surface-container-low rounded-xl overflow-hidden hover:bg-surface-container-high transition-all duration-300 flex flex-col shadow-lg border-l-2 border-transparent hover:border-primary">
+<div class="h-48 relative overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" data-alt="Gourmet beef burger with melted cheese and fresh greens" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCAGR_vdXRHP9Rmq6-lj3Q7zbeP2mPw--S5ko4uPLhsDezniovlyyBM1gOxwBXM40mGetRlM8DBQycVCcXJNHm4jxN5Bz-NEDVh3mmTRthylLDTqEHYDHxcBPXWO-CbWpnIhHYyIa0AQTUGX0UWZItDb116mw5w3HPTvAt5SrXxqumXOWv87Cl_Ubh0LHyK-59fh6YTxPNVDMf4bMzZvJg9GId4YOD09iUlO1Wav_uhTMPhWCOQKR9gP8Sx7K0G7z4VKz2sBKs7AKSW"/>
+<div class="absolute top-4 right-4 bg-surface-container-lowest/80 backdrop-blur-md px-3 py-1 rounded-lg">
+<span class="text-primary font-mono font-bold">18.50€</span>
+</div>
+</div>
+<div class="p-5 flex-1 flex flex-col">
+<h3 class="font-headline font-bold text-lg text-on-surface mb-2">Le Burger de l'Atelier</h3>
+<p class="text-sm text-on-surface/60 line-clamp-2 mb-4 leading-relaxed">Boeuf de race, cheddar affiné 12 mois, oignons confits au porto et roquette sauvage.</p>
+<div class="mt-auto flex items-center justify-between">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-tertiary text-sm" style="font-variation-settings: 'FILL' 1;">eco</span>
+<span class="text-[10px] font-mono text-on-surface/40 uppercase">Local • Bio</span>
+</div>
+<button class="h-10 px-4 bg-primary text-on-primary-container rounded-lg font-bold text-xs uppercase tracking-tighter flex items-center gap-2 transition-all active:scale-95 hover:bg-primary-container">
+<span class="material-symbols-outlined text-sm">add</span>
+                                    Ajouter
+                                </button>
+</div>
+</div>
+</div>
+<!-- Item Card 2 -->
+<div class="group bg-surface-container-low rounded-xl overflow-hidden hover:bg-surface-container-high transition-all duration-300 flex flex-col shadow-lg border-l-2 border-transparent hover:border-primary">
+<div class="h-48 relative overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" data-alt="Colorful healthy poke bowl with salmon and avocado" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA3KQgdK-M5agTpbCfHNSGgha2Jq9M5NLBguGU1zgchQnyXmEezQxGYiptxwMB_txZ07AMJHeBbgc68kEAhhDEapyuTwsbIpPvbkafU7HDgv43539LNc1QEoAgWq85Gi26cdP_zLD-f_n3tEoXsvNf6gofAyQtT5JwYYU7CKlQ0ichYy3lZmlGjcjd3bGCkSf5bW6NgXxaE7MZqm-0lI6g8lXCQwHcWdRNTusS2vPSWPnchDc0dHcqgWUyOHufyXwig1Eq2FXj96Wd3"/>
+<div class="absolute top-4 right-4 bg-surface-container-lowest/80 backdrop-blur-md px-3 py-1 rounded-lg">
+<span class="text-primary font-mono font-bold">16.00€</span>
+</div>
+</div>
+<div class="p-5 flex-1 flex flex-col">
+<h3 class="font-headline font-bold text-lg text-on-surface mb-2">Bowl Signature</h3>
+<p class="text-sm text-on-surface/60 line-clamp-2 mb-4 leading-relaxed">Saumon mariné au yuzu, avocat grillé, edamames, radis noir et riz noir impérial.</p>
+<div class="mt-auto flex items-center justify-between">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-secondary text-sm" style="font-variation-settings: 'FILL' 1;">bolt</span>
+<span class="text-[10px] font-mono text-on-surface/40 uppercase">High Protein</span>
+</div>
+<button class="h-10 px-4 bg-primary text-on-primary-container rounded-lg font-bold text-xs uppercase tracking-tighter flex items-center gap-2 transition-all active:scale-95 hover:bg-primary-container">
+<span class="material-symbols-outlined text-sm">add</span>
+                                    Ajouter
+                                </button>
+</div>
+</div>
+</div>
+<!-- Item Card 3 -->
+<div class="group bg-surface-container-low rounded-xl overflow-hidden hover:bg-surface-container-high transition-all duration-300 flex flex-col shadow-lg border-l-2 border-transparent hover:border-primary">
+<div class="h-48 relative overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" data-alt="Artisanal pepperoni pizza with charred crust" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDfGqjH01t6qfixB_xF2FFs_CJw6BdF8hLEH3vfVulrCGdfeuNlr5nyhNG8CSwWDE3rykmk9Ut-76MEgY_QUrnylw_v-oQyDpticzEeVpl189gV_CFYs3HBoBhQp_rrbfAncw4B7l_b72_jtlhLUQvrpVkRBK6nhQkD1HcNhWyGOoXiqErtWvDyE_iRHiJQfJxNIjSets6vp4_HmfuaUAFC9DpJw_1syZt4exM4WgX6tbayaLdIOS6dIfQs6NfC2j52_5rBDPGl_evk"/>
+<div class="absolute top-4 right-4 bg-surface-container-lowest/80 backdrop-blur-md px-3 py-1 rounded-lg">
+<span class="text-primary font-mono font-bold">14.00€</span>
+</div>
+</div>
+<div class="p-5 flex-1 flex flex-col">
+<h3 class="font-headline font-bold text-lg text-on-surface mb-2">Pizza Diavola</h3>
+<p class="text-sm text-on-surface/60 line-clamp-2 mb-4 leading-relaxed">Salami piquant, fior di latte, basilic frais et huile infusée aux piments de Calabre.</p>
+<div class="mt-auto flex items-center justify-between">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-error text-sm" style="font-variation-settings: 'FILL' 1;">local_fire_department</span>
+<span class="text-[10px] font-mono text-on-surface/40 uppercase">Piquant</span>
+</div>
+<button class="h-10 px-4 bg-primary text-on-primary-container rounded-lg font-bold text-xs uppercase tracking-tighter flex items-center gap-2 transition-all active:scale-95 hover:bg-primary-container">
+<span class="material-symbols-outlined text-sm">add</span>
+                                    Ajouter
+                                </button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Sticky Cart (Panier) -->
+<aside class="w-96 flex flex-col bg-surface-container-low rounded-2xl shadow-2xl overflow-hidden">
+<div class="p-6 bg-surface-container-high border-b border-outline-variant/10">
+<div class="flex items-center justify-between mb-2">
+<h3 class="font-headline font-bold text-xl uppercase tracking-tighter">Votre Panier</h3>
+<span class="bg-primary-container text-on-primary-container text-[10px] font-mono px-2 py-0.5 rounded-full font-bold">3 ARTICLES</span>
+</div>
+<p class="text-xs text-on-surface/40 font-mono">ID COMMANDE: #2489-AT</p>
+</div>
+<!-- Cart Items List -->
+<div class="flex-1 overflow-y-auto p-6 space-y-6">
+<!-- Cart Item -->
+<div class="flex gap-4">
+<div class="w-16 h-16 rounded-lg bg-surface-container-highest flex-shrink-0 overflow-hidden">
+<img class="w-full h-full object-cover opacity-80" data-alt="Beef burger close up" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCwELwq1Xf7sb8DPx8omYCNr-q_2tT7fECyLrYmAyRITzWM-RW0lkNzrtJrhyiLhhnoEc2o-mAdB_y_2xR8bPLU-OtUG9CGliqBsJ2XMs7tYArUuDAmWHBjIlyWd-FLrDtyWLJ8qx08ixyiZWS469EkCzYCtJgr9ODlfgQ7utP3TWIt7p1a6uu_A_Eq1BVxGV1WC3E5T67q1Vd0VS-wRB8vqhU4SeoWyCo3mo40YmJ4UIM78Cr54H5UdHnMm8rZlT2ziVJULow1SHSN"/>
+</div>
+<div class="flex-1 flex flex-col min-w-0">
+<div class="flex justify-between items-start">
+<h4 class="text-sm font-bold text-on-surface truncate pr-2">Burger de l'Atelier</h4>
+<span class="font-mono text-sm font-bold text-primary">18.50€</span>
+</div>
+<p class="text-[10px] text-on-surface/40 mb-3 truncate">Option: Cuisson Saignante</p>
+<div class="flex items-center gap-2">
+<!-- Increased Hitboxes for +/- -->
+<button class="w-[44px] h-[44px] flex items-center justify-center rounded-lg bg-surface-container-highest text-on-surface hover:text-primary transition-all active:scale-90">
+<span class="material-symbols-outlined text-lg">remove</span>
+</button>
+<span class="w-8 text-center font-mono font-bold text-sm">01</span>
+<button class="w-[44px] h-[44px] flex items-center justify-center rounded-lg bg-surface-container-highest text-on-surface hover:text-primary transition-all active:scale-90">
+<span class="material-symbols-outlined text-lg">add</span>
+</button>
+<button class="ml-auto w-[44px] h-[44px] flex items-center justify-center text-on-surface/20 hover:text-error transition-all active:scale-90">
+<span class="material-symbols-outlined text-lg">delete</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Divider -->
+<div class="h-px bg-outline-variant/5"></div>
+<!-- Cart Item 2 -->
+<div class="flex gap-4">
+<div class="w-16 h-16 rounded-lg bg-surface-container-highest flex-shrink-0 overflow-hidden">
+<img class="w-full h-full object-cover opacity-80" data-alt="Pepperoni pizza slice" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDWbRYIIKCzNZB8UT8kM6lCLSSFR-YD4xQxTf-BKQ4tIm6S8l6WmmGUJeEU6kF7jQGJpBG8l7UQJPojidgGpzDN-z7Zo6TnYPqG2HdaMT4h4UBKNWxp-Ca8el8waisc5eZcY01I8tBLTw_0WO74K6s3o_9eh3iF1bL9kauTJk2wIPojDLpQMwR2-wptXwbdvgTX35qJNVCmuDG2ek3ImnFx_P1j_9GuCY7X_YXzXx258dkaK5X1W4y4oeGvAYwNT6S7j4RLo24FdLBS"/>
+</div>
+<div class="flex-1 flex flex-col min-w-0">
+<div class="flex justify-between items-start">
+<h4 class="text-sm font-bold text-on-surface truncate pr-2">Pizza Diavola</h4>
+<span class="font-mono text-sm font-bold text-primary">28.00€</span>
+</div>
+<p class="text-[10px] text-on-surface/40 mb-3 truncate">Quantité: 2</p>
+<div class="flex items-center gap-2">
+<button class="w-[44px] h-[44px] flex items-center justify-center rounded-lg bg-surface-container-highest text-on-surface hover:text-primary transition-all active:scale-90">
+<span class="material-symbols-outlined text-lg">remove</span>
+</button>
+<span class="w-8 text-center font-mono font-bold text-sm">02</span>
+<button class="w-[44px] h-[44px] flex items-center justify-center rounded-lg bg-surface-container-highest text-on-surface hover:text-primary transition-all active:scale-90">
+<span class="material-symbols-outlined text-lg">add</span>
+</button>
+<button class="ml-auto w-[44px] h-[44px] flex items-center justify-center text-on-surface/20 hover:text-error transition-all active:scale-90">
+<span class="material-symbols-outlined text-lg">delete</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer Cart -->
+<div class="p-6 bg-surface-container-highest space-y-4">
+<div class="space-y-2">
+<div class="flex justify-between text-xs text-on-surface/60 font-mono">
+<span>Sous-total</span>
+<span>46.50€</span>
+</div>
+<div class="flex justify-between text-xs text-on-surface/60 font-mono">
+<span>TVA (10%)</span>
+<span>4.65€</span>
+</div>
+<div class="flex justify-between text-lg font-bold font-headline pt-2 border-t border-outline-variant/10 text-primary">
+<span>TOTAL</span>
+<span>51.15€</span>
+</div>
+</div>
+<button class="w-full py-4 bg-primary text-on-primary-container rounded-xl font-bold uppercase tracking-widest flex items-center justify-center gap-3 transition-all active:scale-95 shadow-lg hover:brightness-105">
+<span class="material-symbols-outlined">payments</span>
+                        Confirmer &amp; Payer
+                    </button>
+<button class="w-full py-3 text-on-surface/40 hover:text-on-surface text-xs font-bold uppercase tracking-widest transition-all active:scale-95">
+                        Ajouter une note au chef
+                    </button>
+</div>
+</aside>
+</div>
+</main>
+<!-- Cart Add Toast -->
+<div class="fixed bottom-8 left-1/2 -translate-x-1/2 z-[100] toast-slide-up pointer-events-none">
+<div class="bg-surface-container-highest text-on-surface px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-4 border border-primary/20 backdrop-blur-xl">
+<div class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">shopping_cart</span>
+</div>
+<div>
+<p class="text-sm font-bold">Produit ajouté !</p>
+<p class="text-[10px] opacity-60 font-mono">Votre panier a été mis à jour.</p>
+</div>
+</div>
+</div>
+</body></html>

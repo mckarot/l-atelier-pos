@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="fr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Inter:wght@300;400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Dexie.js CDN -->
+<script src="https://unpkg.com/dexie/dist/dexie.js"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary-container": "#f59e0b",
+              "on-primary-container": "#613b00",
+              "tertiary": "#51e77b",
+              "on-tertiary-fixed": "#002109",
+              "background": "#131313",
+              "on-tertiary": "#003915",
+              "surface": "#131313",
+              "outline": "#a08e7a",
+              "surface-tint": "#ffb95f",
+              "on-error": "#690005",
+              "inverse-primary": "#855300",
+              "on-surface-variant": "#d8c3ad",
+              "surface-container-low": "#1c1b1b",
+              "secondary-fixed": "#ffdbca",
+              "secondary-container": "#ec6a06",
+              "primary-fixed": "#ffddb8",
+              "tertiary-container": "#2bca62",
+              "surface-container-lowest": "#0e0e0e",
+              "on-primary": "#472a00",
+              "inverse-on-surface": "#313030",
+              "on-tertiary-container": "#004f20",
+              "surface-dim": "#131313",
+              "surface-container-highest": "#353534",
+              "secondary-fixed-dim": "#ffb690",
+              "on-primary-fixed-variant": "#653e00",
+              "error-container": "#93000a",
+              "surface-variant": "#353534",
+              "on-secondary-container": "#4a1c00",
+              "surface-container": "#201f1f",
+              "surface-bright": "#3a3939",
+              "outline-variant": "#534434",
+              "surface-container-high": "#2a2a2a",
+              "on-surface": "#e5e2e1",
+              "primary-fixed-dim": "#ffb95f",
+              "tertiary-fixed": "#6bff8f",
+              "on-tertiary-fixed-variant": "#005321",
+              "tertiary-fixed-dim": "#4ae176",
+              "on-background": "#e5e2e1",
+              "on-error-container": "#ffdad6",
+              "inverse-surface": "#e5e2e1",
+              "error": "#ffb4ab",
+              "on-secondary-fixed": "#341100",
+              "primary": "#ffc174",
+              "on-primary-fixed": "#2a1700",
+              "secondary": "#ffb690",
+              "on-secondary-fixed-variant": "#783200",
+              "on-secondary": "#552100"
+            },
+            fontFamily: {
+              "headline": ["Space Grotesk"],
+              "body": ["Inter"],
+              "label": ["Inter"],
+              "mono": ["JetBrains Mono"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      .glass-effect {
+        background: rgba(53, 53, 52, 0.6);
+        backdrop-filter: blur(12px);
+      }
+      ::-webkit-scrollbar { width: 6px; }
+      ::-webkit-scrollbar-track { background: #131313; }
+      ::-webkit-scrollbar-thumb { background: #353534; border-radius: 10px; }
+      [v-cloak] { display: none; }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body selection:bg-primary/30">
+<!-- Sidebar Navigation -->
+<aside class="fixed left-0 top-0 h-full flex flex-col py-6 bg-[#1C1B1B] w-64 shadow-[8px_0_24px_rgba(0,0,0,0.4)] z-50">
+<div class="px-6 mb-10 flex items-center gap-3">
+<div class="w-10 h-10 bg-primary-container rounded flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary-container" style="font-variation-settings: 'FILL' 1;">restaurant</span>
+</div>
+<h1 class="text-[#F5F0EB] font-bold font-headline tracking-tight text-xl">Chef d'Atelier</h1>
+</div>
+<nav class="flex-1 px-4 space-y-1">
+<a class="flex items-center gap-4 text-[#F5F0EB]/60 px-4 py-3 hover:text-[#F5F0EB] font-['Inter'] text-sm font-medium hover:bg-[#353534]/50 transition-all active:translate-x-1" href="#">
+<span class="material-symbols-outlined">restaurant_menu</span>
+<span>Menu</span>
+</a>
+<a class="flex items-center gap-4 text-[#F5F0EB]/60 px-4 py-3 hover:text-[#F5F0EB] font-['Inter'] text-sm font-medium hover:bg-[#353534]/50 transition-all active:translate-x-1" href="#">
+<span class="material-symbols-outlined">receipt_long</span>
+<span>Commandes</span>
+</a>
+<a class="flex items-center gap-4 text-[#F5F0EB]/60 px-4 py-3 hover:text-[#F5F0EB] font-['Inter'] text-sm font-medium hover:bg-[#353534]/50 transition-all active:translate-x-1" href="#">
+<span class="material-symbols-outlined">table_restaurant</span>
+<span>Tables</span>
+</a>
+<a class="flex items-center gap-4 bg-[#353534] text-[#FFC174] rounded-lg px-4 py-3 border-l-4 border-[#FFC174] font-['Inter'] text-sm font-medium transition-all active:translate-x-1" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span>Tableau de bord</span>
+</a>
+<a class="flex items-center gap-4 text-[#F5F0EB]/60 px-4 py-3 hover:text-[#F5F0EB] font-['Inter'] text-sm font-medium hover:bg-[#353534]/50 transition-all active:translate-x-1" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span>Paramètres</span>
+</a>
+</nav>
+<div class="px-4 mt-auto">
+<button class="w-full bg-primary-container text-on-primary-container font-bold py-3 rounded-lg flex items-center justify-center gap-2 hover:brightness-105 active:scale-95 transition-all">
+<span class="material-symbols-outlined">add</span>
+<span>Nouvelle Commande</span>
+</button>
+<div class="mt-6 pt-6 border-t border-outline-variant/20">
+<a class="flex items-center gap-4 text-error px-4 py-3 hover:bg-error/10 rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined">emergency_home</span>
+<span class="font-medium text-sm">Urgence</span>
+</a>
+</div>
+</div>
+</aside>
+<main class="ml-64 min-h-screen flex flex-col">
+<!-- TopAppBar -->
+<header class="flex justify-between items-center w-full px-6 h-16 bg-[#131313] sticky top-0 z-40">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-[#FFC174] cursor-pointer">menu</span>
+<span class="font-['Space_Grotesk'] font-bold text-lg uppercase tracking-wider text-[#FFC174]">L'Atelier POS</span>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-2 text-[#F5F0EB]/60">
+<span class="material-symbols-outlined text-lg">sync</span>
+<span class="text-xs font-mono" id="sync-status">SYNC: OK</span>
+</div>
+<div class="flex items-center gap-3 bg-surface-container-highest px-3 py-1.5 rounded-full border border-outline-variant/10">
+<span class="material-symbols-outlined text-[#F5F0EB]">account_circle</span>
+<span class="text-sm font-medium text-[#F5F0EB]">Chef d'Atelier</span>
+</div>
+</div>
+</header>
+<!-- Low Stock Alert Banner -->
+<div class="px-8 mt-4">
+<div class="bg-error-container/30 border-l-4 border-error p-4 flex items-center justify-between rounded-r-lg">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-error">warning</span>
+<div>
+<p class="text-on-error-container font-bold text-sm uppercase tracking-tight">Alerte Stock Critique</p>
+<p class="text-on-error-container/80 text-xs">3 articles sont épuisés et 5 articles sont en dessous du seuil de sécurité.</p>
+</div>
+</div>
+<button class="text-error font-bold text-xs uppercase tracking-widest hover:underline px-4">Gérer le stock</button>
+</div>
+</div>
+<div class="p-8 space-y-8">
+<!-- KPI Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+<!-- KPI 1: Revenu Quotidien (Dynamic) -->
+<div class="bg-surface-container-low p-6 rounded-lg relative overflow-hidden group">
+<div class="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-full -mr-8 -mt-8 transition-transform group-hover:scale-110"></div>
+<p class="text-on-surface-variant text-xs font-bold uppercase tracking-widest mb-2">Revenu Quotidien</p>
+<h3 class="text-3xl font-headline font-bold text-on-surface flex items-baseline gap-2">
+<span id="kpi-revenue">0.00</span> <span class="text-lg font-normal">€</span>
+</h3>
+<div class="mt-4 flex items-center gap-2">
+<span class="flex items-center text-tertiary text-xs font-bold bg-tertiary/10 px-2 py-0.5 rounded">
+<span class="material-symbols-outlined text-sm">trending_up</span> +12%
+                        </span>
+<span class="text-on-surface-variant/40 text-[10px] uppercase font-bold">vs hier</span>
+</div>
+</div>
+<!-- KPI 2: Réservations (Dynamic) -->
+<div class="bg-surface-container-low p-6 rounded-lg relative overflow-hidden group">
+<p class="text-on-surface-variant text-xs font-bold uppercase tracking-widest mb-2">Réservations</p>
+<h3 class="text-3xl font-headline font-bold text-on-surface" id="kpi-reservations">0</h3>
+<div class="mt-4 flex items-center gap-2">
+<span class="flex items-center text-tertiary text-xs font-bold bg-tertiary/10 px-2 py-0.5 rounded">
+<span class="material-symbols-outlined text-sm">event</span> Réel
+                        </span>
+<span class="text-on-surface-variant/40 text-[10px] uppercase font-bold">En base</span>
+</div>
+</div>
+<!-- KPI 3 -->
+<div class="bg-surface-container-low p-6 rounded-lg relative overflow-hidden group border-l-4 border-error">
+<p class="text-on-surface-variant text-xs font-bold uppercase tracking-widest mb-2">Temps Prep. Moyen</p>
+<h3 class="text-3xl font-headline font-bold text-on-surface font-mono">18:45</h3>
+<div class="mt-4 flex items-center gap-2">
+<span class="flex items-center text-error text-xs font-bold bg-error/10 px-2 py-0.5 rounded">
+<span class="material-symbols-outlined text-sm">trending_down</span> -2min
+                        </span>
+<span class="text-on-surface-variant/40 text-[10px] uppercase font-bold">Objectif: 15:00</span>
+</div>
+</div>
+<!-- KPI 4 -->
+<div class="bg-surface-container-low p-6 rounded-lg relative overflow-hidden group">
+<p class="text-on-surface-variant text-xs font-bold uppercase tracking-widest mb-2">Satisfaction</p>
+<h3 class="text-3xl font-headline font-bold text-on-surface">4.8/5</h3>
+<div class="mt-4 flex items-center gap-2">
+<span class="flex items-center text-tertiary text-xs font-bold bg-tertiary/10 px-2 py-0.5 rounded">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">star</span> Excellent
+                        </span>
+</div>
+</div>
+</div>
+<!-- Main Layout: Chart & Alerts -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+<!-- Revenue Chart Container -->
+<div class="lg:col-span-2 bg-surface-container-low p-6 rounded-lg">
+<div class="flex justify-between items-center mb-8">
+<div>
+<h4 class="text-on-surface font-bold text-lg font-headline">Performance Hebdomadaire</h4>
+<p class="text-on-surface-variant/60 text-xs">Évolution du chiffre d'affaires (7 derniers jours)</p>
+</div>
+<div class="flex gap-2">
+<button class="bg-surface-container-highest px-3 py-1.5 rounded text-xs font-bold text-on-surface">JOUR</button>
+<button class="bg-primary-container/20 px-3 py-1.5 rounded text-xs font-bold text-primary">SEMAINE</button>
+</div>
+</div>
+<!-- Visual Chart Placeholder -->
+<div class="h-64 flex items-end justify-between gap-4 px-2">
+<div class="w-full flex flex-col gap-2 group">
+<div class="w-full bg-primary/20 h-[60%] rounded-t-sm group-hover:bg-primary/40 transition-all relative">
+<div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-surface-container-highest px-2 py-1 rounded text-[10px] font-mono opacity-0 group-hover:opacity-100 transition-opacity">1.2k</div>
+</div>
+<span class="text-[10px] text-center font-mono opacity-40 uppercase">Lun</span>
+</div>
+<div class="w-full flex flex-col gap-2 group">
+<div class="w-full bg-primary/20 h-[75%] rounded-t-sm group-hover:bg-primary/40 transition-all relative"></div>
+<span class="text-[10px] text-center font-mono opacity-40 uppercase">Mar</span>
+</div>
+<div class="w-full flex flex-col gap-2 group">
+<div class="w-full bg-primary/20 h-[65%] rounded-t-sm group-hover:bg-primary/40 transition-all relative"></div>
+<span class="text-[10px] text-center font-mono opacity-40 uppercase">Mer</span>
+</div>
+<div class="w-full flex flex-col gap-2 group">
+<div class="w-full bg-primary/20 h-[90%] rounded-t-sm group-hover:bg-primary/40 transition-all relative"></div>
+<span class="text-[10px] text-center font-mono opacity-40 uppercase">Jeu</span>
+</div>
+<div class="w-full flex flex-col gap-2 group">
+<div class="w-full bg-primary h-full rounded-t-sm relative">
+<div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-primary text-on-primary-container px-2 py-1 rounded text-[10px] font-mono">2.4k</div>
+</div>
+<span class="text-[10px] text-center font-mono text-primary font-bold uppercase">Ven</span>
+</div>
+<div class="w-full flex flex-col gap-2 group">
+<div class="w-full bg-primary/20 h-[80%] rounded-t-sm group-hover:bg-primary/40 transition-all relative"></div>
+<span class="text-[10px] text-center font-mono opacity-40 uppercase">Sam</span>
+</div>
+<div class="w-full flex flex-col gap-2 group">
+<div class="w-full bg-primary/20 h-[50%] rounded-t-sm group-hover:bg-primary/40 transition-all relative"></div>
+<span class="text-[10px] text-center font-mono opacity-40 uppercase">Dim</span>
+</div>
+</div>
+</div>
+<!-- Recent Activity -->
+<div class="bg-surface-container-low p-6 rounded-lg space-y-6">
+<h4 class="text-on-surface font-bold text-lg font-headline">Flux Live</h4>
+<div class="space-y-4">
+<div class="flex gap-4 p-3 hover:bg-surface-container-highest/50 rounded-lg transition-colors cursor-pointer border-l-2 border-primary">
+<div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-primary text-sm">payments</span>
+</div>
+<div>
+<p class="text-xs font-bold text-on-surface">Paiement Reçu - Table 14</p>
+<p class="text-[10px] text-on-surface-variant/60 font-mono">124.50€ • Il y a 2 min</p>
+</div>
+</div>
+<div class="flex gap-4 p-3 hover:bg-surface-container-highest/50 rounded-lg transition-colors cursor-pointer">
+<div class="w-10 h-10 rounded-full bg-tertiary/10 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-tertiary text-sm">done_all</span>
+</div>
+<div>
+<p class="text-xs font-bold text-on-surface">Commande Terminée - #842</p>
+<p class="text-[10px] text-on-surface-variant/60 font-mono">Prête pour service • Il y a 5 min</p>
+</div>
+</div>
+<div class="flex gap-4 p-3 hover:bg-surface-container-highest/50 rounded-lg transition-colors cursor-pointer">
+<div class="w-10 h-10 rounded-full bg-error/10 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-error text-sm">cancel</span>
+</div>
+<div>
+<p class="text-xs font-bold text-on-surface">Annulation - Table 4</p>
+<p class="text-[10px] text-on-surface-variant/60 font-mono">Entrée épuisée • Il y a 12 min</p>
+</div>
+</div>
+</div>
+<button class="w-full py-2 text-xs font-bold uppercase tracking-widest text-primary hover:bg-primary/5 transition-all">Voir tout l'historique</button>
+</div>
+</div>
+<!-- Menu Management Section (Dynamic) -->
+<div class="bg-surface-container-low rounded-lg overflow-hidden">
+<div class="p-6 border-b border-outline-variant/10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+<div>
+<h4 class="text-on-surface font-bold text-xl font-headline">Gestion du Menu</h4>
+<p class="text-on-surface-variant/60 text-xs">Ajustez les prix et la disponibilité en temps réel</p>
+</div>
+<div class="flex gap-3 w-full sm:w-auto">
+<div class="relative flex-1 sm:flex-none">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm">search</span>
+<input class="bg-surface-container-highest border-none rounded-lg pl-10 pr-4 py-2 text-sm focus:ring-2 focus:ring-primary w-full" id="menu-search" placeholder="Rechercher un plat..." type="text"/>
+</div>
+<button class="bg-surface-container-highest p-2 rounded-lg text-on-surface hover:text-primary transition-colors">
+<span class="material-symbols-outlined">filter_list</span>
+</button>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="text-[10px] uppercase tracking-widest text-on-surface-variant/50 font-bold border-b border-outline-variant/5">
+<th class="px-6 py-4">Nom du Plat</th>
+<th class="px-6 py-4">Catégorie</th>
+<th class="px-6 py-4">Prix</th>
+<th class="px-6 py-4">Statut</th>
+<th class="px-6 py-4 text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/5" id="menu-items-body">
+<!-- Dynamically populated rows -->
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</main>
+<!-- Success Toast (Notification) -->
+<div class="fixed bottom-8 right-8 z-[100] transform transition-all translate-y-24 opacity-0 pointer-events-none" id="success-toast">
+<div class="glass-effect border border-primary/20 p-4 rounded-lg shadow-2xl flex items-center gap-4 min-w-[300px]">
+<div class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-primary">check_circle</span>
+</div>
+<div>
+<p class="text-sm font-bold text-on-surface">Modification enregistrée</p>
+<p class="text-[10px] text-on-surface-variant/60">L'état de l'article a été mis à jour avec succès.</p>
+</div>
+<button class="ml-auto text-on-surface-variant/40 hover:text-on-surface" onclick="hideToast()">
+<span class="material-symbols-outlined text-sm">close</span>
+</button>
+</div>
+</div>
+<script>
+        // --- Database Setup (Dexie.js) ---
+        const db = new Dexie('AtelierPOSDatabase');
+
+        db.version(1).stores({
+            menuItems: '++id, name, category, isAvailable',
+            tables: 'id, status',
+            orders: '++id, tableId, status, createdAt',
+            reservations: '++id, date, time, status'
+        });
+
+        // --- Seed Database Function ---
+        const seedDatabase = async () => {
+            const menuCount = await db.menuItems.count();
+            if (menuCount === 0) {
+                await db.menuItems.bulkAdd([
+                    { name: 'Salade de Saison Bio', price: 14.50, description: 'Légumes croquants du potager.', category: 'Entrées', image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAUM-zWGBTqyW6fNpesQkqdMiHsbOZuUuV982y1qwLzpF-iGm11kEhhoDInF9cH51kqaPpTMLg-nFIDOCyA7yw30zyjlEO4zNCNQoYe6doGcvVxK8dYTKCO-OQWmBzkwOmhfRhEzfKwtqfx8LXO-wS_lNRdxaHeTfsFOr94FVIhcwHHr5JYL_JBbzlFJlMu9p8BBqEE_ImzT7wNBLU4G4Hl3ltV2Z-BL629roNuIrKM3j0UOobvh-_opsW4S4fHBrY2rNj1xgsLgbeA', allergens: ['none'], isAvailable: true },
+                    { name: 'Entrecôte Maturée 300g', price: 32.00, description: 'Bœuf Black Angus, maturation 30 jours.', category: 'Plats', image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBP5IdG4v9chtgpzf9OM-lfnlfUB8bAmt8FUMCf2kHihkQrPBe6qBla7mvbVelL9TPTso46ajIiMdXe_69Ck2xmpWRJ1q4e-Rdy2yG_95J-AhmCgm84oSJR360k97nvJw-UJxdUnhg7e2cWzh-5WKta27bKt42TWmPFVleIQBFgdpWp8qdt-URTI1dYwV2ecUun7vgZ0AApemMKx405_DCKRyUzOp8vMdPFwOmzUKLUAPayGM7NxtW0W4eC9u66kjdv7b9gzYDvnbi9', allergens: ['none'], isAvailable: false },
+                    { name: 'Cœur Coulant Chocolat', price: 9.50, description: 'Chocolat 70%, cœur fondant.', category: 'Desserts', image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDr4xp7_E-YdogX52BkmxYvs3ZO_mAWi4bjTIGKoBsn8kiuVovUMy4S4r046zgzmnWrYdpsLOdcRerOTb-I38Gr6pROm1xyauuVubq8rC65yXv58kWKRz9_cJF1UKBAEJyie963wHBiEV2Jb-VyPGEI0VEIIYknChadMYS7hI3BiZQ1lwQfS3fNSUkd-cU0nfDHQKouNy9y1yVjuWrMqk7KKPJF2AyPK1VF8cVkkrDuuj8X6bOS2b4RUlJKMdSJKTRzI_jJ5xyrn9KL', allergens: ['eggs', 'lactose'], isAvailable: true }
+                ]);
+            }
+
+            const tableCount = await db.tables.count();
+            if (tableCount === 0) {
+                const tables = Array.from({ length: 16 }, (_, i) => ({
+                    id: i + 1,
+                    status: 'libre'
+                }));
+                await db.tables.bulkAdd(tables);
+            }
+            
+            // Add some mock orders for revenue calculation if empty
+            const orderCount = await db.orders.count();
+            if (orderCount === 0) {
+                await db.orders.bulkAdd([
+                    { tableId: 1, total: 45.50, status: 'paye', createdAt: new Date() },
+                    { tableId: 4, total: 120.00, status: 'paye', createdAt: new Date() },
+                    { tableId: 2, total: 68.00, status: 'paye', createdAt: new Date() },
+                    { tableId: 8, total: 15.00, status: 'en_preparation', createdAt: new Date() }
+                ]);
+            }
+
+            // Add some mock reservations
+            const resCount = await db.reservations.count();
+            if (resCount === 0) {
+                await db.reservations.bulkAdd([
+                    { customerName: 'Dupont', email: 'd@test.com', phone: '06', date: '2023-10-27', time: '19:30', guests: 4, status: 'confirme' },
+                    { customerName: 'Martin', email: 'm@test.com', phone: '06', date: '2023-10-27', time: '20:00', guests: 2, status: 'confirme' }
+                ]);
+            }
+        };
+
+        // --- Dashboard Update Functions ---
+
+        const updateKPIs = async () => {
+            // 1. Calculate Daily Revenue (sum of 'paye' orders)
+            const paidOrders = await db.orders.where('status').equals('paye').toArray();
+            const totalRevenue = paidOrders.reduce((sum, order) => sum + order.total, 0);
+            document.getElementById('kpi-revenue').innerText = totalRevenue.toLocaleString('fr-FR', { minimumFractionDigits: 2 });
+
+            // 2. Display real reservations count
+            const reservationCount = await db.reservations.count();
+            document.getElementById('kpi-reservations').innerText = reservationCount;
+        };
+
+        const toggleAvailability = async (itemId, currentVal) => {
+            await db.menuItems.update(itemId, { isAvailable: !currentVal });
+            showToast();
+            renderMenu();
+        };
+
+        const renderMenu = async () => {
+            const menuItems = await db.menuItems.toArray();
+            const tbody = document.getElementById('menu-items-body');
+            tbody.innerHTML = '';
+
+            menuItems.forEach(item => {
+                const row = document.createElement('tr');
+                row.className = 'group hover:bg-surface-container-highest/30 transition-colors';
+                row.innerHTML = `
+                    <td class="px-6 py-4">
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 rounded bg-surface-container-high relative overflow-hidden shrink-0">
+                                <img alt="${item.name}" class="w-full h-full object-cover opacity-80 group-hover:scale-110 transition-transform" src="${item.image}"/>
+                            </div>
+                            <span class="text-sm font-medium text-on-surface">${item.name}</span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 text-xs text-on-surface-variant">${item.category}</td>
+                    <td class="px-6 py-4 font-mono text-sm text-primary">${item.price.toFixed(2)}€</td>
+                    <td class="px-6 py-4">
+                        <span class="px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-tighter ${item.isAvailable ? 'bg-tertiary/10 text-tertiary' : 'bg-error/10 text-error'} flex items-center w-fit gap-1">
+                            <span class="w-1.5 h-1.5 rounded-full ${item.isAvailable ? 'bg-tertiary' : 'bg-error'}"></span> 
+                            ${item.isAvailable ? 'Disponible' : 'Épuisé'}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 text-right">
+                        <div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button class="p-2 hover:bg-primary-container/20 rounded-lg text-primary transition-all active:scale-90" title="Modifier">
+                                <span class="material-symbols-outlined text-sm">edit</span>
+                            </button>
+                            <button class="p-2 ${item.isAvailable ? 'hover:bg-error/10 text-error' : 'hover:bg-tertiary/10 text-tertiary'} rounded-lg transition-all active:scale-90" 
+                                    title="${item.isAvailable ? 'Marquer épuisé' : 'Marquer disponible'}"
+                                    onclick="toggleAvailability(${item.id}, ${item.isAvailable})">
+                                <span class="material-symbols-outlined text-sm">${item.isAvailable ? 'block' : 'check_circle'}</span>
+                            </button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        };
+
+        // --- Toast Management ---
+        const showToast = () => {
+            const toast = document.getElementById('success-toast');
+            toast.classList.remove('translate-y-24', 'opacity-0', 'pointer-events-none');
+            toast.classList.add('translate-y-0', 'opacity-100', 'pointer-events-auto');
+            setTimeout(hideToast, 3000);
+        };
+
+        const hideToast = () => {
+            const toast = document.getElementById('success-toast');
+            toast.classList.add('translate-y-24', 'opacity-0', 'pointer-events-none');
+            toast.classList.remove('translate-y-0', 'opacity-100', 'pointer-events-auto');
+        };
+
+        // --- Initial Load ---
+        window.addEventListener('DOMContentLoaded', async () => {
+            await seedDatabase();
+            await updateKPIs();
+            await renderMenu();
+            
+            // Listen for changes in DB to auto-update UI (Real-time effect)
+            db.on('changes', () => {
+                updateKPIs();
+            });
+        });
+    </script>
+</body></html>

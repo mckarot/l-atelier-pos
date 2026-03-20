@@ -1,0 +1,32 @@
+# Projet Final : L'Atelier POS - Système Unifié
+
+## 1. Structure du Projet (Dossier `src/`)
+
+### `/db`
+- `db.ts` : Configuration Dexie.js (Schéma, Seed des tables et plats).
+
+### `/components`
+- `OrderCard.tsx` : Ticket de cuisine/serveur avec suivi temporel.
+- `StatusBadge.tsx` : Indicateurs sémantiques (Libre, Occupé, Prêt).
+- `MenuCard.tsx` : Carte de plat avec prix, photo et allergènes.
+- `ActionButton.tsx` : Boutons "Industrial Chic" avec micro-interactions.
+- `Toast.tsx` : Notifications animées de succès.
+
+### `/views`
+- `ClientView.tsx` : Menu interactif, personnalisation et panier.
+- `ServerView.tsx` : Plan de salle interactif et planning des réservations.
+- `KitchenView.tsx` : KDS (Kitchen Display System) avec colonnes Kanban.
+- `AdminView.tsx` : Dashboard analytique (KPIs, revenus, stocks).
+
+### `/layout`
+- `AppLayout.tsx` : Coque de l'application avec la Sidebar de navigation et le sélecteur de thème.
+
+## 2. Accès au Code Source Final
+
+Pour accéder au code source complet et unifié, vous pouvez consulter l'écran **"L'Atelier POS - Application Unifiée"** que je viens de générer sur votre canevas. Utilisez le bouton **</> View Code** dans la barre d'outils de cet écran pour voir comment tous les modules (Dexie, React, Tailwind) sont articulés.
+
+## 3. Dépendances Principales
+- `dexie` & `dexie-react-hooks` (v4.0.8)
+- `lucide-react`
+- `framer-motion`
+- `tailwindcss`

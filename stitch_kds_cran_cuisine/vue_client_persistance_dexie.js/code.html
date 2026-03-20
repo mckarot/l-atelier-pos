@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="fr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Inter:wght@300;400;500;600;700&amp;family=JetBrains+Mono:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Dexie & React-like hooks for demo purpose in a single HTML -->
+<script src="https://unpkg.com/dexie@latest/dist/dexie.js"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#F59E0B",
+                        "on-primary": "#000000",
+                        "primary-container": "#F59E0B",
+                        "on-primary-container": "#000000",
+                        "surface": "#131313",
+                        "background": "#131313",
+                        "surface-container-low": "#1C1B1B",
+                        "surface-container": "#201F1F",
+                        "surface-container-high": "#2A2A2A",
+                        "surface-container-highest": "#353534",
+                        "on-surface": "#F5F0EB",
+                        "on-surface-variant": "#A08E7A",
+                        "outline": "#534434",
+                        "outline-variant": "#353534",
+                    },
+                    fontFamily: {
+                        "headline": ["Space Grotesk"],
+                        "body": ["Inter"],
+                        "label": ["Inter"],
+                        "mono": ["JetBrains Mono"]
+                    },
+                    borderRadius: { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" },
+                },
+            },
+        }
+    </script>
+<style>
+        .glass-panel {
+            background: rgba(28, 27, 27, 0.8);
+            backdrop-filter: blur(12px);
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        @keyframes slide-up {
+            from { transform: translateY(100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .animate-toast {
+            animation: slide-up 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body selection:bg-primary/30 selection:text-primary min-h-screen">
+<!-- Notification Toast Container -->
+<div class="fixed top-20 right-6 z-[60] flex flex-col gap-3 pointer-events-none" id="toast-container"></div>
+<!-- Top Navigation -->
+<header class="bg-background/95 backdrop-blur-md border-b border-outline-variant/30 font-headline font-bold uppercase tracking-wider sticky top-0 z-50 h-16">
+<div class="flex justify-between items-center h-full px-6 max-w-[1600px] mx-auto">
+<div class="text-2xl font-black text-on-surface tracking-tighter">
+            L'Atelier <span class="text-primary">POS</span>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2 bg-surface-container-low border border-outline-variant/30 px-3 py-1.5 rounded-full">
+<span class="material-symbols-outlined text-primary text-sm">table_restaurant</span>
+<span class="font-mono text-xs font-bold" id="current-table-display">Table 12</span>
+</div>
+<button class="text-on-surface/80 hover:text-primary transition-colors p-2" onclick="toggleReservationModal()">
+<span class="material-symbols-outlined">event</span>
+</button>
+<button class="text-on-surface/80 hover:text-primary transition-colors p-2">
+<span class="material-symbols-outlined">account_circle</span>
+</button>
+</div>
+</div>
+</header>
+<main class="max-w-[1600px] mx-auto p-6 grid grid-cols-1 lg:grid-cols-12 gap-8 pb-32">
+<!-- Main Menu Area (8 cols) -->
+<div class="lg:col-span-8">
+<!-- Category Selector -->
+<div class="flex gap-3 mb-8 overflow-x-auto no-scrollbar pb-2" id="category-filters">
+<button class="cat-btn whitespace-nowrap px-6 py-2 rounded-full bg-primary text-on-primary font-bold transition-all shadow-lg shadow-primary/20" onclick="filterMenu('Tous')">Tous</button>
+<button class="cat-btn whitespace-nowrap px-6 py-2 rounded-full border border-outline-variant text-on-surface-variant hover:border-primary hover:text-primary transition-all" onclick="filterMenu('Entrées')">Entrées</button>
+<button class="cat-btn whitespace-nowrap px-6 py-2 rounded-full border border-outline-variant text-on-surface-variant hover:border-primary hover:text-primary transition-all" onclick="filterMenu('Plats')">Plats</button>
+<button class="cat-btn whitespace-nowrap px-6 py-2 rounded-full border border-outline-variant text-on-surface-variant hover:border-primary hover:text-primary transition-all" onclick="filterMenu('Desserts')">Desserts</button>
+<button class="cat-btn whitespace-nowrap px-6 py-2 rounded-full border border-outline-variant text-on-surface-variant hover:border-primary hover:text-primary transition-all" onclick="filterMenu('Boissons')">Boissons</button>
+</div>
+<!-- Menu Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6" id="menu-grid">
+<!-- Dynamically populated from Dexie -->
+</div>
+</div>
+<!-- Sidebar: Personalization & Summary (4 cols) -->
+<aside class="lg:col-span-4 space-y-6">
+<!-- Personalization Panel -->
+<div class="bg-surface-container-low border border-primary/20 rounded-2xl overflow-hidden p-6 relative">
+<div class="absolute top-0 left-0 w-1 h-full bg-primary"></div>
+<h2 class="font-headline font-bold text-xl mb-6 flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">restaurant</span>
+                Personnalisation
+            </h2>
+<div class="space-y-6">
+<div>
+<h4 class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mb-3">Cuisson de la viande</h4>
+<div class="grid grid-cols-2 gap-2" id="cooking-options">
+<button class="py-2.5 text-sm font-bold rounded-lg bg-primary text-on-primary">À Point</button>
+<button class="py-2.5 text-sm font-bold rounded-lg border border-outline-variant hover:border-primary/50 transition-all">Bleu</button>
+<button class="py-2.5 text-sm font-bold rounded-lg border border-outline-variant hover:border-primary/50 transition-all">Saignant</button>
+<button class="py-2.5 text-sm font-bold rounded-lg border border-outline-variant hover:border-primary/50 transition-all">Bien Cuit</button>
+</div>
+</div>
+<div>
+<h4 class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mb-3">Suppléments</h4>
+<div class="space-y-2">
+<div class="flex items-center justify-between p-3 bg-surface-container rounded-lg border border-outline-variant/30">
+<span class="text-sm font-medium">Bacon Croustillant</span>
+<span class="font-mono text-primary text-sm">+3.00€</span>
+</div>
+<div class="flex items-center justify-between p-3 bg-surface-container rounded-lg border border-outline-variant/30">
+<span class="text-sm font-medium">Double Fromage</span>
+<span class="font-mono text-primary text-sm">+2.50€</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Payment Summary Panel -->
+<div class="bg-surface-container-low border border-outline-variant/30 rounded-2xl p-6">
+<h2 class="font-headline font-bold text-xl mb-6">Résumé du Paiement</h2>
+<div class="flex bg-surface-container p-1 rounded-xl mb-6 border border-outline-variant/30">
+<button class="flex-1 py-2 text-xs font-bold rounded-lg bg-primary text-on-primary shadow-sm" id="btn-on-site">SUR PLACE</button>
+<button class="flex-1 py-2 text-xs font-bold text-on-surface-variant hover:text-on-surface transition-all" id="btn-to-go">À EMPORTER</button>
+</div>
+<div class="space-y-4 mb-8" id="cart-items">
+<!-- Items populated by JS -->
+</div>
+<div class="flex items-center justify-between mb-8">
+<span class="text-on-surface-variant uppercase text-[10px] font-bold tracking-widest">Total à régler</span>
+<span class="font-headline font-bold text-3xl text-primary" id="summary-total">0.00€</span>
+</div>
+<div class="grid grid-cols-2 gap-3 mb-4">
+<button class="py-4 rounded-xl border border-outline-variant flex flex-col items-center justify-center gap-1 hover:border-primary group transition-all">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors">credit_card</span>
+<span class="text-[10px] font-bold uppercase">Carte</span>
+</button>
+<button class="py-4 rounded-xl border border-outline-variant flex flex-col items-center justify-center gap-1 hover:border-primary group transition-all">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors">payments</span>
+<span class="text-[10px] font-bold uppercase">Espèces</span>
+</button>
+</div>
+<button class="w-full py-4 bg-primary text-on-primary font-black text-lg rounded-xl shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all" onclick="confirmOrder()">
+                CONFIRMER
+            </button>
+</div>
+</aside>
+</main>
+<!-- Reservation Modal -->
+<div class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4" id="reservation-modal">
+<div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="toggleReservationModal()"></div>
+<div class="bg-surface-container relative w-full max-w-md rounded-2xl border border-outline-variant/30 overflow-hidden">
+<div class="p-6 border-b border-outline-variant/30">
+<h3 class="font-headline font-bold text-xl">Réserver une table</h3>
+</div>
+<form class="p-6 space-y-4" id="reservation-form">
+<div>
+<label class="text-[10px] font-bold uppercase text-on-surface-variant mb-1 block">Nom</label>
+<input class="w-full bg-surface-container-low border-outline-variant/30 rounded-lg text-sm p-3 focus:ring-primary focus:border-primary" id="res-name" required="" type="text"/>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div>
+<label class="text-[10px] font-bold uppercase text-on-surface-variant mb-1 block">Date</label>
+<input class="w-full bg-surface-container-low border-outline-variant/30 rounded-lg text-sm p-3" id="res-date" required="" type="date"/>
+</div>
+<div>
+<label class="text-[10px] font-bold uppercase text-on-surface-variant mb-1 block">Heure</label>
+<input class="w-full bg-surface-container-low border-outline-variant/30 rounded-lg text-sm p-3" id="res-time" required="" type="time"/>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div>
+<label class="text-[10px] font-bold uppercase text-on-surface-variant mb-1 block">Personnes</label>
+<input class="w-full bg-surface-container-low border-outline-variant/30 rounded-lg text-sm p-3" id="res-guests" min="1" required="" type="number" value="2"/>
+</div>
+<div>
+<label class="text-[10px] font-bold uppercase text-on-surface-variant mb-1 block">Téléphone</label>
+<input class="w-full bg-surface-container-low border-outline-variant/30 rounded-lg text-sm p-3" id="res-phone" required="" type="tel"/>
+</div>
+</div>
+<button class="w-full py-4 bg-primary text-on-primary font-black rounded-xl mt-4" type="submit">RÉSERVER</button>
+</form>
+</div>
+</div>
+<!-- Sticky Cart Bar -->
+<footer class="fixed bottom-0 left-0 right-0 z-50 p-4 bg-gradient-to-t from-background via-background/95 to-transparent">
+<div class="max-w-[1600px] mx-auto">
+<div class="glass-panel border border-primary/20 flex items-center justify-between p-4 rounded-2xl shadow-2xl">
+<div class="flex items-center gap-4">
+<div class="relative">
+<div class="bg-primary text-on-primary w-8 h-8 rounded-full flex items-center justify-center font-mono font-bold text-sm shadow-lg shadow-primary/30 transition-transform duration-300" id="cart-counter">0</div>
+</div>
+<div class="hidden sm:block">
+<p class="font-bold text-on-surface text-sm leading-none mb-1">Votre Panier</p>
+<p class="text-[10px] text-on-surface-variant font-mono uppercase tracking-tight" id="cart-subtext">0 articles sélectionnés</p>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex flex-col items-end">
+<span class="text-[9px] uppercase font-bold tracking-[0.2em] text-on-surface-variant">Sous-total</span>
+<span class="font-mono text-2xl font-bold text-primary" id="cart-total">0.00€</span>
+</div>
+<button class="bg-primary text-on-primary h-14 px-8 rounded-xl font-black uppercase tracking-tight flex items-center gap-3 hover:scale-[1.05] active:scale-95 transition-all shadow-lg shadow-primary/20" onclick="confirmOrder()">
+<span class="material-symbols-outlined">shopping_cart_checkout</span>
+<span class="hidden sm:inline">Finaliser la Commande</span>
+<span class="sm:hidden">Payer</span>
+</button>
+</div>
+</div>
+</div>
+</footer>
+<script>
+    // --- Database Initialization (from Document 32) ---
+    const db = new Dexie('AtelierPOSDatabase');
+    db.version(1).stores({
+        menuItems: '++id, name, category, isAvailable',
+        tables: 'id, status',
+        orders: '++id, tableId, status, createdAt',
+        reservations: '++id, date, time, status'
+    });
+
+    const seedDatabase = async () => {
+        const menuCount = await db.menuItems.count();
+        if (menuCount === 0) {
+            await db.menuItems.bulkAdd([
+                { name: 'Entrecôte Maturée', price: 28.00, description: 'Pièce de boeuf sélectionnée, maturée 30 jours, servie avec son jus corsé.', category: 'Plats', image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDBb2c4BO1hNJmOIsPA9RIdrAfGXxvMxEYTAjI4bnrdfS_qmoqwL-jRB54mOH4I84dsN7WyQnvf-QUob1yNWoAWj4AsIWblOFc0wZ4vE3JIMGBr4K1Rvpl2QAF26l2MTfAwAERCVWY6T-ve52rt17EXpzhRnodpYTeeFE0M5wkPCcAvwXtTodTMaEQDpzbeFwC774Oe_1S3tnqlhZ4LQ3-EMdMn67JZiMALhxd2s2FGgiO5r2SDUVjA8osq87NuWpNyaqePaK9UsTi6', allergens: ['eco'], isAvailable: true },
+                { name: 'Burger de l\'Atelier', price: 19.50, description: 'Pain brioché maison, boeuf Black Angus, cheddar affiné et oignons confits.', category: 'Plats', image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAnJvkVMsKb4zcWzeTjF7AnTlp6NWYF5LP6bHi7VNUZCdG66qRL-wsQibqGL-RkNxlrUA8QE63VvH-HmHwDc1epM0Atlh52pQxdrzmhnOOinQ3Uzmo0oVjUYIqgyyFXHxChWdaE5AwlFX9fvEbdRylituHpydGKGURgtQ2mrslf_9-8wS97IA-CxH_Wrqv8XgFTBQfyhzG-a8wqAaOrYKdNLJIBFe-gfbnLvTfFFWwO80RTo7SknlYZCezZgd3Gcj_QEPDEItaPFH5C', allergens: ['chess'], isAvailable: true },
+                { name: 'Burrata Crémeuse', price: 14.00, description: 'Tomates d\'antan, pesto de basilic frais et éclats de pistaches grillées.', category: 'Entrées', image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDKXJyt_WGd2FYC73fhJFBd73-7OzoVenvgFXHN1mvtegJK9gnOLvcGGTSjP9WA7E1pPfi4PQSv2mWxI1ZBCcY0BgRvAgbY3REPYEOMWzrkKWYeqwQIR8-M4jV07b7XI88f1x0WJXrDKrDs2A2rSZ8Cq5XiBj66F4tTFtm8HE9_mnrW4_n0sm1tFNRl37jGWrGIg-6ywu62SpgLHj-uOyOEGUmONAxETIUuvBLaydmwC2BM7wYl9VoXgfzlfjLrfyk9PMG6BqAXuyR6', allergens: ['nutrition'], isAvailable: true },
+                { name: 'Pavé de Saumon', price: 22.00, description: 'Cuit basse température, petits légumes de saison et émulsion citronnée.', category: 'Plats', image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBywNZY7jGrvG_vTvR93kchh7RDblmtbZkPyQFSVHGoulnjvjTR2nx9OSTSo1cN6blWlWezOgfuLX9xOeF90rPLoaRUFgFF8jplkowQwI4YSDaAkexIGbTBs-Iqp-Fx603_GzhzZPwmzEqGVvBvX3lPLN2u-3Qa7Yje4DaXUZPBFrAm86-juTeghGe919ijWduIUraG9fh9rG0PfWgklolcONwS8lS0RNyRuB4qphgWe581wget_GFy7lkiw_B83nmni7zGtLZAcMwY', allergens: ['water_drop'], isAvailable: true }
+            ]);
+        }
+    };
+
+    // --- State & UI Logic ---
+    let localCart = [];
+    let currentCategory = 'Tous';
+    const tableId = 12;
+
+    async function init() {
+        await seedDatabase();
+        renderMenu();
+    }
+
+    async function renderMenu() {
+        const items = await db.menuItems.toArray();
+        const container = document.getElementById('menu-grid');
+        container.innerHTML = '';
+
+        const filtered = currentCategory === 'Tous' ? items : items.filter(i => i.category === currentCategory);
+
+        filtered.forEach(item => {
+            const card = document.createElement('div');
+            card.className = "group bg-surface-container-low rounded-xl overflow-hidden border border-outline-variant/30 hover:border-primary/50 transition-all flex flex-col h-full";
+            card.innerHTML = `
+                <div class="aspect-video relative overflow-hidden">
+                    <img alt="${item.name}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src="${item.image}"/>
+                    <div class="absolute bottom-2 right-2 flex gap-1">
+                        ${item.allergens.map(a => `
+                            <div class="bg-black/80 backdrop-blur-md p-1 rounded-full border border-white/10">
+                                <span class="material-symbols-outlined text-primary text-[14px]">${a}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+                <div class="p-5 flex flex-col flex-1">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="font-headline font-bold text-lg leading-tight">${item.name}</h3>
+                        <span class="font-mono text-primary font-bold text-lg">${item.price.toFixed(2)}€</span>
+                    </div>
+                    <p class="text-sm text-on-surface-variant mb-6 line-clamp-2">${item.description}</p>
+                    <button class="mt-auto w-full py-3 bg-surface-container-highest text-primary border border-primary/20 rounded-lg font-bold flex items-center justify-center gap-2 hover:bg-primary hover:text-on-primary hover:scale-[1.02] active:scale-95 transition-all" onclick="addToCart(${item.id}, '${item.name.replace("'", "\\'")}', ${item.price})">
+                        <span class="material-symbols-outlined text-lg">add_shopping_cart</span>
+                        AJOUTER
+                    </button>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+    }
+
+    function filterMenu(cat) {
+        currentCategory = cat;
+        document.querySelectorAll('.cat-btn').forEach(btn => {
+            if(btn.innerText === cat) {
+                btn.className = "cat-btn whitespace-nowrap px-6 py-2 rounded-full bg-primary text-on-primary font-bold transition-all shadow-lg shadow-primary/20";
+            } else {
+                btn.className = "cat-btn whitespace-nowrap px-6 py-2 rounded-full border border-outline-variant text-on-surface-variant hover:border-primary hover:text-primary transition-all";
+            }
+        });
+        renderMenu();
+    }
+
+    function addToCart(id, name, price) {
+        const existing = localCart.find(i => i.menuItemId === id);
+        if (existing) {
+            existing.quantity++;
+        } else {
+            localCart.push({ menuItemId: id, name, price, quantity: 1 });
+        }
+        updateCartUI();
+        showToast(name + " ajouté !");
+    }
+
+    function updateCartUI() {
+        const cartList = document.getElementById('cart-items');
+        const counter = document.getElementById('cart-counter');
+        const subtext = document.getElementById('cart-subtext');
+        const totalDisp = document.getElementById('cart-total');
+        const summaryTotal = document.getElementById('summary-total');
+        
+        cartList.innerHTML = '';
+        let total = 0;
+        let count = 0;
+
+        localCart.forEach(item => {
+            total += item.price * item.quantity;
+            count += item.quantity;
+
+            const div = document.createElement('div');
+            div.className = 'flex justify-between items-center py-2 border-b border-outline-variant/10';
+            div.innerHTML = `
+                <div class="flex items-center gap-3">
+                    <span class="font-mono text-[10px] bg-surface-container-highest px-2 py-0.5 rounded text-primary border border-primary/20">x${item.quantity}</span>
+                    <span class="text-sm">${item.name}</span>
+                </div>
+                <span class="font-mono text-sm">${(item.price * item.quantity).toFixed(2)}€</span>
+            `;
+            cartList.appendChild(div);
+        });
+
+        counter.innerText = count;
+        subtext.innerText = count + " articles sélectionnés";
+        totalDisp.innerText = total.toFixed(2) + "€";
+        summaryTotal.innerText = total.toFixed(2) + "€";
+    }
+
+    async function confirmOrder() {
+        if (localCart.length === 0) {
+            showToast("Votre panier est vide");
+            return;
+        }
+
+        const total = localCart.reduce((acc, curr) => acc + (curr.price * curr.quantity), 0);
+        
+        const newOrder = {
+            tableId: tableId,
+            items: localCart.map(i => ({
+                menuItemId: i.menuItemId,
+                name: i.name,
+                quantity: i.quantity,
+                price: i.price
+            })),
+            total: total,
+            status: 'en_attente',
+            createdAt: new Date(),
+            updatedAt: new Date()
+        };
+
+        try {
+            await db.orders.add(newOrder);
+            localCart = [];
+            updateCartUI();
+            showToast("Commande confirmée !");
+        } catch (e) {
+            console.error(e);
+            showToast("Erreur lors de la commande");
+        }
+    }
+
+    function toggleReservationModal() {
+        document.getElementById('reservation-modal').classList.toggle('hidden');
+    }
+
+    document.getElementById('reservation-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const newReservation = {
+            customerName: document.getElementById('res-name').value,
+            date: document.getElementById('res-date').value,
+            time: document.getElementById('res-time').value,
+            guests: parseInt(document.getElementById('res-guests').value),
+            phone: document.getElementById('res-phone').value,
+            status: 'confirme'
+        };
+
+        try {
+            await db.reservations.add(newReservation);
+            showToast("Réservation enregistrée !");
+            toggleReservationModal();
+            e.target.reset();
+        } catch (e) {
+            console.error(e);
+            showToast("Erreur de réservation");
+        }
+    });
+
+    function showToast(msg) {
+        const container = document.getElementById('toast-container');
+        const toast = document.createElement('div');
+        toast.className = 'bg-primary text-on-primary px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 animate-toast pointer-events-auto border-t-2 border-white/20';
+        toast.innerHTML = `
+            <span class="material-symbols-outlined">check_circle</span>
+            <span class="font-bold text-sm uppercase tracking-tight">${msg}</span>
+        `;
+        container.appendChild(toast);
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateX(20px)';
+            toast.style.transition = 'all 0.4s ease';
+            setTimeout(() => toast.remove(), 400);
+        }, 2500);
+    }
+
+    init();
+</script>
+</body></html>

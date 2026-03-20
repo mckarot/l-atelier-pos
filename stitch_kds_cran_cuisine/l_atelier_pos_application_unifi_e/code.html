@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="fr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>L'Atelier POS - Système Unifié</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Inter:wght@300;400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;700&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              colors: {
+                "tertiary-container": "#2bca62",
+                "on-secondary-fixed-variant": "#783200",
+                "primary-container": "#f59e0b",
+                "on-tertiary-fixed-variant": "#005321",
+                "background": "#131313",
+                "secondary-fixed": "#ffdbca",
+                "on-tertiary-fixed": "#002109",
+                "on-surface-variant": "#d8c3ad",
+                "on-primary-fixed": "#2a1700",
+                "on-secondary-container": "#4a1c00",
+                "on-secondary": "#552100",
+                "primary": "#ffc174",
+                "surface-container-lowest": "#0e0e0e",
+                "surface-container-low": "#1c1b1b",
+                "surface-bright": "#3a3939",
+                "tertiary-fixed-dim": "#4ae176",
+                "surface-tint": "#ffb95f",
+                "secondary-fixed-dim": "#ffb690",
+                "inverse-on-surface": "#313030",
+                "on-background": "#e5e2e1",
+                "on-primary-container": "#613b00",
+                "outline": "#a08e7a",
+                "inverse-surface": "#e5e2e1",
+                "on-secondary-fixed": "#341100",
+                "on-primary-fixed-variant": "#653e00",
+                "inverse-primary": "#855300",
+                "on-primary": "#472a00",
+                "primary-fixed-dim": "#ffb95f",
+                "on-surface": "#e5e2e1",
+                "surface-variant": "#353534",
+                "error-container": "#93000a",
+                "tertiary": "#51e77b",
+                "surface-container-high": "#2a2a2a",
+                "secondary-container": "#ec6a06",
+                "on-tertiary": "#003915",
+                "outline-variant": "#534434",
+                "on-tertiary-container": "#004f20",
+                "secondary": "#ffb690",
+                "tertiary-fixed": "#6bff8f",
+                "surface-container-highest": "#353534",
+                "primary-fixed": "#ffddb8",
+                "on-error": "#690005",
+                "surface-dim": "#131313",
+                "on-error-container": "#ffdad6",
+                "surface-container": "#201f1f",
+                "surface": "#131313",
+                "error": "#ffb4ab"
+              },
+              fontFamily: {
+                "headline": ["Space Grotesk"],
+                "body": ["Inter"],
+                "label": ["Inter"],
+                "mono": ["JetBrains Mono"]
+              },
+              borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+            },
+          },
+        }
+      </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        .active-nav-indicator {
+            box-shadow: 4px 0 0 0 #FFC174 inset;
+        }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: #131313; }
+        ::-webkit-scrollbar-thumb { background: #353534; border-radius: 10px; }
+      </style>
+</head>
+<body class="bg-background text-on-background font-body selection:bg-primary-container selection:text-on-primary-container">
+<div class="flex h-screen overflow-hidden">
+<!-- SideNavBar (Shared Component) -->
+<aside class="fixed left-0 top-0 h-full flex flex-col py-6 bg-[#1C1B1B] dark:bg-[#1C1B1B] w-64 border-r-0 z-50">
+<div class="px-6 mb-8">
+<div class="flex items-center gap-3 mb-1">
+<div class="w-8 h-8 bg-primary rounded-sm flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary text-xl" style="font-variation-settings: 'FILL' 1;">restaurant_menu</span>
+</div>
+<span class="text-xl font-bold text-[#F5F0EB] font-['Space_Grotesk'] tracking-tight">Atelier Admin</span>
+</div>
+<p class="text-xs text-[#F5F0EB]/40 font-mono uppercase tracking-widest">Station 01 - Main Floor</p>
+</div>
+<nav class="flex-1 px-3 space-y-1">
+<!-- Dashboard (Active) -->
+<a class="flex items-center gap-3 px-3 py-3 rounded-lg text-[#FFC174] font-bold border-r-2 border-[#FFC174] bg-[#353534]/30 transition-colors duration-200 group" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-['Space_Grotesk']">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-3 rounded-lg text-[#F5F0EB]/60 font-medium hover:text-[#F5F0EB] hover:bg-[#353534] transition-colors duration-200 group active:scale-95" href="#">
+<span class="material-symbols-outlined" data-icon="receipt_long">receipt_long</span>
+<span class="font-['Space_Grotesk']">Live Orders</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-3 rounded-lg text-[#F5F0EB]/60 font-medium hover:text-[#F5F0EB] hover:bg-[#353534] transition-colors duration-200 group active:scale-95" href="#">
+<span class="material-symbols-outlined" data-icon="soup_kitchen">soup_kitchen</span>
+<span class="font-['Space_Grotesk']">Kitchen Display</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-3 rounded-lg text-[#F5F0EB]/60 font-medium hover:text-[#F5F0EB] hover:bg-[#353534] transition-colors duration-200 group active:scale-95" href="#">
+<span class="material-symbols-outlined" data-icon="menu_book">menu_book</span>
+<span class="font-['Space_Grotesk']">Menu Editor</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-3 rounded-lg text-[#F5F0EB]/60 font-medium hover:text-[#F5F0EB] hover:bg-[#353534] transition-colors duration-200 group active:scale-95" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span class="font-['Space_Grotesk']">Staff Management</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-3 rounded-lg text-[#F5F0EB]/60 font-medium hover:text-[#F5F0EB] hover:bg-[#353534] transition-colors duration-200 group active:scale-95" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span class="font-['Space_Grotesk']">Reports</span>
+</a>
+</nav>
+<div class="px-6 mt-4 mb-6">
+<button class="w-full bg-primary-container text-on-primary-container font-bold py-3 rounded-xl flex items-center justify-center gap-2 hover:brightness-110 active:scale-[0.98] transition-all">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">add_circle</span>
+<span>Create Order</span>
+</button>
+</div>
+<div class="px-3 border-t border-outline-variant/10 pt-4 space-y-1">
+<div class="flex items-center justify-between px-3 py-2 text-[#F5F0EB]/60">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-sm">light_mode</span>
+<span class="text-xs font-medium font-['Space_Grotesk']">Mode Sombre</span>
+</div>
+<div class="w-8 h-4 bg-surface-container-highest rounded-full relative cursor-pointer">
+<div class="absolute right-0.5 top-0.5 w-3 h-3 bg-primary rounded-full"></div>
+</div>
+</div>
+<a class="flex items-center gap-3 px-3 py-3 rounded-lg text-[#F5F0EB]/60 font-medium hover:text-[#F5F0EB] hover:bg-[#353534] transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-['Space_Grotesk']">Settings</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-3 rounded-lg text-[#F5F0EB]/60 font-medium hover:text-[#F5F0EB] hover:bg-[#353534] transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+<span class="font-['Space_Grotesk']">Support</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 ml-64 flex flex-col h-full bg-background relative overflow-y-auto">
+<!-- TopAppBar (Shared Component Implementation) -->
+<header class="flex justify-between items-center w-full px-8 h-16 sticky top-0 bg-[#131313]/80 backdrop-blur-xl z-40 shadow-[0px_8px_24px_rgba(0,0,0,0.4)]">
+<div class="flex items-center gap-8">
+<h1 class="text-lg font-black text-[#F5F0EB] uppercase font-headline tracking-tighter">L'Atelier POS</h1>
+<div class="hidden md:flex items-center bg-surface-container-high px-4 py-1.5 rounded-lg border border-outline-variant/10">
+<span class="material-symbols-outlined text-on-surface-variant text-sm mr-2">search</span>
+<input class="bg-transparent border-none text-sm focus:ring-0 placeholder:text-on-surface-variant/50 w-64 text-on-surface" placeholder="Rechercher une commande..." type="text"/>
+<span class="text-[10px] text-on-surface-variant/40 font-mono ml-4 border border-outline-variant/30 px-1 rounded">⌘K</span>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-4 text-[#F5F0EB]/80">
+<div class="relative cursor-pointer hover:text-[#FFC174] transition-opacity active:opacity-80">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+<span class="absolute -top-1 -right-1 w-2 h-2 bg-primary rounded-full"></span>
+</div>
+<span class="material-symbols-outlined cursor-pointer hover:text-[#FFC174] transition-opacity active:opacity-80" data-icon="monetization_on">monetization_on</span>
+<div class="flex items-center gap-3 cursor-pointer hover:text-[#FFC174] transition-opacity active:opacity-80 group">
+<div class="flex flex-col items-end">
+<span class="text-[10px] font-mono leading-none text-on-surface-variant">Admin</span>
+<span class="text-xs font-bold font-headline">Jean Dupont</span>
+</div>
+<span class="material-symbols-outlined text-3xl" data-icon="account_circle" style="font-variation-settings: 'FILL' 1;">account_circle</span>
+</div>
+</div>
+</div>
+</header>
+<!-- Content Canvas -->
+<div class="p-8 max-w-7xl mx-auto w-full">
+<!-- Sync Indicator Bar -->
+<div class="mb-8 flex items-center justify-between bg-surface-container-low p-4 rounded-xl border-l-4 border-tertiary shadow-sm">
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2">
+<span class="relative flex h-3 w-3">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-tertiary opacity-75"></span>
+<span class="relative inline-flex rounded-full h-3 w-3 bg-tertiary"></span>
+</span>
+<span class="font-mono text-sm text-tertiary font-bold">DEXIE.JS CONNECTÉ</span>
+</div>
+<div class="h-4 w-px bg-outline-variant/20"></div>
+<p class="text-sm text-on-surface-variant">Synchronisation locale active • Dernière mise à jour : il y a 2s</p>
+</div>
+<div class="flex items-center gap-2 bg-surface-container-high px-3 py-1 rounded-full">
+<span class="material-symbols-outlined text-sm text-tertiary">cloud_done</span>
+<span class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Version Unifiée 2.4.0</span>
+</div>
+</div>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-12 gap-6">
+<!-- Welcome Hero Card (Large) -->
+<div class="col-span-12 lg:col-span-8 relative overflow-hidden bg-surface-container-low rounded-xl p-8 min-h-[320px] flex flex-col justify-end group">
+<div class="absolute inset-0 z-0 opacity-20 pointer-events-none">
+<div class="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent"></div>
+<img class="w-full h-full object-cover" data-alt="Intérieur de restaurant haut de gamme sombre et moderne" src="https://lh3.googleusercontent.com/aida-public/AB6AXuARMAkWmgy9YL6ygwxSIkdtH9c0y31rA5YGHsu7BQn-7LMq4_fxbmMrV4j9YWomS8CLdEbZGxyHDeJUBX4Wox6HpFjQ61RVTQIh65LkVtN1tc4e0QwB57SKjxnG5kM1zX5GkfQL9yqBVHjfDX6goFEwD90chWUP9a7Cy_iSfLuY49Tez86ZKAZ3MQO2X72PeBKCQRBis_ULQ7m0f08utfp6T8_Ye2WOcSqkWMVFyIcNiNpPvDbwjKg5glnBxdk5ARuI-hYxQsyPDku5"/>
+</div>
+<div class="relative z-10">
+<span class="bg-primary text-on-primary text-[10px] font-bold px-2 py-1 rounded uppercase tracking-widest mb-4 inline-block">Tableau de bord</span>
+<h2 class="text-4xl font-black text-[#F5F0EB] font-headline mb-2">Bienvenue à L'Atelier</h2>
+<p class="text-on-surface-variant max-w-md leading-relaxed">Le système est prêt pour le service du soir. 4 réservations confirmées pour les 30 prochaines minutes.</p>
+<div class="mt-8 flex gap-4">
+<button class="px-6 py-2.5 bg-[#F5F0EB] text-background font-bold rounded-lg flex items-center gap-2 hover:bg-white transition-all active:scale-95">
+<span class="material-symbols-outlined text-sm">rocket_launch</span>
+                                    Lancer le service
+                                </button>
+<button class="px-6 py-2.5 bg-surface-container-highest text-[#F5F0EB] font-bold rounded-lg border border-outline-variant/20 hover:bg-surface-bright transition-all active:scale-95">
+                                    Statistiques
+                                </button>
+</div>
+</div>
+</div>
+<!-- Performance Stats (Medium) -->
+<div class="col-span-12 md:col-span-6 lg:col-span-4 bg-surface-container-highest rounded-xl p-6 flex flex-col justify-between">
+<div class="flex justify-between items-start">
+<span class="material-symbols-outlined text-primary text-3xl">insights</span>
+<span class="text-[10px] font-mono text-tertiary">+12.4% vs hier</span>
+</div>
+<div>
+<span class="text-on-surface-variant text-sm font-medium">Chiffre d'Affaire</span>
+<div class="text-4xl font-bold font-mono text-[#F5F0EB] mt-1 tracking-tight">4 280,50€</div>
+</div>
+<div class="mt-6 flex items-center gap-2 text-xs text-on-surface-variant">
+<span class="w-2 h-2 rounded-full bg-primary"></span>
+<span>Objectif journalier atteint à 85%</span>
+</div>
+</div>
+<!-- Active Tables Grid (Focus Section) -->
+<div class="col-span-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+<!-- Table Card 1 -->
+<div class="bg-surface-container-low p-5 rounded-xl border border-outline-variant/10 hover:border-primary/30 transition-all cursor-pointer group">
+<div class="flex justify-between items-center mb-4">
+<span class="text-xs font-mono text-on-surface-variant">Table 04</span>
+<span class="px-2 py-0.5 bg-primary/10 text-primary text-[10px] font-bold rounded">OCCUPÉE</span>
+</div>
+<div class="space-y-3">
+<div class="flex justify-between items-center">
+<span class="text-sm font-medium">4 Personnes</span>
+<span class="text-sm font-mono text-on-surface-variant">42:12</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="flex -space-x-2">
+<div class="w-6 h-6 rounded-full bg-surface-container-highest border border-background flex items-center justify-center text-[8px]">JD</div>
+<div class="w-6 h-6 rounded-full bg-surface-container-high border border-background flex items-center justify-center text-[8px]">+3</div>
+</div>
+<span class="text-xs text-on-surface-variant">Serveur: Jean</span>
+</div>
+<div class="pt-2 border-t border-outline-variant/5 flex justify-between items-center">
+<span class="text-sm font-bold font-mono">112,00 €</span>
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors">arrow_forward_ios</span>
+</div>
+</div>
+</div>
+<!-- Table Card 2 (Kitchen Alert) -->
+<div class="bg-surface-container-low p-5 rounded-xl border-l-4 border-error shadow-sm group cursor-pointer">
+<div class="flex justify-between items-center mb-4">
+<span class="text-xs font-mono text-on-surface-variant">Table 12</span>
+<span class="px-2 py-0.5 bg-error/10 text-error text-[10px] font-bold rounded uppercase">URGENT</span>
+</div>
+<div class="space-y-3">
+<div class="flex justify-between items-center">
+<span class="text-sm font-medium">2 Personnes</span>
+<span class="text-sm font-mono text-error animate-pulse">28:45</span>
+</div>
+<p class="text-xs text-on-surface-variant italic">Attente Entrée &gt; 15min</p>
+<div class="pt-2 border-t border-outline-variant/5 flex justify-between items-center">
+<span class="text-sm font-bold font-mono">45,50 €</span>
+<span class="material-symbols-outlined text-error">warning</span>
+</div>
+</div>
+</div>
+<!-- Table Card 3 -->
+<div class="bg-surface-container-low p-5 rounded-xl border border-outline-variant/10 hover:border-primary/30 transition-all cursor-pointer group">
+<div class="flex justify-between items-center mb-4">
+<span class="text-xs font-mono text-on-surface-variant">Table 08</span>
+<span class="px-2 py-0.5 bg-tertiary/10 text-tertiary text-[10px] font-bold rounded">PRÊT</span>
+</div>
+<div class="space-y-3">
+<div class="flex justify-between items-center">
+<span class="text-sm font-medium">1 Personne</span>
+<span class="text-sm font-mono text-on-surface-variant">12:05</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm text-tertiary">check_circle</span>
+<span class="text-xs text-on-surface-variant">Commandes prêtes</span>
+</div>
+<div class="pt-2 border-t border-outline-variant/5 flex justify-between items-center">
+<span class="text-sm font-bold font-mono">24,00 €</span>
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors">receipt</span>
+</div>
+</div>
+</div>
+<!-- Add Table Placeholder -->
+<div class="bg-surface-container-low p-5 rounded-xl border-2 border-dashed border-outline-variant/20 flex flex-col items-center justify-center gap-3 hover:border-primary/50 transition-all cursor-pointer group">
+<div class="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center group-hover:bg-primary transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-background">add</span>
+</div>
+<span class="text-xs font-bold uppercase tracking-widest text-on-surface-variant">Nouvelle Table</span>
+</div>
+</div>
+<!-- Live Kitchen Monitor (Wide) -->
+<div class="col-span-12 lg:col-span-12 bg-surface-container-low rounded-xl overflow-hidden border border-outline-variant/5">
+<div class="px-6 py-4 bg-surface-container-high flex justify-between items-center">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">soup_kitchen</span>
+<h3 class="font-headline font-bold uppercase tracking-wider text-sm">Moniteur Cuisine en Direct</h3>
+</div>
+<div class="flex gap-2">
+<span class="text-[10px] font-mono text-on-surface-variant">7 COMMANDES EN COURS</span>
+<div class="h-4 w-px bg-outline-variant/20"></div>
+<span class="text-[10px] font-mono text-tertiary">SYNC OK</span>
+</div>
+</div>
+<div class="p-0 overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-background/40">
+<th class="px-6 py-3 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Commande</th>
+<th class="px-6 py-3 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Table</th>
+<th class="px-6 py-3 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Items</th>
+<th class="px-6 py-3 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Temps écoule</th>
+<th class="px-6 py-3 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant text-right">Statut</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/5">
+<tr class="hover:bg-surface-container-high transition-colors">
+<td class="px-6 py-4 font-mono text-sm">#ORD-2841</td>
+<td class="px-6 py-4 font-headline font-bold">Table 04</td>
+<td class="px-6 py-4">
+<div class="flex gap-1">
+<span class="bg-surface-container-highest px-2 py-0.5 rounded text-[10px]">2x Burger Classique</span>
+<span class="bg-surface-container-highest px-2 py-0.5 rounded text-[10px]">1x Salade César</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="text-sm font-mono text-tertiary">08:24</span>
+</td>
+<td class="px-6 py-4 text-right">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-container text-on-primary-container">En préparation</span>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-high transition-colors">
+<td class="px-6 py-4 font-mono text-sm">#ORD-2840</td>
+<td class="px-6 py-4 font-headline font-bold">Table 12</td>
+<td class="px-6 py-4">
+<div class="flex gap-1">
+<span class="bg-surface-container-highest px-2 py-0.5 rounded text-[10px]">1x Filet de Boeuf</span>
+<span class="bg-surface-container-highest px-2 py-0.5 rounded text-[10px]">1x Tartare Saumon</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="text-sm font-mono text-error">22:15</span>
+</td>
+<td class="px-6 py-4 text-right">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-error-container text-on-error-container">Retardé</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+<!-- Portal Footer Info -->
+<footer class="mt-auto p-8 flex flex-col md:flex-row justify-between items-center gap-4 bg-surface-container-lowest/50 border-t border-outline-variant/5">
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-tertiary"></div>
+<span class="text-[10px] font-mono text-on-surface-variant uppercase tracking-tighter">Instance: PROD-PARIS-01</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm text-on-surface-variant">database</span>
+<span class="text-[10px] font-mono text-on-surface-variant uppercase tracking-tighter">Dexie.js IndexedDB: 24.2 MB</span>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<span class="text-[10px] font-mono text-on-surface-variant/50 uppercase">Système Unifié v2.4 (Atelier POS)</span>
+<div class="px-2 py-1 bg-surface-container-high rounded text-[10px] text-on-surface-variant font-bold border border-outline-variant/20">STABLE</div>
+</div>
+</footer>
+</main>
+</div>
+<!-- Contextual FAB (Shared Component Strategy) -->
+<button class="fixed bottom-8 right-8 w-14 h-14 bg-primary text-on-primary rounded-xl shadow-2xl flex items-center justify-center group active:scale-95 transition-all hover:rotate-90 z-50">
+<span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">add</span>
+</button>
+</body></html>

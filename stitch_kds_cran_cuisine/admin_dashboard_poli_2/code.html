@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="fr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>L'Atelier POS - Tableau de bord</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;800&amp;family=Inter:wght@300;400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #131313;
+        }
+        .font-headline { font-family: 'Space Grotesk', sans-serif; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+        
+        .glass-card {
+            background: rgba(53, 53, 52, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        
+        .industrial-gradient {
+            background: linear-gradient(15deg, #f59e0b 0%, #ffc174 100%);
+        }
+
+        /* Custom scrollbar for data-heavy sections */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: #1c1b1b; }
+        ::-webkit-scrollbar-thumb { background: #353534; border-radius: 10px; }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              colors: {
+                "outline": "#a08e7a",
+                "secondary-fixed-dim": "#ffb690",
+                "on-primary-container": "#613b00",
+                "surface-container-low": "#1c1b1b",
+                "on-tertiary-container": "#004f20",
+                "surface-container-lowest": "#0e0e0e",
+                "on-tertiary": "#003915",
+                "surface-container-highest": "#353534",
+                "inverse-on-surface": "#313030",
+                "primary-fixed": "#ffddb8",
+                "surface-bright": "#3a3939",
+                "on-surface": "#e5e2e1",
+                "tertiary": "#51e77b",
+                "error": "#ffb4ab",
+                "tertiary-fixed-dim": "#4ae176",
+                "secondary-fixed": "#ffdbca",
+                "surface-container-high": "#2a2a2a",
+                "tertiary-container": "#2bca62",
+                "primary-fixed-dim": "#ffb95f",
+                "primary": "#ffc174",
+                "on-tertiary-fixed": "#002109",
+                "surface-container": "#201f1f",
+                "on-tertiary-fixed-variant": "#005321",
+                "surface": "#131313",
+                "on-primary-fixed": "#2a1700",
+                "on-secondary-container": "#4a1c00",
+                "on-secondary-fixed": "#341100",
+                "outline-variant": "#534434",
+                "error-container": "#93000a",
+                "primary-container": "#f59e0b",
+                "on-primary": "#472a00",
+                "surface-tint": "#ffb95f",
+                "inverse-surface": "#e5e2e1",
+                "background": "#131313",
+                "surface-variant": "#353534",
+                "tertiary-fixed": "#6bff8f",
+                "secondary-container": "#ec6a06",
+                "on-error": "#690005",
+                "on-error-container": "#ffdad6",
+                "on-secondary": "#552100",
+                "on-background": "#e5e2e1",
+                "on-surface-variant": "#d8c3ad",
+                "surface-dim": "#131313",
+                "on-secondary-fixed-variant": "#783200",
+                "secondary": "#ffb690",
+                "on-primary-fixed-variant": "#653e00",
+                "inverse-primary": "#855300"
+              },
+              fontFamily: {
+                "headline": ["Space Grotesk"],
+                "body": ["Inter"],
+                "label": ["Inter"]
+              },
+              borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+            },
+          },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-surface selection:bg-primary selection:text-on-primary-container">
+<!-- Top Navigation Bar -->
+<header class="flex justify-between items-center w-full px-6 h-16 fixed top-0 z-50 bg-[#131313]">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-[#FFC174]">menu</span>
+<h1 class="font-['Space_Grotesk'] font-bold text-lg uppercase tracking-wider text-[#F5F0EB]">L'Atelier POS</h1>
+</div>
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-[#F5F0EB] opacity-60 hover:opacity-100 transition-opacity p-2 rounded-lg hover:bg-[#353534] active:scale-95 duration-150">sync</button>
+<button class="material-symbols-outlined text-[#F5F0EB] opacity-60 hover:opacity-100 transition-opacity p-2 rounded-lg hover:bg-[#353534] active:scale-95 duration-150">light_mode</button>
+<button class="material-symbols-outlined text-[#F5F0EB] opacity-60 hover:opacity-100 transition-opacity p-2 rounded-lg hover:bg-[#353534] active:scale-95 duration-150">account_circle</button>
+</div>
+</header>
+<div class="flex pt-16 min-h-screen">
+<!-- Sidebar Navigation -->
+<aside class="fixed left-0 top-0 h-full flex flex-col py-6 bg-[#1C1B1B] w-64 shadow-[8px_0_24px_rgba(0,0,0,0.4)] z-40">
+<div class="px-6 mb-10 flex items-center gap-3">
+<div class="w-10 h-10 rounded-xl bg-primary-container flex items-center justify-center text-on-primary-container">
+<span class="material-symbols-outlined" data-weight="fill">restaurant_menu</span>
+</div>
+<div>
+<p class="text-[#F5F0EB] font-bold font-headline text-sm leading-tight">Chef d'Atelier</p>
+<p class="text-[#F5F0EB]/60 text-xs uppercase tracking-widest">Service Midi</p>
+</div>
+</div>
+<nav class="flex-1 px-3 space-y-1">
+<a class="flex items-center gap-4 text-[#F5F0EB]/60 px-4 py-3 hover:text-[#F5F0EB] hover:bg-[#353534]/50 rounded-lg transition-all duration-300 active:scale-95 active:translate-x-1" href="#">
+<span class="material-symbols-outlined">restaurant_menu</span>
+<span class="font-['Inter'] text-sm font-medium">Menu</span>
+</a>
+<a class="flex items-center gap-4 text-[#F5F0EB]/60 px-4 py-3 hover:text-[#F5F0EB] hover:bg-[#353534]/50 rounded-lg transition-all duration-300 active:scale-95 active:translate-x-1" href="#">
+<span class="material-symbols-outlined">receipt_long</span>
+<span class="font-['Inter'] text-sm font-medium">Commandes</span>
+</a>
+<a class="flex items-center gap-4 text-[#F5F0EB]/60 px-4 py-3 hover:text-[#F5F0EB] hover:bg-[#353534]/50 rounded-lg transition-all duration-300 active:scale-95 active:translate-x-1" href="#">
+<span class="material-symbols-outlined">table_restaurant</span>
+<span class="font-['Inter'] text-sm font-medium">Tables</span>
+</a>
+<a class="flex items-center gap-4 bg-[#353534] text-[#FFC174] rounded-lg px-4 py-3 border-l-4 border-[#FFC174] transition-all duration-300 active:scale-95 active:translate-x-1" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-['Inter'] text-sm font-medium">Tableau de bord</span>
+</a>
+<a class="flex items-center gap-4 text-[#F5F0EB]/60 px-4 py-3 hover:text-[#F5F0EB] hover:bg-[#353534]/50 rounded-lg transition-all duration-300 active:scale-95 active:translate-x-1" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-['Inter'] text-sm font-medium">Paramètres</span>
+</a>
+</nav>
+<div class="px-6 py-4 space-y-4">
+<div class="h-px bg-outline-variant/10 w-full"></div>
+<div class="flex items-center justify-between p-2 bg-surface-container-highest rounded-full transition-all">
+<button class="w-1/2 flex items-center justify-center gap-2 py-1.5 rounded-full text-xs font-bold text-on-surface opacity-40 hover:opacity-100 transition-all active:scale-95">
+<span class="material-symbols-outlined text-sm">light_mode</span>
+</button>
+<button class="w-1/2 flex items-center justify-center gap-2 py-1.5 rounded-full text-xs font-bold bg-primary text-on-primary transition-all active:scale-95">
+<span class="material-symbols-outlined text-sm" data-weight="fill">dark_mode</span>
+</button>
+</div>
+<a class="flex items-center gap-4 text-[#F5F0EB]/60 px-4 py-2 hover:text-error transition-all duration-300" href="#">
+<span class="material-symbols-outlined">emergency_home</span>
+<span class="font-['Inter'] text-sm font-medium uppercase tracking-tighter">Urgence</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 ml-64 p-8 animate-fade-in opacity-0" style="animation: fadeIn 0.3s ease-out forwards;">
+<!-- Header Section -->
+<div class="flex justify-between items-end mb-10">
+<div>
+<p class="text-primary font-mono text-xs uppercase tracking-widest mb-1">Live Intelligence</p>
+<h2 class="text-4xl font-headline font-extrabold text-on-surface">Atelier Dashboard</h2>
+</div>
+<div class="flex gap-4">
+<div class="bg-surface-container-high p-1 rounded-xl flex">
+<button class="px-4 py-2 text-xs font-bold rounded-lg text-on-surface/40 hover:text-on-surface transition-all active:scale-95">24H</button>
+<button class="px-4 py-2 text-xs font-bold rounded-lg bg-surface-container-highest text-primary shadow-sm transition-all active:scale-95">LIVE</button>
+</div>
+<button class="px-6 py-2 bg-primary-container text-on-primary-container font-bold rounded-xl flex items-center gap-2 hover:brightness-105 active:scale-95 transition-all">
+<span class="material-symbols-outlined text-lg">add</span>
+                        Nouvelle Commande
+                    </button>
+</div>
+</div>
+<!-- KPI Bento Grid -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
+<div class="bg-surface-container-low p-6 rounded-xl border-l-4 border-primary group hover:bg-surface-container transition-all cursor-default">
+<div class="flex justify-between items-start mb-4">
+<span class="material-symbols-outlined text-primary/60 group-hover:text-primary transition-colors">payments</span>
+<span class="text-tertiary text-xs font-mono font-bold">+12.4%</span>
+</div>
+<p class="text-on-surface/60 text-xs font-bold uppercase tracking-widest mb-1">CA Journalier</p>
+<h3 class="text-3xl font-mono font-bold text-on-surface">4,280.50 €</h3>
+</div>
+<div class="bg-surface-container-low p-6 rounded-xl border-l-4 border-secondary group hover:bg-surface-container transition-all cursor-default">
+<div class="flex justify-between items-start mb-4">
+<span class="material-symbols-outlined text-secondary/60 group-hover:text-secondary transition-colors">shopping_cart</span>
+<span class="text-tertiary text-xs font-mono font-bold">+5.2%</span>
+</div>
+<p class="text-on-surface/60 text-xs font-bold uppercase tracking-widest mb-1">Commandes</p>
+<h3 class="text-3xl font-mono font-bold text-on-surface">142</h3>
+</div>
+<div class="bg-surface-container-low p-6 rounded-xl border-l-4 border-tertiary group hover:bg-surface-container transition-all cursor-default">
+<div class="flex justify-between items-start mb-4">
+<span class="material-symbols-outlined text-tertiary/60 group-hover:text-tertiary transition-colors">timer</span>
+<span class="text-error text-xs font-mono font-bold">-2.1m</span>
+</div>
+<p class="text-on-surface/60 text-xs font-bold uppercase tracking-widest mb-1">Moy. Préparation</p>
+<h3 class="text-3xl font-mono font-bold text-on-surface">14:20</h3>
+</div>
+<div class="bg-surface-container-low p-6 rounded-xl border-l-4 border-outline group hover:bg-surface-container transition-all cursor-default">
+<div class="flex justify-between items-start mb-4">
+<span class="material-symbols-outlined text-outline/60 group-hover:text-outline transition-colors">group</span>
+<span class="text-tertiary text-xs font-mono font-bold">85%</span>
+</div>
+<p class="text-on-surface/60 text-xs font-bold uppercase tracking-widest mb-1">Occupation</p>
+<h3 class="text-3xl font-mono font-bold text-on-surface">24/28</h3>
+</div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+<!-- Live Orders Status -->
+<div class="lg:col-span-2 space-y-6">
+<div class="flex justify-between items-center">
+<h4 class="font-headline font-bold text-xl flex items-center gap-3">
+<span class="w-2 h-2 rounded-full bg-tertiary animate-pulse"></span>
+                            Commandes en cuisine
+                        </h4>
+<a class="text-primary text-sm font-bold hover:underline" href="#">Voir tout</a>
+</div>
+<div class="space-y-4">
+<!-- Order Card -->
+<div class="bg-surface-container-low hover:bg-surface-container-high transition-all p-5 rounded-xl flex items-center gap-6 group">
+<div class="flex flex-col items-center justify-center bg-surface-container-highest px-4 py-2 rounded-lg border border-outline-variant/10">
+<span class="text-on-surface/40 text-[10px] font-bold uppercase">Table</span>
+<span class="text-2xl font-mono font-bold text-primary">08</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start mb-1">
+<h5 class="font-bold text-on-surface group-hover:text-primary transition-colors">#2045 — Jean D.</h5>
+<span class="font-mono text-sm text-secondary-fixed-dim">12:05</span>
+</div>
+<p class="text-sm text-on-surface/60 line-clamp-1">2x Burger Signature, 1x Entrecôte, 3x Frites Maison, 2x Coca Zero</p>
+</div>
+<div class="flex flex-col items-end gap-2">
+<span class="bg-tertiary-container/20 text-tertiary px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest">En cours</span>
+<div class="w-24 h-1.5 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-tertiary w-2/3"></div>
+</div>
+</div>
+</div>
+<!-- Order Card (Urgent) -->
+<div class="bg-surface-container-low hover:bg-surface-container-high transition-all p-5 rounded-xl flex items-center gap-6 border-l-4 border-error relative overflow-hidden group">
+<div class="absolute inset-0 bg-error/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<div class="flex flex-col items-center justify-center bg-surface-container-highest px-4 py-2 rounded-lg border border-error/20">
+<span class="text-error/60 text-[10px] font-bold uppercase">Table</span>
+<span class="text-2xl font-mono font-bold text-error">12</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start mb-1">
+<h5 class="font-bold text-on-surface">#2043 — Sophie L.</h5>
+<span class="font-mono text-sm text-error animate-pulse">22:15</span>
+</div>
+<p class="text-sm text-on-surface/60 line-clamp-1">1x Tartare de Boeuf, 1x Salade César, 1x Chablis 75cl</p>
+</div>
+<div class="flex flex-col items-end gap-2">
+<span class="bg-error/20 text-error px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest">En Retard</span>
+<button class="bg-error text-on-error font-bold text-xs py-1.5 px-4 rounded-lg active:scale-95 transition-all">Prioriser</button>
+</div>
+</div>
+<!-- Order Card -->
+<div class="bg-surface-container-low hover:bg-surface-container-high transition-all p-5 rounded-xl flex items-center gap-6 group">
+<div class="flex flex-col items-center justify-center bg-surface-container-highest px-4 py-2 rounded-lg border border-outline-variant/10">
+<span class="text-on-surface/40 text-[10px] font-bold uppercase">Emport</span>
+<span class="text-2xl font-mono font-bold text-primary">WEB</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start mb-1">
+<h5 class="font-bold text-on-surface group-hover:text-primary transition-colors">#2046 — Marc A.</h5>
+<span class="font-mono text-sm text-on-surface/40">04:30</span>
+</div>
+<p class="text-sm text-on-surface/60 line-clamp-1">4x Menu MIDI, 4x Café Expresso</p>
+</div>
+<div class="flex flex-col items-end gap-2">
+<span class="bg-surface-container-highest text-on-surface/60 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest">En Attente</span>
+<div class="w-24 h-1.5 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-primary w-1/4"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Secondary Column (Data/Visuals) -->
+<div class="space-y-8">
+<!-- Revenue Visual (Placeholder for chart) -->
+<div class="bg-surface-container-high p-6 rounded-xl">
+<div class="flex justify-between items-center mb-6">
+<h4 class="font-headline font-bold text-lg">Flux de revenus</h4>
+<span class="material-symbols-outlined text-on-surface/40">more_vert</span>
+</div>
+<div class="h-48 flex items-end justify-between gap-1 mb-6">
+<div class="w-full bg-primary/20 rounded-t-lg h-24 hover:bg-primary transition-all duration-300"></div>
+<div class="w-full bg-primary/20 rounded-t-lg h-32 hover:bg-primary transition-all duration-300"></div>
+<div class="w-full bg-primary/20 rounded-t-lg h-16 hover:bg-primary transition-all duration-300"></div>
+<div class="w-full bg-primary/20 rounded-t-lg h-40 hover:bg-primary transition-all duration-300"></div>
+<div class="w-full bg-primary/20 rounded-t-lg h-36 hover:bg-primary transition-all duration-300"></div>
+<div class="w-full bg-primary rounded-t-lg h-44 group relative">
+<div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-on-surface text-surface text-[10px] px-2 py-1 rounded font-bold opacity-0 group-hover:opacity-100 transition-opacity">1.2k</div>
+</div>
+<div class="w-full bg-primary/20 rounded-t-lg h-28 hover:bg-primary transition-all duration-300"></div>
+</div>
+<div class="flex justify-between text-[10px] font-mono font-bold text-on-surface/40 uppercase">
+<span>10:00</span>
+<span>12:00</span>
+<span>14:00</span>
+<span>16:00</span>
+</div>
+</div>
+<!-- Top Items -->
+<div class="bg-surface-container-high p-6 rounded-xl">
+<h4 class="font-headline font-bold text-lg mb-6">Meilleures ventes</h4>
+<div class="space-y-5">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-lg overflow-hidden bg-surface-container-highest">
+<img alt="Burger" class="w-full h-full object-cover" data-alt="Juicy gourmet burger on a dark plate" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAWRjXTlVCd-1mNHNVh9lJxiSPOHCDHu-Zb-6D0ZJDqAeQemJDweOBDideKGfyjiW52s9CkCh2uqO8S6X9wN99qL0TYNmibi2gOVwzrXF4na3Gc4hsBDDbwo9ZrEYgAQr_789ovvZRDspXqzfL-rGfUtAdShQ5Sr4L4I7kftXkQxyiJGxV9Qg5-0cnAyKMysc7PjHbJxF8RuoAO7Mp5NtRzIrXZL8Fd6TUwiyDSxm7ZmIAv1eDpq9cvRmFW7_m2gRY3DdSiXa5NMzKt"/>
+</div>
+<div class="flex-1">
+<p class="text-sm font-bold text-on-surface">Burger L'Atelier</p>
+<div class="w-full h-1 bg-surface-container-highest rounded-full mt-2">
+<div class="h-full bg-primary w-[88%] rounded-full"></div>
+</div>
+</div>
+<span class="font-mono text-xs font-bold">42</span>
+</div>
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-lg overflow-hidden bg-surface-container-highest">
+<img alt="Steak" class="w-full h-full object-cover" data-alt="Tender grilled ribs with barbecue sauce" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBWdK22MyhdNI6noWllez57i2-bdQp7G4SP-ZCdznSpLH3kO7lbh9lhq4dhUUtW6OCHfCFEZJ1d4Bcb7K4lbIUSL6rrml09zz_xfR546FIOCwF6UNx8Vo1PCVfWluA4yySgr3X1uUm5AgrxpuWBZhaIZi8pJtl63kX768DNLSV5lSnenL_2A0A4uGFXbyCfLTtvyKfWiuiJtNcJWNh6tGvWdhviSRUIx1VB66npIxygBG3UbBu65hjrmtqOqMkRAfNSWBSHillIcEtr"/>
+</div>
+<div class="flex-1">
+<p class="text-sm font-bold text-on-surface">Ribs Fondants</p>
+<div class="w-full h-1 bg-surface-container-highest rounded-full mt-2">
+<div class="h-full bg-primary w-[65%] rounded-full"></div>
+</div>
+</div>
+<span class="font-mono text-xs font-bold">28</span>
+</div>
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-lg overflow-hidden bg-surface-container-highest">
+<img alt="Pizza" class="w-full h-full object-cover" data-alt="Wood-fired artisanal pizza with basil" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD3w2Jw-Q0TY8UBXMTLFaS36evQbxaDu5FgtYpdf4rnNLgYt9NOowWb8WwyrnJ_66MXk65jAbngWBV112Rt860ibekSt1KzQZjJoRNmPAhfV4JCGV2LLHxzrnU5hFyf1nBFnibm7PkI0OM0g5emUO85nxAy0UZ6LssysFWGu3n1X9H3THZaUilwcGYusw1NEUzxzs_Ku7AI6PySPbg_XjOKVzaWUO4xhIz2fPFkiqgCdIufqsxGAvZhGwgSOwwe828mlfB610eleKFD"/>
+</div>
+<div class="flex-1">
+<p class="text-sm font-bold text-on-surface">Pizza Bianca</p>
+<div class="w-full h-1 bg-surface-container-highest rounded-full mt-2">
+<div class="h-full bg-primary w-[45%] rounded-full"></div>
+</div>
+</div>
+<span class="font-mono text-xs font-bold">19</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+<!-- Background Elements -->
+<div class="fixed top-0 right-0 w-[500px] h-[500px] bg-primary/5 blur-[120px] rounded-full -z-10 pointer-events-none"></div>
+<div class="fixed bottom-0 left-64 w-[300px] h-[300px] bg-secondary/5 blur-[100px] rounded-full -z-10 pointer-events-none"></div>
+<style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</body></html>
