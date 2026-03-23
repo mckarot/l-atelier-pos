@@ -31,7 +31,7 @@ export function useFloorPlan(sectorFilter?: string) {
   // Enrichir les tables avec les données de commandes
   const floorTables: FloorTable[] = (tables || []).map((table) => {
     const order = activeOrders?.find((o) => o.tableId === table.id);
-    
+
     let tableOrder: TableOrder | undefined;
     if (order) {
       tableOrder = {
@@ -46,6 +46,7 @@ export function useFloorPlan(sectorFilter?: string) {
         total: order.total || 0,
         startTime: order.createdAt,
         customerName: order.customerName,
+        notes: order.notes,
       };
     }
 
@@ -108,6 +109,7 @@ export function useTable(tableId: number) {
       total: order.total || 0,
       startTime: order.createdAt,
       customerName: order.customerName,
+      notes: order.notes,
     };
   }
 

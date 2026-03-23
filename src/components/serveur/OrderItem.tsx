@@ -1,29 +1,29 @@
 // src/components/serveur/OrderItem.tsx
 // Item de commande avec contrôles de quantité
 
-import { cn } from '../../utils/cn';
 import type { OrderItem as OrderItemType } from './types';
 
 export interface OrderItemProps {
   item: OrderItemType;
-  onQuantityChange?: (itemId: number, delta: number) => void;
+  itemIndex: number; // Index de l'item dans la liste
+  onQuantityChange?: (itemIndex: number, delta: number) => void;
   readOnly?: boolean;
 }
 
-export function OrderItem({ item, onQuantityChange, readOnly = false }: OrderItemProps): JSX.Element {
+export function OrderItem({ item, itemIndex, onQuantityChange, readOnly = false }: OrderItemProps): JSX.Element {
   const handleDecrement = () => {
     if (!readOnly && item.quantity > 0) {
-      onQuantityChange?.(item.id, -1);
+      onQuantityChange?.(itemIndex, -1);
     }
   };
 
   const handleIncrement = () => {
     if (!readOnly) {
-      onQuantityChange?.(item.id, 1);
+      onQuantityChange?.(itemIndex, 1);
     }
   };
 
-  const itemTotal = item.price * item.quantity;
+  const itemTotal = (item.price || 0) * item.quantity;
 
   return (
     <div className="bg-surface-container p-4 rounded-lg border border-outline-variant/10">
@@ -44,7 +44,7 @@ export function OrderItem({ item, onQuantityChange, readOnly = false }: OrderIte
             </p>
           )}
           <span className="text-primary font-mono text-sm font-bold">
-            €{item.price.toFixed(2)}
+            €{(item.price || 0).toFixed(2)}
           </span>
         </div>
 
@@ -55,12 +55,11 @@ export function OrderItem({ item, onQuantityChange, readOnly = false }: OrderIte
               <button
                 onClick={handleDecrement}
                 disabled={item.quantity <= 0}
-                className={cn(
-                  'w-8 h-8 rounded-lg flex items-center justify-center transition-colors',
+                className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${
                   item.quantity <= 0
                     ? 'bg-surface-container-high text-on-surface-variant/30 cursor-not-allowed'
                     : 'bg-surface-container-highest text-on-surface hover:bg-primary-container hover:text-on-primary-container'
-                )}
+                }`}
                 aria-label="Diminuer la quantité"
               >
                 <span className="material-symbols-outlined text-sm">remove</span>

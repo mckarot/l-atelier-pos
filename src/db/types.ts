@@ -64,6 +64,7 @@ export type StationType =
 
 /** Item individuel dans une commande */
 export interface OrderItem {
+  id?: number; // Identifiant optionnel pour les opérations de mise à jour
   name: string;
   quantity: number;
   customization?: string;
@@ -71,11 +72,12 @@ export interface OrderItem {
   station?: StationType;
   supplements?: Supplement[];
   cookingLevel?: CookingLevel;
+  price?: number; // Prix unitaire (pour affichage et calculs)
 }
 
 /** Commande complète */
 export interface Order {
-  id: number;
+  id: number; // Auto-incrémenté par Dexie lors de l'insertion
   tableId: number;
   customerName: string;
   status: OrderStatus;
@@ -85,6 +87,8 @@ export interface Order {
   createdAt: number;
   updatedAt?: number;
   servedAt?: number;
+  paymentMethod?: 'especes' | 'cb' | 'none';
+  paidAt?: number;
 }
 
 /** Table du restaurant */

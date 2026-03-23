@@ -33,10 +33,21 @@ const AdminMenuView = React.lazy(() => import('./views/Admin/Menu'));
 const AdminStaffView = React.lazy(() => import('./views/Admin/Staff'));
 const AdminReportsView = React.lazy(() => import('./views/Admin/Reports'));
 const KDSView = React.lazy(() => import('./views/KDS'));
+const KDSMenuView = React.lazy(() => import('./views/KDS/MenuView'));
+const KDSTablesView = React.lazy(() => import('./views/KDS/TablesView'));
+const KDSDashboardView = React.lazy(() => import('./views/KDS/DashboardView'));
+const KDSSettingsView = React.lazy(() => import('./views/KDS/SettingsView'));
 const ServeurLayout = React.lazy(() => import('./views/Serveur'));
 const FloorPlanView = React.lazy(() => import('./views/Serveur/FloorPlanView'));
 const ReservationsView = React.lazy(() => import('./views/Serveur/ReservationsView'));
+const ServeurMenuView = React.lazy(() => import('./views/Serveur/MenuView'));
+const ServeurOrdersView = React.lazy(() => import('./views/Serveur/OrdersView'));
+const ServeurDashboardView = React.lazy(() => import('./views/Serveur/DashboardView'));
+const ServeurSettingsView = React.lazy(() => import('./views/Serveur/SettingsView'));
 const ClientView = React.lazy(() => import('./views/Client'));
+const ClientOrdersView = React.lazy(() => import('./views/Client/OrdersView'));
+const ClientTablesView = React.lazy(() => import('./views/Client/TablesView'));
+const ClientDashboardView = React.lazy(() => import('./views/Client/DashboardView'));
 
 // Helper pour récupérer le rôle depuis localStorage
 function getUserRole(): string | null {
@@ -154,6 +165,44 @@ export const router = createBrowserRouter([
           </ProtectedRoute>
         ),
         errorElement: <ErrorBoundary />,
+        children: [
+          {
+            path: 'menu',
+            element: (
+              <Suspense fallback={<LoadingFallback />}>
+                <KDSMenuView />
+              </Suspense>
+            ),
+            errorElement: <ErrorBoundary />,
+          },
+          {
+            path: 'tables',
+            element: (
+              <Suspense fallback={<LoadingFallback />}>
+                <KDSTablesView />
+              </Suspense>
+            ),
+            errorElement: <ErrorBoundary />,
+          },
+          {
+            path: 'dashboard',
+            element: (
+              <Suspense fallback={<LoadingFallback />}>
+                <KDSDashboardView />
+              </Suspense>
+            ),
+            errorElement: <ErrorBoundary />,
+          },
+          {
+            path: 'settings',
+            element: (
+              <Suspense fallback={<LoadingFallback />}>
+                <KDSSettingsView />
+              </Suspense>
+            ),
+            errorElement: <ErrorBoundary />,
+          },
+        ],
       },
       {
         path: 'serveur/*',
@@ -184,6 +233,42 @@ export const router = createBrowserRouter([
             ),
             errorElement: <ErrorBoundary />,
           },
+          {
+            path: 'menu',
+            element: (
+              <Suspense fallback={<LoadingFallback />}>
+                <ServeurMenuView />
+              </Suspense>
+            ),
+            errorElement: <ErrorBoundary />,
+          },
+          {
+            path: 'orders',
+            element: (
+              <Suspense fallback={<LoadingFallback />}>
+                <ServeurOrdersView />
+              </Suspense>
+            ),
+            errorElement: <ErrorBoundary />,
+          },
+          {
+            path: 'dashboard',
+            element: (
+              <Suspense fallback={<LoadingFallback />}>
+                <ServeurDashboardView />
+              </Suspense>
+            ),
+            errorElement: <ErrorBoundary />,
+          },
+          {
+            path: 'settings',
+            element: (
+              <Suspense fallback={<LoadingFallback />}>
+                <ServeurSettingsView />
+              </Suspense>
+            ),
+            errorElement: <ErrorBoundary />,
+          },
         ],
       },
       {
@@ -196,6 +281,35 @@ export const router = createBrowserRouter([
           </ProtectedRoute>
         ),
         errorElement: <ErrorBoundary />,
+        children: [
+          {
+            path: 'orders',
+            element: (
+              <Suspense fallback={<LoadingFallback />}>
+                <ClientOrdersView />
+              </Suspense>
+            ),
+            errorElement: <ErrorBoundary />,
+          },
+          {
+            path: 'tables',
+            element: (
+              <Suspense fallback={<LoadingFallback />}>
+                <ClientTablesView />
+              </Suspense>
+            ),
+            errorElement: <ErrorBoundary />,
+          },
+          {
+            path: 'dashboard',
+            element: (
+              <Suspense fallback={<LoadingFallback />}>
+                <ClientDashboardView />
+              </Suspense>
+            ),
+            errorElement: <ErrorBoundary />,
+          },
+        ],
       },
     ],
   },

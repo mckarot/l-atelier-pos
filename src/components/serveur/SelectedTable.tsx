@@ -2,15 +2,14 @@
 // Panel de détail d'une table sélectionnée
 
 import { useState } from 'react';
-import { cn } from '../../utils/cn';
-import type { FloorTable, OrderItem } from './types';
+import { useServerOrders } from '../../hooks/useServerOrders';
+import type { FloorTable } from './types';
 import { OrderItem as OrderItemComponent } from './OrderItem';
 import { useElapsedTime } from '../../hooks/useFloorPlan';
 
 export interface SelectedTableProps {
   table: FloorTable;
   onClose: () => void;
-  onAddItem?: () => void;
   onCheckout?: () => void;
   onAddNote?: () => void;
   onSplit?: () => void;
@@ -19,17 +18,17 @@ export interface SelectedTableProps {
 export function SelectedTable({
   table,
   onClose,
-  onAddItem,
   onCheckout,
   onAddNote,
   onSplit,
 }: SelectedTableProps): JSX.Element {
   const [searchQuery, setSearchQuery] = useState('');
+  const { updateItemQuantity } = useServerOrders();
   const elapsed = table.currentOrder ? useElapsedTime(table.currentOrder.startTime) : null;
 
-  const handleQuantityChange = (itemId: number, delta: number) => {
-    // TODO: Implementer la logique de mise à jour de quantité
-    console.log(`Item ${itemId}: ${delta > 0 ? '+' : ''}${delta}`);
+  const handleQuantityChange = async (itemIndex: number, delta: number) => {
+    if (!table.currentOrder) return;
+    await updateItemQuantity(table.currentOrder.id, itemIndex, delta);
   };
 
   const filteredItems = table.currentOrder?.items.filter((item) =>
@@ -110,13 +109,35 @@ export function SelectedTable({
           </div>
         </div>
 
+        {/* Order notes */}
+        {table.currentOrder?.notes && (
+          <div className="px-6 py-4">
+            <div className="rounded-lg bg-primary-container/10 border border-primary-container/20 p-4">
+              <div className="flex items-start gap-2">
+                <span className="material-symbols-outlined text-primary text-sm mt-0.5">
+                  note_alt
+                </span>
+                <div>
+                  <span className="text-xs font-medium text-primary uppercase tracking-widest block mb-1">
+                    Notes
+                  </span>
+                  <p className="text-sm text-on-surface whitespace-pre-wrap">
+                    {table.currentOrder.notes}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Order items */}
         <div className="p-6 space-y-3">
           {filteredItems && filteredItems.length > 0 ? (
-            filteredItems.map((item) => (
+            filteredItems.map((item, index) => (
               <OrderItemComponent
-                key={item.id}
+                key={`${item.name}-${index}`}
                 item={item}
+                itemIndex={index}
                 onQuantityChange={handleQuantityChange}
               />
             ))

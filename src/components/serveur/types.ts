@@ -20,12 +20,14 @@ export interface TableOrder {
   total: number;
   startTime: number;
   customerName?: string;
+  notes?: string;
 }
 
 /** Item de commande avec contrôles */
 export interface OrderItem extends DbOrderItem {
   id: number;
   price: number;
+  description?: string;
   customization?: string;
 }
 
