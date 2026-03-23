@@ -22,6 +22,15 @@ export type { TableOccupancyProps } from './TableOccupancy';
 export { ReservationsPlanning } from './ReservationsPlanning';
 export type { ReservationsPlanningProps } from './ReservationsPlanning';
 
+export { ServerCartItem } from './ServerCartItem';
+export type { ServerCartItemProps } from './ServerCartItem';
+
+export { NewOrderModal } from './NewOrderModal';
+export type { NewOrderModalProps } from './NewOrderModal';
+
+export { AddItemModal } from './AddItemModal';
+export type { AddItemModalProps } from './AddItemModal';
+
 export type {
   FloorTable,
   TableOrder,

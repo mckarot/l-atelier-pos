@@ -1,11 +1,13 @@
 // src/components/serveur/SelectedTable.tsx
 // Panel de détail d'une table sélectionnée
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useServerOrders } from '../../hooks/useServerOrders';
 import type { FloorTable } from './types';
 import { OrderItem as OrderItemComponent } from './OrderItem';
 import { useElapsedTime } from '../../hooks/useFloorPlan';
+import { NewOrderModal } from './NewOrderModal';
+import { AddItemModal } from './AddItemModal';
 
 export interface SelectedTableProps {
   table: FloorTable;
@@ -13,6 +15,8 @@ export interface SelectedTableProps {
   onCheckout?: () => void;
   onAddNote?: () => void;
   onSplit?: () => void;
+  onOrderCreated?: (orderId: number) => void;
+  onItemsAdded?: () => void;
 }
 
 export function SelectedTable({
@@ -21,14 +25,48 @@ export function SelectedTable({
   onCheckout,
   onAddNote,
   onSplit,
+  onOrderCreated,
+  onItemsAdded,
 }: SelectedTableProps): JSX.Element {
   const [searchQuery, setSearchQuery] = useState('');
+  const [isNewOrderModalOpen, setIsNewOrderModalOpen] = useState(false);
+  const [isAddItemModalOpen, setIsAddItemModalOpen] = useState(false);
   const { updateItemQuantity } = useServerOrders();
   const elapsed = table.currentOrder ? useElapsedTime(table.currentOrder.startTime) : null;
+
+  // Escape key handler
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
 
   const handleQuantityChange = async (itemIndex: number, delta: number) => {
     if (!table.currentOrder) return;
     await updateItemQuantity(table.currentOrder.id, itemIndex, delta);
+  };
+
+  const handleOpenNewOrder = () => {
+    setIsNewOrderModalOpen(true);
+  };
+
+  const handleOpenAddItem = () => {
+    setIsAddItemModalOpen(true);
+  };
+
+  const handleOrderCreated = (orderId: number) => {
+    onOrderCreated?.(orderId);
+    setIsNewOrderModalOpen(false);
+  };
+
+  const handleItemsAdded = () => {
+    onItemsAdded?.();
+    setIsAddItemModalOpen(false);
   };
 
   const filteredItems = table.currentOrder?.items.filter((item) =>
@@ -173,17 +211,55 @@ export function SelectedTable({
             </button>
           </div>
 
-          {/* Primary action - Checkout */}
-          <button
-            onClick={onCheckout}
-            className="w-full bg-primary-container text-on-primary-container font-bold py-4 px-6 rounded-lg flex items-center justify-center gap-3 hover:brightness-110 active:scale-95 transition-all"
-            aria-label="Encaisser"
-          >
-            <span className="material-symbols-outlined">payment</span>
-            <span>ENCAISSER</span>
-          </button>
+          {/* Primary action - varies by table status */}
+          {!table.currentOrder ? (
+            // TABLE LIBRE - Nouvelle commande
+            <button
+              onClick={handleOpenNewOrder}
+              className="w-full bg-primary-container text-on-primary-container font-bold py-4 px-6 rounded-lg flex items-center justify-center gap-3 hover:brightness-110 active:scale-95 transition-all"
+              aria-label="Prendre une nouvelle commande"
+            >
+              <span className="material-symbols-outlined">add_shopping_cart</span>
+              <span>PRENDRE COMMANDE</span>
+            </button>
+          ) : (
+            // TABLE OCCUPÉE - Ajouter des items + Encaisser
+            <div className="space-y-3">
+              <button
+                onClick={handleOpenAddItem}
+                className="w-full bg-surface-container-highest text-on-surface font-bold py-4 px-6 rounded-lg flex items-center justify-center gap-3 hover:bg-surface-container-high transition-colors"
+                aria-label="Ajouter des items à la commande"
+              >
+                <span className="material-symbols-outlined">add_circle</span>
+                <span>AJOUTER</span>
+              </button>
+              <button
+                onClick={onCheckout}
+                className="w-full bg-primary-container text-on-primary-container font-bold py-4 px-6 rounded-lg flex items-center justify-center gap-3 hover:brightness-110 active:scale-95 transition-all"
+                aria-label="Encaisser"
+              >
+                <span className="material-symbols-outlined">payment</span>
+                <span>ENCAISSER</span>
+              </button>
+            </div>
+          )}
         </div>
       </aside>
+
+      {/* Modals */}
+      <NewOrderModal
+        isOpen={isNewOrderModalOpen}
+        onClose={() => setIsNewOrderModalOpen(false)}
+        table={table}
+        onOrderCreated={handleOrderCreated}
+      />
+
+      <AddItemModal
+        isOpen={isAddItemModalOpen}
+        onClose={() => setIsAddItemModalOpen(false)}
+        table={table}
+        onItemsAdded={handleItemsAdded}
+      />
     </div>
   );
 }

@@ -26,10 +26,9 @@ US-XXX (user story)
 [4] react-ts-dexie-reviewer → Audit code + conformité visuelle PNG
   │
   ▼
-[5] test-automation-specialist → Tests après validation du code
-  │
+
   ▼
-[6] ui-animator            → Animations UNIQUEMENT si US le demande
+[5] ui-animator            → Animations UNIQUEMENT si US le demande
 ```
 
 ---
