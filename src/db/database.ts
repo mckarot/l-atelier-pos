@@ -281,6 +281,8 @@ export async function seedDatabase(): Promise<void> {
       status: 'confirme',
       tableId: 6,
       notes: 'Anniversaire - prévoir un gâteau',
+      createdAt: Date.now(),
+      referenceNumber: `RES-${Date.now()}-001`,
     },
     {
       id: 2,
@@ -292,6 +294,8 @@ export async function seedDatabase(): Promise<void> {
       guests: 2,
       status: 'en_attente',
       notes: 'Préfère une table près de la fenêtre',
+      createdAt: Date.now(),
+      referenceNumber: `RES-${Date.now()}-002`,
     },
   ];
 

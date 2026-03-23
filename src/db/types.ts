@@ -116,7 +116,7 @@ export interface MenuItem {
 
 /** Réservation client */
 export interface Reservation {
-  id: number;
+  id: number; // Auto-incrémenté par Dexie lors de l'insertion
   customerName: string;
   email?: string;
   phone?: string;
@@ -126,7 +126,16 @@ export interface Reservation {
   status: ReservationStatus;
   tableId?: number;
   notes?: string;
+  createdAt: number;
+  referenceNumber: string;
 }
+
+/** Input de création de réservation (sans id, createdAt, referenceNumber) */
+export type CreateReservationInput = Omit<Reservation, 'id' | 'createdAt' | 'referenceNumber'> & {
+  id?: number; // Optionnel pour permettre à Dexie d'auto-incrémenter
+  createdAt?: number;
+  referenceNumber?: string;
+};
 
 /** Utilisateur du système */
 export interface User {
@@ -155,8 +164,6 @@ export type UpdateTableInput = Pick<TableRecord, 'id'> & Partial<TableRecord>;
 export type CreateMenuItemInput = Omit<MenuItem, 'id'>;
 
 export type UpdateMenuItemInput = Pick<MenuItem, 'id'> & Partial<MenuItem>;
-
-export type CreateReservationInput = Omit<Reservation, 'id'>;
 
 export type UpdateReservationInput = Pick<Reservation, 'id'> & Partial<Reservation>;
 

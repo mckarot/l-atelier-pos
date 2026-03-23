@@ -103,8 +103,24 @@ export function useReservation(reservationId: number): Reservation | undefined {
  * @returns ID de la réservation créée
  */
 export async function createReservation(input: CreateReservationInput): Promise<number> {
-  const id = await db.reservations.add(input as Reservation);
-  return id;
+  try {
+    // Construire l'objet avec tous les champs requis par le schéma Dexie
+    // Note: Dexie accepte les objets sans 'id' pour les tables avec ++id (auto-incrément)
+    const newReservation = {
+      ...input,
+      status: input.status || 'en_attente' as ReservationStatus,
+      createdAt: Date.now(),
+      referenceNumber: `RES-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+    };
+
+    // db.reservations.add() avec ++id dans le schéma accepte implicitement Omit<Reservation, 'id'>
+    // https://dexie.org/docs/Table/Table.add()
+    const id = await db.reservations.add(newReservation as any);
+    return id;
+  } catch (error) {
+    console.error('[createReservation] Error:', error);
+    throw error;
+  }
 }
 
 /**
@@ -116,7 +132,12 @@ export async function updateReservationStatus(
   reservationId: number,
   status: ReservationStatus
 ): Promise<void> {
-  await db.reservations.update(reservationId, { status });
+  try {
+    await db.reservations.update(reservationId, { status });
+  } catch (error) {
+    console.error('[updateReservationStatus] Error:', error);
+    throw error;
+  }
 }
 
 /**
@@ -124,9 +145,14 @@ export async function updateReservationStatus(
  * @param reservationId - ID de la réservation à annuler
  */
 export async function cancelReservation(reservationId: number): Promise<void> {
-  await db.reservations.update(reservationId, {
-    status: 'annule',
-  });
+  try {
+    await db.reservations.update(reservationId, {
+      status: 'annule',
+    });
+  } catch (error) {
+    console.error('[cancelReservation] Error:', error);
+    throw error;
+  }
 }
 
 /**
@@ -135,22 +161,19 @@ export async function cancelReservation(reservationId: number): Promise<void> {
  * @returns Observable des réservations futures
  */
 export function useUpcomingReservations(): Reservation[] | undefined {
+  const today = new Date().toISOString().split('T')[0];
+
   return useLiveQuery(
-    () => {
-      const today = new Date().toISOString().split('T')[0];
-      // Dexie n'a pas greaterOrEqual/atLeast, on utilise filter après toArray
-      return db.reservations
-        .toArray()
-        .then(reservations =>
-          reservations
-            .filter(r => r.date >= today && r.status !== 'annule')
-            .sort((a, b) => {
-              const dateCompare = a.date.localeCompare(b.date);
-              if (dateCompare !== 0) return dateCompare;
-              return a.time.localeCompare(b.time);
-            })
-        );
+    async () => {
+      const allReservations = await db.reservations
+        .where('date')
+        .aboveOrEqual(today)
+        .toArray();
+
+      return allReservations
+        .filter(r => r.status !== 'annule')
+        .sort((a, b) => a.time.localeCompare(b.time));
     },
-    []
+    [today]
   );
 }

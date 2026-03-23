@@ -1,6 +1,7 @@
 // src/hooks/useReservationsPlanning.ts
 // Hook pour la gestion du planning des réservations
 
+import { useMemo } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../db/database';
 import type { Reservation as DbReservation } from '../db/types';
@@ -35,26 +36,23 @@ export function useUpcomingArrivals(limit = 5) {
   const now = new Date();
   const currentTime = now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
 
-  const reservations = useLiveQuery<DbReservation[]>(
-    async () => {
-      const allReservations = await db.reservations
+  const allReservations = useLiveQuery<DbReservation[]>(
+    () =>
+      db.reservations
         .where('date')
         .equals(today)
-        .filter((r) => r.status !== 'annule')
-        .toArray();
-
-      // Filtrer les réservations futures ou actuelles
-      const upcoming = allReservations.filter((r) => r.time >= currentTime);
-
-      // Trier par heure et limiter
-      return upcoming
-        .sort((a, b) => a.time.localeCompare(b.time))
-        .slice(0, limit);
-    },
-    [today, currentTime, limit]
+        .toArray(),
+    [today]
   );
 
-  return reservations || [];
+  // Filtrer en dehors du useLiveQuery avec useMemo
+  return useMemo(() => {
+    return (allReservations || [])
+      .filter(r => r.status !== 'annule')
+      .filter(r => r.time >= currentTime)
+      .sort((a, b) => a.time.localeCompare(b.time))
+      .slice(0, limit);
+  }, [allReservations, currentTime, limit]);
 }
 
 /**
