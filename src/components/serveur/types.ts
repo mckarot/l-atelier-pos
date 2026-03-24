@@ -1,10 +1,10 @@
 // src/components/serveur/types.ts
 // Types TypeScript pour le module Serveur
 
-import type { Order, OrderItem as DbOrderItem, TableRecord } from '../../db/types';
+import type { Order, OrderItem as DbOrderItem, TableRecord } from '../../firebase/types';
 
 /** Statut d'une table */
-export type TableStatus = 'libre' | 'occupee' | 'pret' | 'reserve';
+export type TableStatus = 'libre' | 'occupee' | 'pret' | 'reservation';
 
 /** Table du plan de salle avec données enrichies */
 export interface FloorTable extends TableRecord {
@@ -38,7 +38,7 @@ export interface Reservation {
   time: string;
   guests: number;
   tableId?: number;
-  status: 'confirme' | 'arrive' | 'annule' | 'en_attente';
+  status: 'confirme' | 'arrive' | 'annule' | 'attente';
   email?: string;
   phone?: string;
   notes?: string;

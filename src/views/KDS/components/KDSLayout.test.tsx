@@ -359,16 +359,16 @@ describe('KDSLayout - Integration tests', () => {
     it('devrait afficher les commandes seedées dans les colonnes', async () => {
       // Arrange - Seed data
       await seedTable({ id: 1, status: 'occupee' });
-      await seedOrder({ tableId: 1, status: 'en_attente' });
-      await seedOrder({ tableId: 1, status: 'en_preparation' });
+      await seedOrder({ tableId: 1, status: 'attente' });
+      await seedOrder({ tableId: 1, status: 'preparation' });
       await seedOrder({ tableId: 1, status: 'pret' });
 
       // Mock useLiveQuery to return seeded data
       vi.mocked(useLiveQuery).mockImplementation((fn) => {
         if (fn?.toString().includes('activeOrders')) {
           return [
-            { id: 1, tableId: 1, status: 'en_attente', items: [], createdAt: Date.now() },
-            { id: 2, tableId: 1, status: 'en_preparation', items: [], createdAt: Date.now() },
+            { id: 1, tableId: 1, status: 'attente', items: [], createdAt: Date.now() },
+            { id: 2, tableId: 1, status: 'preparation', items: [], createdAt: Date.now() },
             { id: 3, tableId: 1, status: 'pret', items: [], createdAt: Date.now() },
           ] as any;
         }

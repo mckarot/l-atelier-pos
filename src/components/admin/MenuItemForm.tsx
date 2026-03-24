@@ -3,7 +3,7 @@
 
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { cn, iconFilled } from '../../utils/cn';
-import type { MenuItem, MenuCategory, StationType } from '../../db/types';
+import type { MenuItem, MenuCategory, StationType } from '../../firebase/types';
 import { CATEGORIES, STATIONS } from '../../hooks/useMenuEditor';
 
 export interface MenuItemFormProps {
@@ -45,7 +45,7 @@ export function MenuItemForm({
   const [description, setDescription] = useState(item?.description || '');
   const [price, setPrice] = useState(item?.price?.toString() || '');
   const [category, setCategory] = useState<MenuCategory>(
-    item?.category || 'Entrées'
+    item?.category || 'entree'
   );
   const [image, setImage] = useState(item?.image || '');
   const [station, setStation] = useState<StationType | ''>(

@@ -2,6 +2,7 @@
 // Placeholder pour la vue Tableau de bord du module Serveur
 
 import { useNavigate } from 'react-router-dom';
+import { FirebaseTestPanel } from '../../components/dev/FirebaseTestPanel';
 
 export default function DashboardView(): JSX.Element {
   const navigate = useNavigate();
@@ -25,12 +26,15 @@ export default function DashboardView(): JSX.Element {
           onClick={() => navigate('/serveur')}
           aria-label="Retourner au plan de salle"
           className="px-6 py-3 bg-primary-container text-on-primary-container rounded-lg font-bold
-                     hover:brightness-110 active:scale-[0.98] transition-all focus-visible:outline 
+                     hover:brightness-110 active:scale-[0.98] transition-all focus-visible:outline
                      focus-visible:outline-2 focus-visible:outline-primary"
         >
           Retour au plan de salle
         </button>
       </div>
+
+      {/* Panneau de test Firebase (DEV ONLY) */}
+      <FirebaseTestPanel />
     </div>
   );
 }

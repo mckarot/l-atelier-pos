@@ -2,17 +2,14 @@
 // Header du module Serveur
 
 import { useEffect, useState } from 'react';
-import { cn } from '../../utils/cn';
 
 export interface ServeurHeaderProps {
   title?: string;
-  subtitle?: string;
   onMenuClick?: () => void;
 }
 
 export function ServeurHeader({
   title = "L'ATELIER POS",
-  subtitle,
   onMenuClick,
 }: ServeurHeaderProps): JSX.Element {
   const [currentTime, setCurrentTime] = useState(new Date());

@@ -6,14 +6,14 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { CartItem } from './CartItem';
 import type { CartItem as CartItemType } from '../../hooks/useCart';
-import type { MenuItem } from '../../db/types';
+import type { MenuItem } from '../../firebase/types';
 
 const mockMenuItem: MenuItem = {
   id: 1,
   name: 'Burger de l\'Atelier',
   description: 'Boeuf charolais',
   price: 19.50,
-  category: 'Plats',
+  category: 'plat',
   isAvailable: 1,
 };
 

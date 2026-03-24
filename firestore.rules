@@ -1,0 +1,170 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // ============================================
+    // MODE DÉVELOPPEMENT - ACCÈS COMPLET
+    // ============================================
+    // En local (émulateurs), on permet tout pour faciliter le dev
+    // En production, il faudra utiliser les rules complètes ci-dessous
+    
+    match /{document=**} {
+      allow read, write: if true;
+    }
+    
+    // ============================================
+    // RÈGLES DE PRODUCTION (commentées pour le dev)
+    // ============================================
+    // Décommenter ces règles et commenter le mode dev pour la prod
+    
+    /*
+    // ============================================
+    // FONCTIONS UTILITAIRES
+    // ============================================
+    
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function getUserRole() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+    }
+    
+    function isAdmin() {
+      return isAuthenticated() && getUserRole() == 'admin';
+    }
+    
+    function isKDS() {
+      return isAuthenticated() && getUserRole() == 'kds';
+    }
+    
+    function isServeur() {
+      return isAuthenticated() && getUserRole() == 'serveur';
+    }
+    
+    function isClient() {
+      return isAuthenticated() && getUserRole() == 'client';
+    }
+    
+    function isOwnProfile(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    // ============================================
+    // COLLECTION: users
+    // ============================================
+    match /users/{userId} {
+      allow read: if isAdmin() || isOwnProfile(userId);
+      allow create: if isAuthenticated() && request.auth.uid == userId;
+      allow update, delete: if isAdmin();
+      
+      function validUser() {
+        return request.resource.data.keys().hasAll(['email', 'role', 'isActive', 'createdAt'])
+          && request.resource.data.role in ['admin', 'kds', 'serveur', 'client']
+          && request.resource.data.isActive is bool
+          && request.resource.data.createdAt is int;
+      }
+      
+      allow create: if validUser();
+      allow update: if isAdmin() && request.resource.data.keys().hasOnly(['email', 'role', 'isActive', 'name']);
+    }
+    
+    // ============================================
+    // COLLECTION: orders
+    // ============================================
+    match /orders/{orderId} {
+      allow read: if isAdmin() || isKDS() || isServeur();
+      
+      allow create: if isAuthenticated() 
+        && (isServeur() || isAdmin())
+        && request.resource.data.keys().hasAll(['tableId', 'customerName', 'status', 'items', 'total', 'createdAt']);
+      
+      allow update: if isAuthenticated()
+        && (isAdmin() || isKDS() || isServeur())
+        && request.resource.data.keys().hasOnly(['status', 'items', 'total', 'notes', 'updatedAt', 'servedAt', 'paymentMethod']);
+      
+      allow delete: if isAdmin();
+      
+      match /items/{itemId} {
+        allow read, write: if false;
+      }
+    }
+    
+    // ============================================
+    // COLLECTION: tables
+    // ============================================
+    match /tables/{tableId} {
+      allow read: if isAuthenticated();
+      allow create: if isAdmin();
+      
+      allow update: if isAuthenticated()
+        && (isAdmin() || isKDS() || isServeur())
+        && request.resource.data.keys().hasOnly(['status', 'currentOrderId', 'name']);
+      
+      allow delete: if isAdmin();
+      
+      function validTableStatus() {
+        return request.resource.data.status in ['libre', 'occupee', 'reservation', 'maintenance'];
+      }
+      
+      allow update: if validTableStatus();
+    }
+    
+    // ============================================
+    // COLLECTION: menuItems
+    // ============================================
+    match /menuItems/{menuItemId} {
+      allow read: if isAuthenticated();
+      allow create: if isAdmin()
+        && request.resource.data.keys().hasAll(['name', 'description', 'price', 'category', 'isAvailable', 'station']);
+      
+      allow update: if isAdmin()
+        && request.resource.data.keys().hasOnly(['name', 'description', 'price', 'category', 'isAvailable', 'station', 'image', 'allergens', 'customizationOptions']);
+      
+      allow delete: if isAdmin();
+      
+      function validMenuItem() {
+        return request.resource.data.category in ['entree', 'plat', 'dessert', 'boisson']
+          && request.resource.data.isAvailable is bool
+          && request.resource.data.price is number
+          && request.resource.data.price >= 0;
+      }
+      
+      allow create, update: if validMenuItem();
+    }
+    
+    // ============================================
+    // COLLECTION: reservations
+    // ============================================
+    match /reservations/{reservationId} {
+      allow read: if isAdmin() || isServeur();
+      
+      allow create: if isAuthenticated()
+        && (isServeur() || isAdmin())
+        && request.resource.data.keys().hasAll(['customerName', 'date', 'time', 'guests', 'status', 'createdAt', 'referenceNumber']);
+      
+      allow update: if isAuthenticated()
+        && (isAdmin() || isServeur())
+        && request.resource.data.keys().hasOnly(['status', 'tableId', 'notes', 'email', 'phone']);
+      
+      allow delete: if isAdmin();
+      
+      function validReservation() {
+        return request.resource.data.status in ['en_attente', 'confirme', 'arrive', 'annule']
+          && request.resource.data.guests is int
+          && request.resource.data.guests >= 1
+          && request.resource.data.guests <= 20;
+      }
+      
+      allow create, update: if validReservation();
+    }
+    
+    // ============================================
+    // RÈGLES PAR DÉFAUT
+    // ============================================
+    match /{document=**} {
+      allow read, write: if false;
+    }
+    */
+  }
+}

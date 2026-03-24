@@ -2,8 +2,7 @@
 // Error Boundary racine pour les erreurs critiques de l'application
 
 import { Component, type ErrorInfo, type ReactNode } from 'react';
-import { Link } from 'react-router-dom';
-import { categorizeDexieError } from '../../utils/errorUtils';
+import { categorizeFirebaseError } from '../../utils/errorUtils';
 
 interface RootErrorBoundaryProps {
   children: ReactNode;
@@ -48,7 +47,7 @@ export class RootErrorBoundary extends Component<RootErrorBoundaryProps, RootErr
       return this.props.children;
     }
 
-    const { category } = categorizeDexieError(this.state.error);
+    const { category } = categorizeFirebaseError(this.state.error);
 
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4">

@@ -2,7 +2,7 @@
 // Ligne de commande pour le tableau Live Orders
 
 import { type JSX, useCallback, useMemo } from 'react';
-import type { Order } from '../../db/types';
+import type { Order } from '../../firebase/types';
 import { Timer } from '../../components/ui/Timer';
 import { cn } from '../../utils/cn';
 import { getTimerAlertStatus, type TimerAlertStatus } from '../../utils/timer';
@@ -15,9 +15,9 @@ export interface OrderRowProps {
   /** Commande à afficher */
   order: Order;
   /** Action quand on lance la préparation */
-  onLaunch: (orderId: number) => void;
+  onLaunch: (orderId: string) => void;
   /** Action quand on termine la commande */
-  onComplete: (orderId: number) => void;
+  onComplete: (orderId: string) => void;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -51,7 +51,7 @@ export function OrderRow({
 }: OrderRowProps): JSX.Element {
   // Calcul du statut d'alerte pour les classes conditionnelles
   const alertStatus = useMemo<TimerAlertStatus>(
-    () => getTimerAlertStatus(Date.now() - order.createdAt),
+    () => getTimerAlertStatus(Date.now() - order.createdAt.toMillis()),
     [order.createdAt]
   );
 
@@ -157,8 +157,8 @@ export function OrderRow({
           <span
             className={cn(
               'w-1.5 h-1.5 rounded-full',
-              order.status === 'en_attente' && 'bg-amber-500',
-              order.status === 'en_preparation' && 'bg-blue-500',
+              order.status === 'attente' && 'bg-amber-500',
+              order.status === 'preparation' && 'bg-blue-500',
               order.status === 'pret' && 'bg-green-500'
             )}
             aria-hidden="true"
@@ -170,7 +170,7 @@ export function OrderRow({
       {/* Colonne ACTIONS */}
       <td className="py-4 px-4">
         <div className="flex gap-2">
-          {order.status === 'en_attente' && (
+          {order.status === 'attente' && (
             <button
               onClick={handleLaunch}
               className="px-4 py-2 bg-primary-container text-on-primary-container font-headline font-bold text-xs uppercase tracking-wider rounded-lg hover:brightness-110 active:scale-[0.98] transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary"
@@ -179,7 +179,7 @@ export function OrderRow({
               Lancer
             </button>
           )}
-          {order.status === 'en_preparation' && (
+          {order.status === 'preparation' && (
             <button
               onClick={handleComplete}
               className="px-4 py-2 bg-tertiary-container text-on-tertiary-container font-headline font-bold text-xs uppercase tracking-wider rounded-lg hover:brightness-110 active:scale-[0.98] transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-tertiary"

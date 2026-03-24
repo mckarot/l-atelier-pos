@@ -83,11 +83,11 @@ describe('OrderFilters', () => {
   describe('Filtre par statut', () => {
     it('devrait afficher le statut sélectionné dans le select', () => {
       // Arrange & Act
-      renderOrderFilters({ selectedStatus: 'en_attente' });
+      renderOrderFilters({ selectedStatus: 'attente' });
 
       // Assert
       const select = screen.getByRole('combobox', { name: /statut/i });
-      expect(select).toHaveValue('en_attente');
+      expect(select).toHaveValue('attente');
     });
 
     it('devrait appeler onStatusChange quand on change le statut', async () => {
@@ -98,10 +98,10 @@ describe('OrderFilters', () => {
 
       // Act
       const select = screen.getByRole('combobox', { name: /statut/i });
-      await user.selectOptions(select, 'en_preparation');
+      await user.selectOptions(select, 'preparation');
 
       // Assert
-      expect(onStatusChange).toHaveBeenCalledWith('en_preparation');
+      expect(onStatusChange).toHaveBeenCalledWith('preparation');
       expect(onStatusChange).toHaveBeenCalledTimes(1);
     });
 
@@ -109,7 +109,7 @@ describe('OrderFilters', () => {
       // Arrange
       const user = userEvent.setup();
       const onStatusChange = vi.fn();
-      renderOrderFilters({ selectedStatus: 'en_attente', onStatusChange });
+      renderOrderFilters({ selectedStatus: 'attente', onStatusChange });
 
       // Act
       const select = screen.getByRole('combobox', { name: /statut/i });
@@ -128,11 +128,11 @@ describe('OrderFilters', () => {
       // Act & Assert
       const select = screen.getByRole('combobox', { name: /statut/i });
 
-      await user.selectOptions(select, 'en_attente');
-      expect(onStatusChange).toHaveBeenCalledWith('en_attente');
+      await user.selectOptions(select, 'attente');
+      expect(onStatusChange).toHaveBeenCalledWith('attente');
 
-      await user.selectOptions(select, 'en_preparation');
-      expect(onStatusChange).toHaveBeenCalledWith('en_preparation');
+      await user.selectOptions(select, 'preparation');
+      expect(onStatusChange).toHaveBeenCalledWith('preparation');
 
       await user.selectOptions(select, 'pret');
       expect(onStatusChange).toHaveBeenCalledWith('pret');
@@ -277,12 +277,12 @@ describe('OrderFilters', () => {
 
       // Act
       const select = screen.getByRole('combobox', { name: /statut/i });
-      await user.selectOptions(select, 'en_attente');
+      await user.selectOptions(select, 'attente');
       await user.selectOptions(select, 'pret');
 
       // Assert
       expect(onStatusChange).toHaveBeenCalledTimes(2);
-      expect(onStatusChange).toHaveBeenNthCalledWith(1, 'en_attente');
+      expect(onStatusChange).toHaveBeenNthCalledWith(1, 'attente');
       expect(onStatusChange).toHaveBeenNthCalledWith(2, 'pret');
     });
   });

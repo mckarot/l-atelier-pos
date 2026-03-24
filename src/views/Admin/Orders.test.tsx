@@ -7,8 +7,8 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { createMemoryRouter, RouterProvider, type RouteObject } from 'react-router-dom';
 import { AdminOrders } from './Orders';
-import { db } from '../../db/database';
-import type { Order } from '../../db/types';
+import { db } from '../../firebase/config';
+import type { Order } from '../../firebase/types';
 import * as useOrdersModule from '../../hooks/useOrders';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -36,7 +36,7 @@ const seedOrders = async (orders: Partial<Order>[]): Promise<void> => {
   const ordersToInsert: Omit<Order, 'id'>[] = orders.map((order, i) => ({
     tableId: order.tableId ?? (i % 16) + 1,
     customerName: order.customerName ?? `Client ${i + 1}`,
-    status: order.status ?? 'en_attente',
+    status: order.status ?? 'attente',
     items: order.items ?? [{ name: `Item ${i + 1}`, quantity: 1, station: 'FROID' }],
     total: order.total ?? 20,
     createdAt: order.createdAt ?? now - (i + 1) * 5 * 60 * 1000,
@@ -78,8 +78,8 @@ describe('AdminOrders - Integration', () => {
     it('devrait afficher le compteur de commandes actives', async () => {
       // Arrange
       await seedOrders([
-        { status: 'en_attente' },
-        { status: 'en_preparation' },
+        { status: 'attente' },
+        { status: 'preparation' },
         { status: 'pret' },
       ]);
 
@@ -105,11 +105,11 @@ describe('AdminOrders - Integration', () => {
     it('devrait afficher les commandes actives (en_attente, en_preparation, pret)', async () => {
       // Arrange
       await seedOrders([
-        { status: 'en_attente', customerName: 'Pierre' },
-        { status: 'en_preparation', customerName: 'Marie' },
+        { status: 'attente', customerName: 'Pierre' },
+        { status: 'preparation', customerName: 'Marie' },
         { status: 'pret', customerName: 'Jean' },
-        { status: 'servi', customerName: 'Sophie' }, // Ne devrait pas apparaître
-        { status: 'paye', customerName: 'Lucas' }, // Ne devrait pas apparaître
+        { status: 'served', customerName: 'Sophie' }, // Ne devrait pas apparaître
+        { status: 'paid', customerName: 'Lucas' }, // Ne devrait pas apparaître
       ]);
 
       // Act
@@ -131,7 +131,7 @@ describe('AdminOrders - Integration', () => {
         {
           tableId: 12,
           customerName: 'Marie Laurent',
-          status: 'en_attente',
+          status: 'attente',
           items: [
             { name: 'Tartare de Saumon', quantity: 2, station: 'FROID' },
             { name: 'Filet de Boeuf', quantity: 1, station: 'GRILL' },
@@ -165,8 +165,8 @@ describe('AdminOrders - Integration', () => {
     it('devrait filtrer les commandes par statut', async () => {
       // Arrange
       await seedOrders([
-        { status: 'en_attente', customerName: 'Pierre' },
-        { status: 'en_preparation', customerName: 'Marie' },
+        { status: 'attente', customerName: 'Pierre' },
+        { status: 'preparation', customerName: 'Marie' },
         { status: 'pret', customerName: 'Jean' },
       ]);
 
@@ -180,7 +180,7 @@ describe('AdminOrders - Integration', () => {
 
       // Sélectionner le filtre "En attente"
       const statusSelect = screen.getByRole('combobox', { name: /statut/i });
-      await user.selectOptions(statusSelect, 'en_attente');
+      await user.selectOptions(statusSelect, 'attente');
 
       // Assert
       await waitFor(() => {
@@ -279,7 +279,7 @@ describe('AdminOrders - Integration', () => {
     it('devrait appeler updateOrderStatus au clic sur LANCER', async () => {
       // Arrange
       await seedOrders([
-        { status: 'en_attente', customerName: 'Test' },
+        { status: 'attente', customerName: 'Test' },
       ]);
 
       // Mock updateOrderStatus
@@ -301,14 +301,14 @@ describe('AdminOrders - Integration', () => {
       // Assert - updateOrderStatus devrait être appelé avec status en_preparation
       expect(updateOrderStatusSpy).toHaveBeenCalled();
       expect(updateOrderStatusSpy).toHaveBeenCalledWith(
-        expect.objectContaining({ status: 'en_preparation' })
+        expect.objectContaining({ status: 'preparation' })
       );
     });
 
     it('devrait appeler updateOrderStatus au clic sur TERMINER', async () => {
       // Arrange
       await seedOrders([
-        { status: 'en_preparation', customerName: 'Test' },
+        { status: 'preparation', customerName: 'Test' },
       ]);
 
       // Mock updateOrderStatus
@@ -337,7 +337,7 @@ describe('AdminOrders - Integration', () => {
     it('devrait mettre à jour l\'affichage après avoir lancé une commande', async () => {
       // Arrange
       await seedOrders([
-        { status: 'en_attente', customerName: 'Test' },
+        { status: 'attente', customerName: 'Test' },
       ]);
 
       // Mock updateOrderStatus qui met vraiment à jour la DB
@@ -356,7 +356,7 @@ describe('AdminOrders - Integration', () => {
 
       // Filtrer par "En attente"
       const statusSelect = screen.getByRole('combobox', { name: /statut/i });
-      await user.selectOptions(statusSelect, 'en_attente');
+      await user.selectOptions(statusSelect, 'attente');
 
       await waitFor(() => {
         expect(screen.getByText('Test')).toBeInTheDocument();
@@ -382,7 +382,7 @@ describe('AdminOrders - Integration', () => {
       expect(screen.getByText('00 COMMANDES ACTIVES')).toBeInTheDocument();
 
       // Act - Ajouter une commande
-      await seedOrders([{ status: 'en_attente', customerName: 'Nouveau' }]);
+      await seedOrders([{ status: 'attente', customerName: 'Nouveau' }]);
 
       // Assert - Mise à jour réactive
       await waitFor(() => {
@@ -393,7 +393,7 @@ describe('AdminOrders - Integration', () => {
 
     it('devrait mettre à jour l\'affichage quand une commande est supprimée', async () => {
       // Arrange
-      await seedOrders([{ status: 'en_attente' }]);
+      await seedOrders([{ status: 'attente' }]);
       renderWithRouter();
 
       await waitFor(() => {
@@ -411,7 +411,7 @@ describe('AdminOrders - Integration', () => {
 
     it('devrait mettre à jour l\'affichage quand le statut change', async () => {
       // Arrange
-      await seedOrders([{ status: 'en_attente' }]);
+      await seedOrders([{ status: 'attente' }]);
       renderWithRouter();
 
       await waitFor(() => {
@@ -419,7 +419,7 @@ describe('AdminOrders - Integration', () => {
       }, { timeout: 2000 });
 
       // Act - Changer le statut
-      await db.orders.update(1, { status: 'en_preparation' });
+      await db.orders.update(1, { status: 'preparation' });
 
       // Assert - Le statut devrait être mis à jour (chercher par role="status")
       await waitFor(() => {
@@ -487,7 +487,7 @@ describe('AdminOrders - Integration', () => {
   describe('Gestion d\'erreur', () => {
     it('devrait gérer les erreurs lors de updateOrderStatus sans crash', async () => {
       // Arrange
-      await seedOrders([{ status: 'en_attente' }]);
+      await seedOrders([{ status: 'attente' }]);
 
       // Mock updateOrderStatus qui throw
       const updateOrderStatusSpy = vi.spyOn(useOrdersModule, 'updateOrderStatus');

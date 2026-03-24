@@ -2,13 +2,11 @@
 import { cn, iconFilled } from '../../utils/cn';
 
 interface AdminTopBarProps {
-  activeOrdersCount: number;
   onSearch: (query: string) => void;
   searchQuery: string;
 }
 
 export function AdminTopBar({
-  activeOrdersCount,
   onSearch,
   searchQuery,
 }: AdminTopBarProps): JSX.Element {

@@ -19,7 +19,7 @@ function createOrder(overrides: Partial<Order> = {}): Omit<Order, 'id'> {
   return {
     tableId: 1,
     customerName: 'Test Customer',
-    status: 'en_preparation',
+    status: 'preparation',
     items: [{ name: 'Test Item', quantity: 1 }],
     total: 50,
     createdAt: now,
@@ -52,12 +52,12 @@ describe('useKitchenOrders', () => {
       await db.orders.add({
         ...createOrder(),
         id: 1,
-        status: 'en_attente',
+        status: 'attente',
       });
       await db.orders.add({
         ...createOrder(),
         id: 2,
-        status: 'en_preparation',
+        status: 'preparation',
       });
       await db.orders.add({
         ...createOrder(),
@@ -68,7 +68,7 @@ describe('useKitchenOrders', () => {
       await db.orders.add({
         ...createOrder(),
         id: 4,
-        status: 'paye',
+        status: 'paid',
       });
 
       // Act
@@ -85,7 +85,7 @@ describe('useKitchenOrders', () => {
       await db.orders.add({
         ...createOrder(),
         id: 1,
-        status: 'paye',
+        status: 'paid',
       });
 
       // Act
@@ -205,7 +205,7 @@ describe('useKitchenOrders', () => {
 
       // Assert
       await waitFor(() => {
-        expect(result.current![0].status).toBe('en_preparation');
+        expect(result.current![0].status).toBe('preparation');
       });
     });
 
@@ -256,7 +256,7 @@ describe('useKitchenOrders', () => {
         expect(result.current).toHaveLength(2);
         // La première commande devrait être en retard
         expect(result.current![0].status).toBe('retard');
-        expect(result.current![1].status).toBe('en_preparation');
+        expect(result.current![1].status).toBe('preparation');
       });
     });
 
@@ -372,7 +372,7 @@ describe('useStockAlert', () => {
         name: 'Item 1',
         description: 'Desc 1',
         price: 10,
-        category: 'Entrées',
+        category: 'entree',
         isAvailable: 0, // Épuisé
       });
       await db.menuItems.add({
@@ -380,7 +380,7 @@ describe('useStockAlert', () => {
         name: 'Item 2',
         description: 'Desc 2',
         price: 15,
-        category: 'Plats',
+        category: 'plat',
         isAvailable: 1,
       });
 
@@ -400,7 +400,7 @@ describe('useStockAlert', () => {
         name: 'Item 1',
         description: 'Desc 1',
         price: 10, // < 15 = stock faible
-        category: 'Entrées',
+        category: 'entree',
         isAvailable: 1,
       });
       await db.menuItems.add({
@@ -408,7 +408,7 @@ describe('useStockAlert', () => {
         name: 'Item 2',
         description: 'Desc 2',
         price: 20, // >= 15 = pas stock faible
-        category: 'Plats',
+        category: 'plat',
         isAvailable: 1,
       });
 
@@ -428,7 +428,7 @@ describe('useStockAlert', () => {
         name: 'Item 1',
         description: 'Desc 1',
         price: 20,
-        category: 'Entrées',
+        category: 'entree',
         isAvailable: 1,
       });
 
@@ -572,7 +572,7 @@ describe('Réactivité', () => {
       name: 'Item 1',
       description: 'Desc 1',
       price: 10,
-      category: 'Entrées',
+      category: 'entree',
       isAvailable: 0,
     });
 

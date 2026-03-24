@@ -1,8 +1,8 @@
 // src/test/helpers/seed.ts
 // Factories typées pour le seed des données de test
 
-import { db } from '../../db/database';
-import type { User, Order, MenuItem, TableRecord, Reservation, UserRole } from '../../db/types';
+import { db } from '../../firebase/config';
+import type { User, Order, MenuItem, TableRecord, Reservation, UserRole } from '../../firebase/types';
 
 /**
  * Crée un utilisateur de test avec des données par défaut
@@ -47,7 +47,7 @@ export async function seedMenuItem(overrides: Partial<Omit<MenuItem, 'id'>> = {}
     name: overrides.name ?? `Menu Item ${Date.now()}`,
     description: overrides.description ?? 'Test description',
     price: overrides.price ?? 15.0,
-    category: overrides.category ?? 'Plats',
+    category: overrides.category ?? 'plat',
     isAvailable: overrides.isAvailable ?? 1,
     image: overrides.image,
     allergens: overrides.allergens,
@@ -66,7 +66,7 @@ export async function seedMenuItems(count: number): Promise<MenuItem[]> {
     name: `Menu Item ${i + 1}`,
     description: `Description ${i + 1}`,
     price: 10 + i * 5,
-    category: (['Entrées', 'Plats', 'Desserts'] as const)[i % 3],
+    category: (['entree', 'plat', 'dessert'] as const)[i % 3],
     isAvailable: 1,
   }));
   await db.menuItems.bulkAdd(items);
@@ -97,7 +97,7 @@ export async function seedOrder(overrides: Partial<Omit<Order, 'id' | 'createdAt
   const id = await db.orders.add({
     tableId: overrides.tableId ?? 1,
     customerName: overrides.customerName ?? 'Client Test',
-    status: overrides.status ?? 'en_attente',
+    status: overrides.status ?? 'attente',
     items: overrides.items ?? [{ name: 'Test Item', quantity: 1 }],
     total: overrides.total ?? 20.0,
     createdAt: Date.now(),

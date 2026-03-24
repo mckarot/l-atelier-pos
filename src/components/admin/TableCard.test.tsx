@@ -12,7 +12,7 @@ function createTableService(overrides: Partial<TableService> = {}): TableService
     orderId: 1402,
     tableId: 8,
     tableName: 'Table 08',
-    status: 'en_preparation',
+    status: 'preparation',
     guests: 4,
     server: 'Marc',
     items: [
@@ -75,7 +75,7 @@ describe('TableCard', () => {
   describe('Badge de statut', () => {
     it('affiche le badge "EN PRÉPARATION" pour le statut en_preparation', () => {
       // Arrange
-      const service = createTableService({ status: 'en_preparation' });
+      const service = createTableService({ status: 'preparation' });
 
       // Act
       render(<TableCard service={service} />);
@@ -119,7 +119,7 @@ describe('TableCard', () => {
 
     it('n\'affiche pas d\'icône pour le statut en_preparation', () => {
       // Arrange
-      const service = createTableService({ status: 'en_preparation' });
+      const service = createTableService({ status: 'preparation' });
 
       // Act
       render(<TableCard service={service} />);
@@ -144,7 +144,7 @@ describe('TableCard', () => {
 
     it('applique border-tertiary pour le statut en_preparation', () => {
       // Arrange
-      const service = createTableService({ status: 'en_preparation' });
+      const service = createTableService({ status: 'preparation' });
 
       // Act
       render(<TableCard service={service} />);
@@ -181,7 +181,7 @@ describe('TableCard', () => {
 
     it('applique bg-tertiary/10 text-tertiary pour le badge en_preparation', () => {
       // Arrange
-      const service = createTableService({ status: 'en_preparation' });
+      const service = createTableService({ status: 'preparation' });
 
       // Act
       render(<TableCard service={service} />);

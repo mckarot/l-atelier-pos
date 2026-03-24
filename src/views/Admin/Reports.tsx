@@ -1,14 +1,15 @@
 // src/views/Admin/Reports.tsx
 // Rapports et analytics - Tableau des commandes exportable CSV
 
-import { useState } from 'react';
-import { useLiveQuery } from 'dexie-react-hooks';
-import { db } from '../../db/database';
-import type { Order } from '../../db/types';
+import { useState, useEffect } from 'react';
+import { collection, query, orderBy, onSnapshot, type Timestamp } from 'firebase/firestore';
+import { getDb } from '../../firebase/config';
+import type { Order } from '../../firebase/types';
 
 export default function AdminReports(): JSX.Element {
   const [dateFilter, setDateFilter] = useState<'today' | 'week' | 'month' | 'all'>('today');
   const [isExporting, setIsExporting] = useState(false);
+  const [allOrders, setAllOrders] = useState<Order[]>([]);
 
   // Calculer les dates de filtre
   const getDateRange = () => {
@@ -32,28 +33,57 @@ export default function AdminReports(): JSX.Element {
     }
   };
 
-  // Charger les commandes depuis Dexie
-  const allOrders = useLiveQuery(() => db.orders.toArray(), []);
+  // Charger les commandes depuis Firebase
+  useEffect(() => {
+    const ordersRef = collection(getDb(), 'orders');
+    const q = query(ordersRef, orderBy('createdAt', 'asc'));
+
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
+        const orders = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+        } as Order));
+        setAllOrders(orders);
+      },
+      (error) => {
+        console.error('[AdminReports] Error loading orders:', error);
+      }
+    );
+
+    return () => unsubscribe();
+  }, []);
 
   // Filtrer les commandes par date
   const { start, end } = getDateRange();
-  const filteredOrders = allOrders?.filter(
-    (order) => order.createdAt >= start && order.createdAt <= end
+  const filteredOrders = allOrders.filter(
+    (order) => {
+      const orderTime = order.createdAt instanceof Timestamp 
+        ? order.createdAt.toMillis() 
+        : order.createdAt;
+      return orderTime >= start && orderTime <= end;
+    }
   );
 
   // Trier par date décroissante
-  const sortedOrders = filteredOrders?.sort((a, b) => b.createdAt - a.createdAt);
+  const sortedOrders = filteredOrders.sort((a, b) => {
+    const aTime = a.createdAt instanceof Timestamp ? a.createdAt.toMillis() : a.createdAt;
+    const bTime = b.createdAt instanceof Timestamp ? b.createdAt.toMillis() : b.createdAt;
+    return bTime - aTime;
+  });
 
   // Calculer les statistiques
-  const totalRevenue = sortedOrders?.reduce((sum, order) => sum + (order.total || 0), 0) || 0;
-  const paidOrders = sortedOrders?.filter((o) => o.status === 'paye').length || 0;
-  const activeOrders = sortedOrders?.filter((o) => 
-    ['en_attente', 'en_preparation', 'pret'].includes(o.status)
+  const totalRevenue = sortedOrders.reduce((sum, order) => sum + (order.total || 0), 0) || 0;
+  const paidOrders = sortedOrders.filter((o) => o.status === 'paid').length || 0;
+  const activeOrders = sortedOrders.filter((o) =>
+    ['attente', 'preparation', 'pret'].includes(o.status)
   ).length || 0;
 
   // Formater une date
-  const formatDate = (timestamp: number) => {
-    const date = new Date(timestamp);
+  const formatDate = (timestamp: number | Timestamp) => {
+    const ts = timestamp instanceof Timestamp ? timestamp.toMillis() : timestamp;
+    const date = new Date(ts);
     return date.toLocaleDateString('fr-FR', {
       day: '2-digit',
       month: '2-digit',
@@ -61,8 +91,9 @@ export default function AdminReports(): JSX.Element {
     });
   };
 
-  const formatTime = (timestamp: number) => {
-    const date = new Date(timestamp);
+  const formatTime = (timestamp: number | Timestamp) => {
+    const ts = timestamp instanceof Timestamp ? timestamp.toMillis() : timestamp;
+    const date = new Date(ts);
     return date.toLocaleTimeString('fr-FR', {
       hour: '2-digit',
       minute: '2-digit',
@@ -88,7 +119,7 @@ export default function AdminReports(): JSX.Element {
       ];
 
       // Lignes de données
-      const rows = sortedOrders?.map((order) => [
+      const rows = sortedOrders.map((order) => [
         order.id,
         order.tableId,
         order.customerName || '-',
@@ -98,7 +129,7 @@ export default function AdminReports(): JSX.Element {
         formatDate(order.createdAt),
         formatTime(order.createdAt),
         order.notes || '',
-      ]) || [];
+      ]);
 
       // Créer le contenu CSV
       const csvContent = [
@@ -110,9 +141,9 @@ export default function AdminReports(): JSX.Element {
       const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
       const link = document.createElement('a');
       const url = URL.createObjectURL(blob);
-      
+
       const filename = `rapport-commandes-${dateFilter}-${formatDate(Date.now()).replace(/\//g, '-')}.csv`;
-      
+
       link.setAttribute('href', url);
       link.setAttribute('download', filename);
       link.style.visibility = 'hidden';
@@ -127,19 +158,19 @@ export default function AdminReports(): JSX.Element {
   // Badge de statut
   const getStatusBadge = (status: Order['status']) => {
     const statusClasses: Record<Order['status'], string> = {
-      en_attente: 'bg-surface-variant text-on-surface',
-      en_preparation: 'bg-primary/20 text-primary',
+      attente: 'bg-surface-variant text-on-surface',
+      preparation: 'bg-primary/20 text-primary',
       pret: 'bg-tertiary/20 text-tertiary',
-      servi: 'bg-blue-500/20 text-blue-400',
+      served: 'bg-blue-500/20 text-blue-400',
       paye: 'bg-surface-container-highest text-on-surface-variant',
       annule: 'bg-error/20 text-error',
     };
 
     const statusLabels: Record<Order['status'], string> = {
-      en_attente: 'À PRÉPARER',
-      en_preparation: 'EN COURS',
+      attente: 'À PRÉPARER',
+      preparation: 'EN COURS',
       pret: 'PRÊT',
-      servi: 'SERVI',
+      served: 'SERVI',
       paye: 'PAYÉ',
       annule: 'ANNULÉ',
     };
@@ -165,7 +196,7 @@ export default function AdminReports(): JSX.Element {
         </div>
         <button
           onClick={exportToCSV}
-          disabled={isExporting || !sortedOrders?.length}
+          disabled={isExporting || !sortedOrders.length}
           className="bg-primary-container text-on-primary-container font-bold px-6 py-3 rounded-xl flex items-center gap-2 hover:brightness-110 disabled:opacity-50 disabled:hover:brightness-100 transition-all"
         >
           <span className="material-symbols-outlined">
@@ -229,7 +260,7 @@ export default function AdminReports(): JSX.Element {
             </span>
           </div>
           <p className="font-mono text-3xl font-bold text-on-surface">
-            {sortedOrders?.length || 0}
+            {sortedOrders.length || 0}
           </p>
         </div>
 
@@ -291,11 +322,11 @@ export default function AdminReports(): JSX.Element {
               </tr>
             </thead>
             <tbody className="divide-y divide-outline-variant/10">
-              {sortedOrders?.map((order) => (
+              {sortedOrders.map((order) => (
                 <tr key={order.id} className="hover:bg-surface-container-high/50 transition-colors">
                   <td className="px-6 py-4">
                     <span className="font-mono text-xs font-bold text-on-surface-variant">
-                      #{order.id}
+                      #{order.id.slice(-4)}
                     </span>
                   </td>
                   <td className="px-6 py-4">
@@ -349,7 +380,7 @@ export default function AdminReports(): JSX.Element {
           </table>
         </div>
 
-        {(!sortedOrders || sortedOrders.length === 0) && (
+        {sortedOrders.length === 0 && (
           <div className="text-center py-12">
             <span className="material-symbols-outlined text-on-surface-variant/40 text-4xl mb-4">
               receipt_long

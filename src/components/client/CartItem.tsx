@@ -1,8 +1,9 @@
 // src/components/client/CartItem.tsx
 // Item individuel du panier
 
-import { cn, iconFilled } from '../../utils/cn';
+import { iconFilled } from '../../utils/cn';
 import type { CartItem as CartItemType } from '../../hooks/useCart';
+import { SUPPLEMENT_LABELS, SUPPLEMENT_PRICES } from '../../firebase/types';
 
 interface CartItemProps {
   item: CartItemType;
@@ -48,7 +49,7 @@ export function CartItem({
             )}
             {supplements?.map((supplement) => (
               <p
-                key={supplement.name}
+                key={supplement}
                 className="text-xs text-on-surface-variant flex items-center gap-1"
               >
                 <span
@@ -57,7 +58,7 @@ export function CartItem({
                 >
                   add_circle
                 </span>
-                {supplement.name} (+{supplement.price.toFixed(2)}€)
+                {SUPPLEMENT_LABELS[supplement]} (+{SUPPLEMENT_PRICES[supplement].toFixed(2)}€)
               </p>
             ))}
           </div>

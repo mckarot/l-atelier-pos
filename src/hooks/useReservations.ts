@@ -1,124 +1,317 @@
 // src/hooks/useReservations.ts
-// Hooks Dexie pour la gestion des réservations
+// Hooks Firestore pour la gestion des réservations
 
-import { useLiveQuery } from 'dexie-react-hooks';
-import { db } from '../db/database';
-import type { Reservation, ReservationStatus, CreateReservationInput } from '../db/types';
+import { useState, useEffect } from 'react';
+import {
+  collection,
+  doc,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  query,
+  where,
+  orderBy,
+  onSnapshot,
+  Timestamp,
+} from 'firebase/firestore';
+import { db } from '../firebase/config';
+import type {
+  Reservation,
+  ReservationStatus,
+  CreateReservationInput,
+} from '../firebase/types';
 
 /**
  * Récupère toutes les réservations
- * Utilise l'index `date` pour le tri chronologique
- * @returns Observable de toutes les réservations
+ * Utilise un snapshot temps réel pour les mises à jour automatiques
+ * @returns Toutes les réservations triées par date et heure
  */
-export function useAllReservations(): Reservation[] | undefined {
-  return useLiveQuery(
-    () => db.reservations
-      .orderBy('date')
-      .toArray()
-      .then((reservations: Reservation[]) =>
-        reservations.sort((a, b) => {
-          // Tri par date puis par heure
-          const dateCompare = a.date.localeCompare(b.date);
-          if (dateCompare !== 0) return dateCompare;
-          return a.time.localeCompare(b.time);
-        })
-      ),
-    []
-  );
+export function useAllReservations(): {
+  reservations: Reservation[];
+  isLoading: boolean;
+  error: Error | null;
+} {
+  const [reservations, setReservations] = useState<Reservation[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+
+  useEffect(() => {
+    setIsLoading(true);
+    setError(null);
+
+    const q = query(
+      collection(db, 'reservations'),
+      orderBy('date', 'asc'),
+      orderBy('time', 'asc')
+    );
+
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
+        const fetchedReservations = snapshot.docs.map(
+          (doc) =>
+            ({
+              id: doc.id,
+              ...doc.data(),
+            }) as Reservation
+        );
+        setReservations(fetchedReservations);
+        setIsLoading(false);
+      },
+      (err) => {
+        console.error('[useAllReservations] Error:', err);
+        setError(err instanceof Error ? err : new Error('Erreur Firestore'));
+        setIsLoading(false);
+      }
+    );
+
+    return () => unsubscribe();
+  }, []);
+
+  return { reservations, isLoading, error };
 }
 
 /**
  * Récupère les réservations pour une date spécifique
- * Utilise l'index `date` pour un filtrage O(log n)
  * @param date - Date au format YYYY-MM-DD
- * @returns Observable des réservations pour cette date
+ * @returns Les réservations pour cette date
  */
-export function useReservationsByDate(date: string): Reservation[] | undefined {
-  return useLiveQuery(
-    () => db.reservations
-      .where('date')
-      .equals(date)
-      .sortBy('time'),
-    [date]
-  );
+export function useReservationsByDate(
+  date: string
+): { reservations: Reservation[]; isLoading: boolean; error: Error | null } {
+  const [reservations, setReservations] = useState<Reservation[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+
+  useEffect(() => {
+    setIsLoading(true);
+    setError(null);
+
+    const q = query(
+      collection(db, 'reservations'),
+      where('date', '==', date),
+      orderBy('time', 'asc')
+    );
+
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
+        const fetchedReservations = snapshot.docs.map(
+          (doc) =>
+            ({
+              id: doc.id,
+              ...doc.data(),
+            }) as Reservation
+        );
+        setReservations(fetchedReservations);
+        setIsLoading(false);
+      },
+      (err) => {
+        console.error('[useReservationsByDate] Error:', err);
+        setError(err instanceof Error ? err : new Error('Erreur Firestore'));
+        setIsLoading(false);
+      }
+    );
+
+    return () => unsubscribe();
+  }, [date]);
+
+  return { reservations, isLoading, error };
 }
 
 /**
  * Récupère les réservations du jour courant
- * Utilise l'index `date` avec la date d'aujourd'hui
- * @returns Observable des réservations du jour
+ * @returns Les réservations du jour
  */
-export function useTodayReservations(): Reservation[] | undefined {
-  return useLiveQuery(
-    () => {
-      const today = new Date().toISOString().split('T')[0];
-      return db.reservations
-        .where('date')
-        .equals(today)
-        .sortBy('time');
-    },
-    []
-  );
+export function useTodayReservations(): {
+  reservations: Reservation[];
+  isLoading: boolean;
+  error: Error | null;
+} {
+  const [reservations, setReservations] = useState<Reservation[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+
+  useEffect(() => {
+    setIsLoading(true);
+    setError(null);
+
+    const today = new Date().toISOString().split('T')[0];
+
+    const q = query(
+      collection(db, 'reservations'),
+      where('date', '==', today),
+      orderBy('time', 'asc')
+    );
+
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
+        const fetchedReservations = snapshot.docs.map(
+          (doc) =>
+            ({
+              id: doc.id,
+              ...doc.data(),
+            }) as Reservation
+        );
+        setReservations(fetchedReservations);
+        setIsLoading(false);
+      },
+      (err) => {
+        console.error('[useTodayReservations] Error:', err);
+        setError(err instanceof Error ? err : new Error('Erreur Firestore'));
+        setIsLoading(false);
+      }
+    );
+
+    return () => unsubscribe();
+  }, []);
+
+  return { reservations, isLoading, error };
 }
 
 /**
  * Récupère les réservations par statut
- * Utilise l'index `status` pour un filtrage O(log n)
- * @param status - Statut à filtrer ('confirme', 'en_attente', 'annule', 'arrive')
- * @returns Observable des réservations avec ce statut
+ * @param status - Statut à filtrer
+ * @returns Les réservations avec ce statut
  */
-export function useReservationsByStatus(status: ReservationStatus): Reservation[] | undefined {
-  return useLiveQuery(
-    () => db.reservations
-      .where('status')
-      .equals(status)
-      .toArray()
-      .then((results: Reservation[]) =>
-        results.sort((a, b) => {
-          const dateCompare = a.date.localeCompare(b.date);
-          if (dateCompare !== 0) return dateCompare;
-          return a.time.localeCompare(b.time);
-        })
-      ),
-    [status]
-  );
+export function useReservationsByStatus(
+  status: ReservationStatus
+): { reservations: Reservation[]; isLoading: boolean; error: Error | null } {
+  const [reservations, setReservations] = useState<Reservation[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+
+  useEffect(() => {
+    setIsLoading(true);
+    setError(null);
+
+    const q = query(
+      collection(db, 'reservations'),
+      where('status', '==', status),
+      orderBy('date', 'asc'),
+      orderBy('time', 'asc')
+    );
+
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
+        const fetchedReservations = snapshot.docs.map(
+          (doc) =>
+            ({
+              id: doc.id,
+              ...doc.data(),
+            }) as Reservation
+        );
+        setReservations(fetchedReservations);
+        setIsLoading(false);
+      },
+      (err) => {
+        console.error('[useReservationsByStatus] Error:', err);
+        setError(err instanceof Error ? err : new Error('Erreur Firestore'));
+        setIsLoading(false);
+      }
+    );
+
+    return () => unsubscribe();
+  }, [status]);
+
+  return { reservations, isLoading, error };
 }
 
 /**
  * Récupère une réservation par son ID
- * Utilise l'index primaire `id` pour une recherche O(1)
  * @param reservationId - ID de la réservation
- * @returns La réservation ou undefined
+ * @returns La réservation ou null
  */
-export function useReservation(reservationId: number): Reservation | undefined {
-  return useLiveQuery(
-    () => db.reservations.get(reservationId),
-    [reservationId]
-  );
+export function useReservation(
+  reservationId: string | null
+): { reservation: Reservation | null; isLoading: boolean; error: Error | null } {
+  const [reservation, setReservation] = useState<Reservation | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+
+  useEffect(() => {
+    if (!reservationId) {
+      setReservation(null);
+      setIsLoading(false);
+      return;
+    }
+
+    setIsLoading(true);
+    setError(null);
+
+    const reservationRef = doc(db, 'reservations', reservationId);
+
+    const unsubscribe = onSnapshot(
+      reservationRef,
+      (docSnap) => {
+        if (docSnap.exists()) {
+          setReservation({
+            id: docSnap.id,
+            ...docSnap.data(),
+          } as Reservation);
+        } else {
+          setReservation(null);
+        }
+        setIsLoading(false);
+      },
+      (err) => {
+        console.error('[useReservation] Error:', err);
+        setError(err instanceof Error ? err : new Error('Erreur Firestore'));
+        setIsLoading(false);
+      }
+    );
+
+    return () => unsubscribe();
+  }, [reservationId]);
+
+  return { reservation, isLoading, error };
 }
 
 /**
  * Crée une nouvelle réservation
- * @param input - Données de création (sans id)
+ * @param input - Données de création
  * @returns ID de la réservation créée
  */
-export async function createReservation(input: CreateReservationInput): Promise<number> {
+export async function createReservation(
+  input: CreateReservationInput
+): Promise<string> {
   try {
-    // Construire l'objet avec tous les champs requis par le schéma Dexie
-    // Note: Dexie accepte les objets sans 'id' pour les tables avec ++id (auto-incrément)
-    const newReservation = {
+    const reservationData = {
       ...input,
-      status: input.status || 'en_attente' as ReservationStatus,
-      createdAt: Date.now(),
-      referenceNumber: `RES-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      status: input.status || 'attente',
+      createdAt: Timestamp.now(),
+      referenceNumber:
+        input.referenceNumber ||
+        `RES-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
     };
 
-    // db.reservations.add() avec ++id dans le schéma accepte implicitement Omit<Reservation, 'id'>
-    // https://dexie.org/docs/Table/Table.add()
-    const id = await db.reservations.add(newReservation as any);
-    return id;
+    const docRef = await addDoc(collection(db, 'reservations'), reservationData);
+    return docRef.id;
   } catch (error) {
     console.error('[createReservation] Error:', error);
+    throw error;
+  }
+}
+
+/**
+ * Met à jour une réservation existante
+ * @param reservationId - ID de la réservation
+ * @param updates - Données à mettre à jour
+ */
+export async function updateReservation(
+  reservationId: string,
+  updates: Partial<Reservation>
+): Promise<void> {
+  try {
+    const reservationRef = doc(db, 'reservations', reservationId);
+    await updateDoc(reservationRef, {
+      ...updates,
+      updatedAt: Timestamp.now(),
+    });
+  } catch (error) {
+    console.error('[updateReservation] Error:', error);
     throw error;
   }
 }
@@ -129,11 +322,15 @@ export async function createReservation(input: CreateReservationInput): Promise<
  * @param status - Nouveau statut
  */
 export async function updateReservationStatus(
-  reservationId: number,
+  reservationId: string,
   status: ReservationStatus
 ): Promise<void> {
   try {
-    await db.reservations.update(reservationId, { status });
+    const reservationRef = doc(db, 'reservations', reservationId);
+    await updateDoc(reservationRef, {
+      status,
+      updatedAt: Timestamp.now(),
+    });
   } catch (error) {
     console.error('[updateReservationStatus] Error:', error);
     throw error;
@@ -141,13 +338,15 @@ export async function updateReservationStatus(
 }
 
 /**
- * Annule une réservation (soft delete via statut 'annule')
- * @param reservationId - ID de la réservation à annuler
+ * Annule une réservation
+ * @param reservationId - ID de la réservation
  */
-export async function cancelReservation(reservationId: number): Promise<void> {
+export async function cancelReservation(reservationId: string): Promise<void> {
   try {
-    await db.reservations.update(reservationId, {
+    const reservationRef = doc(db, 'reservations', reservationId);
+    await updateDoc(reservationRef, {
       status: 'annule',
+      updatedAt: Timestamp.now(),
     });
   } catch (error) {
     console.error('[cancelReservation] Error:', error);
@@ -156,24 +355,74 @@ export async function cancelReservation(reservationId: number): Promise<void> {
 }
 
 /**
- * Récupère les réservations à venir (aujourd'hui et futur)
- * Utilise l'index `date` avec un filtre de range
- * @returns Observable des réservations futures
+ * Supprime une réservation
+ * @param reservationId - ID de la réservation
  */
-export function useUpcomingReservations(): Reservation[] | undefined {
-  const today = new Date().toISOString().split('T')[0];
+export async function deleteReservation(reservationId: string): Promise<void> {
+  try {
+    await deleteDoc(doc(db, 'reservations', reservationId));
+  } catch (error) {
+    console.error('[deleteReservation] Error:', error);
+    throw error;
+  }
+}
 
-  return useLiveQuery(
-    async () => {
-      const allReservations = await db.reservations
-        .where('date')
-        .aboveOrEqual(today)
-        .toArray();
+/**
+ * Récupère les réservations à venir (30 prochaines minutes)
+ * @returns Les réservations à venir
+ */
+export function useUpcomingArrivals(
+  limit = 5
+): { reservations: Reservation[]; isLoading: boolean; error: Error | null } {
+  const [reservations, setReservations] = useState<Reservation[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
 
-      return allReservations
-        .filter(r => r.status !== 'annule')
-        .sort((a, b) => a.time.localeCompare(b.time));
-    },
-    [today]
-  );
+  useEffect(() => {
+    setIsLoading(true);
+    setError(null);
+
+    const today = new Date().toISOString().split('T')[0];
+    const now = new Date();
+    const currentTime = `${now.getHours().toString().padStart(2, '0')}:${now
+      .getMinutes()
+      .toString()
+      .padStart(2, '0')}`;
+
+    const q = query(
+      collection(db, 'reservations'),
+      where('date', '==', today),
+      where('status', '==', 'confirme'),
+      orderBy('time', 'asc')
+    );
+
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
+        const allReservations = snapshot.docs.map(
+          (doc) =>
+            ({
+              id: doc.id,
+              ...doc.data(),
+            }) as Reservation
+        );
+
+        const upcoming = allReservations
+          .filter((r) => r.time >= currentTime)
+          .slice(0, limit);
+
+        setReservations(upcoming);
+        setIsLoading(false);
+      },
+      (err) => {
+        console.error('[useUpcomingArrivals] Error:', err);
+        setError(err instanceof Error ? err : new Error('Erreur Firestore'));
+        setIsLoading(false);
+      }
+    );
+
+    return () => unsubscribe();
+  }, [limit]);
+
+  return { reservations, isLoading, error };
 }

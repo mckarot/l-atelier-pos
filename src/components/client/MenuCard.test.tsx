@@ -5,14 +5,14 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MenuCard } from './MenuCard';
-import type { MenuItem } from '../../db/types';
+import type { MenuItem } from '../../firebase/types';
 
 const mockMenuItem: MenuItem = {
   id: 1,
   name: 'Burger de l\'Atelier',
   description: 'Boeuf charolais, cheddar affiné, bacon croustillant, sauce maison',
   price: 19.50,
-  category: 'Plats',
+  category: 'plat',
   image: 'https://example.com/burger.jpg',
   allergens: ['gluten', 'lait'],
   isAvailable: 1,

@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useRole } from './useRole';
 import { clearUserRole } from '../utils/roleGuard';
-import type { UserRole } from '../db/types';
+import type { UserRole } from '../firebase/types';
 
 export interface UseRoleGuardReturn {
   isAuthorized: boolean;

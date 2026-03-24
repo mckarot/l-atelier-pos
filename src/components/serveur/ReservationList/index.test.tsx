@@ -5,7 +5,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { ReservationList } from './index';
 import { db } from '../../../db/database';
-import type { Reservation } from '../../../db/types';
+import type { Reservation } from '../../../firebase/types';
 
 // Mock des hooks et fonctions
 vi.mock('../../../hooks/useTodayReservationsList', () => ({
@@ -50,7 +50,7 @@ describe('ReservationList', () => {
       date: new Date().toISOString().split('T')[0],
       time: '20:00',
       guests: 2,
-      status: 'en_attente',
+      status: 'attente',
       notes: 'Près de la fenêtre',
       createdAt: Date.now(),
       referenceNumber: 'RES-1234567890-002',

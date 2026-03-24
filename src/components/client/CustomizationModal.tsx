@@ -3,7 +3,8 @@
 
 import { useState, useCallback } from 'react';
 import { cn, iconFilled } from '../../utils/cn';
-import type { MenuItem, Supplement, CookingLevel } from '../../db/types';
+import type { MenuItem, Supplement, CookingLevel } from '../../firebase/types';
+import { SUPPLEMENT_LABELS, SUPPLEMENT_PRICES } from '../../firebase/types';
 
 interface CustomizationModalProps {
   item: MenuItem;
@@ -20,14 +21,14 @@ export function CustomizationModal({
   const [selectedSupplements, setSelectedSupplements] = useState<Supplement[]>([]);
   const [orderType, setOrderType] = useState<'sur_place' | 'emporter'>('sur_place');
 
-  const cookingOptions = item.customizationOptions?.cooking || [];
-  const supplementOptions = item.customizationOptions?.supplements || [];
+  const cookingOptions: CookingLevel[] = item.customizationOptions?.cookingLevel ? [item.customizationOptions.cookingLevel] : [];
+  const supplementOptions: Supplement[] = item.customizationOptions?.extra || [];
 
   const handleToggleSupplement = useCallback((supplement: Supplement) => {
     setSelectedSupplements((prev) => {
-      const exists = prev.find((s) => s.name === supplement.name);
+      const exists = prev.includes(supplement);
       if (exists) {
-        return prev.filter((s) => s.name !== supplement.name);
+        return prev.filter((s) => s !== supplement);
       }
       return [...prev, supplement];
     });
@@ -38,7 +39,7 @@ export function CustomizationModal({
   }, [selectedCooking, selectedSupplements, onConfirm]);
 
   const basePrice = item.price;
-  const supplementsPrice = selectedSupplements.reduce((sum, s) => sum + s.price, 0);
+  const supplementsPrice = selectedSupplements.reduce((sum, s) => sum + SUPPLEMENT_PRICES[s], 0);
   const totalPrice = basePrice + supplementsPrice;
 
   return (
@@ -112,10 +113,10 @@ export function CustomizationModal({
               </h3>
               <div className="space-y-2">
                 {supplementOptions.map((supplement) => {
-                  const isSelected = selectedSupplements.some((s) => s.name === supplement.name);
+                  const isSelected = selectedSupplements.includes(supplement);
                   return (
                     <button
-                      key={supplement.name}
+                      key={supplement}
                       onClick={() => handleToggleSupplement(supplement)}
                       className={cn(
                         'w-full px-4 py-3 rounded-lg flex items-center justify-between transition-all',
@@ -130,13 +131,13 @@ export function CustomizationModal({
                         'font-medium',
                         isSelected ? 'text-primary' : 'text-on-surface-variant'
                       )}>
-                        {supplement.name}
+                        {SUPPLEMENT_LABELS[supplement]}
                       </span>
                       <span className={cn(
                         'font-mono font-bold',
                         isSelected ? 'text-primary' : 'text-on-surface-variant'
                       )}>
-                        +{supplement.price.toFixed(2)}€
+                        +{SUPPLEMENT_PRICES[supplement].toFixed(2)}€
                       </span>
                     </button>
                   );
@@ -196,11 +197,11 @@ export function CustomizationModal({
               </div>
               {selectedSupplements.map((supplement) => (
                 <div
-                  key={supplement.name}
+                  key={supplement}
                   className="flex justify-between text-on-surface-variant"
                 >
-                  <span>└ {supplement.name}</span>
-                  <span className="font-mono">+{supplement.price.toFixed(2)}€</span>
+                  <span>└ {SUPPLEMENT_LABELS[supplement]}</span>
+                  <span className="font-mono">+{SUPPLEMENT_PRICES[supplement].toFixed(2)}€</span>
                 </div>
               ))}
               <div className="border-t border-outline-variant/10 pt-2 mt-2 flex justify-between">

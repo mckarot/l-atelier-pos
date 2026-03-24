@@ -3,9 +3,9 @@
 
 import { describe, it, expect, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { db } from '../../db/database';
+import { db } from '../../firebase/config';
 import { KitchenMonitor } from './KitchenMonitor';
-import type { Order } from '../../db/types';
+import type { Order } from '../../firebase/types';
 
 // Helper pour créer une commande
 function createOrder(overrides: Partial<Order> = {}): Omit<Order, 'id'> {
@@ -13,7 +13,7 @@ function createOrder(overrides: Partial<Order> = {}): Omit<Order, 'id'> {
   return {
     tableId: 1,
     customerName: 'Test Customer',
-    status: 'en_preparation',
+    status: 'preparation',
     items: [{ name: 'Test Item', quantity: 1 }],
     total: 50,
     createdAt: now,
@@ -99,7 +99,7 @@ describe('KitchenMonitor', () => {
         ...createOrder(),
         id: 2841,
         tableId: 4,
-        status: 'en_preparation',
+        status: 'preparation',
         items: [
           { name: 'Burger Classique', quantity: 2 },
           { name: 'Salade César', quantity: 1 },

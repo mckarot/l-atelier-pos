@@ -71,7 +71,7 @@ describe('useMenu Hooks', () => {
   describe('useMenuItemsByCategory', () => {
     it('devrait retourner les items de la catégorie "Entrées"', async () => {
       // Arrange & Act
-      const { result } = renderHook(() => useMenuItemsByCategory('Entrées'));
+      const { result } = renderHook(() => useMenuItemsByCategory('entree'));
 
       // Assert
       await waitFor(() => {
@@ -81,13 +81,13 @@ describe('useMenu Hooks', () => {
       const items = result.current!;
       expect(items.length).toBeGreaterThan(0);
       items.forEach(item => {
-        expect(item.category).toBe('Entrées');
+        expect(item.category).toBe('entree');
       });
     });
 
     it('devrait retourner les items de la catégorie "Plats"', async () => {
       // Arrange & Act
-      const { result } = renderHook(() => useMenuItemsByCategory('Plats'));
+      const { result } = renderHook(() => useMenuItemsByCategory('plat'));
 
       // Assert
       await waitFor(() => {
@@ -97,13 +97,13 @@ describe('useMenu Hooks', () => {
       const items = result.current!;
       expect(items.length).toBeGreaterThan(0);
       items.forEach(item => {
-        expect(item.category).toBe('Plats');
+        expect(item.category).toBe('plat');
       });
     });
 
     it('devrait retourner les items de la catégorie "Desserts"', async () => {
       // Arrange & Act
-      const { result } = renderHook(() => useMenuItemsByCategory('Desserts'));
+      const { result } = renderHook(() => useMenuItemsByCategory('dessert'));
 
       // Assert
       await waitFor(() => {
@@ -113,13 +113,13 @@ describe('useMenu Hooks', () => {
       const items = result.current!;
       expect(items.length).toBeGreaterThan(0);
       items.forEach(item => {
-        expect(item.category).toBe('Desserts');
+        expect(item.category).toBe('dessert');
       });
     });
 
     it('devrait retourner les items triés par nom dans chaque catégorie', async () => {
       // Arrange & Act
-      const { result } = renderHook(() => useMenuItemsByCategory('Plats'));
+      const { result } = renderHook(() => useMenuItemsByCategory('plat'));
 
       // Assert
       await waitFor(() => {
@@ -139,12 +139,12 @@ describe('useMenu Hooks', () => {
         name: 'Test',
         description: 'Test',
         price: 10,
-        category: 'Entrées',
+        category: 'entree',
         isAvailable: 1,
       });
 
       // Act
-      const { result } = renderHook(() => useMenuItemsByCategory('Desserts'));
+      const { result } = renderHook(() => useMenuItemsByCategory('dessert'));
 
       // Assert
       await waitFor(() => {
@@ -176,7 +176,7 @@ describe('useMenu Hooks', () => {
         name: 'Item Indisponible',
         description: 'Test',
         price: 15,
-        category: 'Plats',
+        category: 'plat',
         isAvailable: 0,
       });
 
@@ -252,7 +252,7 @@ describe('useMenu Hooks', () => {
       });
 
       expect(result.current!.name).toBe('Tartare de Saumon');
-      expect(result.current!.category).toBe('Entrées');
+      expect(result.current!.category).toBe('entree');
       expect(result.current!.price).toBe(14.50);
     });
 
@@ -274,7 +274,7 @@ describe('useMenu Hooks', () => {
         name: 'Nouvel Item',
         description: 'Description du nouvel item',
         price: 22.00,
-        category: 'Plats' as const,
+        category: 'plat' as const,
         isAvailable: 1 as const,
       };
 
@@ -289,7 +289,7 @@ describe('useMenu Hooks', () => {
       expect(createdItem).toBeDefined();
       expect(createdItem!.name).toBe('Nouvel Item');
       expect(createdItem!.price).toBe(22.00);
-      expect(createdItem!.category).toBe('Plats');
+      expect(createdItem!.category).toBe('plat');
       expect(createdItem!.isAvailable).toBe(1);
     });
 
@@ -299,7 +299,7 @@ describe('useMenu Hooks', () => {
         name: 'Item Allergène',
         description: 'Test',
         price: 18.00,
-        category: 'Entrées' as const,
+        category: 'entree' as const,
         isAvailable: 1 as const,
         allergens: ['poisson', 'gluten'],
       };
@@ -318,7 +318,7 @@ describe('useMenu Hooks', () => {
         name: 'Item Station',
         description: 'Test',
         price: 20.00,
-        category: 'Plats' as const,
+        category: 'plat' as const,
         isAvailable: 1 as const,
         station: 'GRILL' as const,
       };
@@ -337,7 +337,7 @@ describe('useMenu Hooks', () => {
         name: 'Item Image',
         description: 'Test',
         price: 25.00,
-        category: 'Desserts' as const,
+        category: 'dessert' as const,
         isAvailable: 1 as const,
         image: 'https://example.com/image.jpg',
       };
@@ -356,7 +356,7 @@ describe('useMenu Hooks', () => {
         name: 'Item Indisponible',
         description: 'Test',
         price: 15.00,
-        category: 'Desserts' as const,
+        category: 'dessert' as const,
         isAvailable: 0 as const,
       };
 
@@ -389,7 +389,7 @@ describe('useMenu Hooks', () => {
         name: 'Test',
         description: 'Test',
         price: 10,
-        category: 'Plats',
+        category: 'plat',
         isAvailable: 0,
       });
 
@@ -455,14 +455,14 @@ describe('useMenu Hooks', () => {
         name: 'Test Item 1',
         description: 'Test',
         price: 10,
-        category: 'Plats',
+        category: 'plat',
         isAvailable: 1,
       });
       await db.menuItems.add({
         name: 'Test Item 2',
         description: 'Test',
         price: 12,
-        category: 'Plats',
+        category: 'plat',
         isAvailable: 1,
       });
 

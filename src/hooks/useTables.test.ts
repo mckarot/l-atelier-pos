@@ -90,7 +90,7 @@ describe('useTables Hooks', () => {
       });
 
       expect(result.current!.id).toBe(6);
-      expect(result.current!.status).toBe('reserve');
+      expect(result.current!.status).toBe('reservation');
       expect(result.current!.capacity).toBe(6);
     });
 
@@ -140,7 +140,7 @@ describe('useTables Hooks', () => {
 
     it('devrait retourner les tables avec le statut "reserve"', async () => {
       // Arrange & Act
-      const { result } = renderHook(() => useTablesByStatus('reserve'));
+      const { result } = renderHook(() => useTablesByStatus('reservation'));
 
       // Assert
       await waitFor(() => {
@@ -149,7 +149,7 @@ describe('useTables Hooks', () => {
 
       const tables = result.current!;
       tables.forEach(table => {
-        expect(table.status).toBe('reserve');
+        expect(table.status).toBe('reservation');
       });
     });
 

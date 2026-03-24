@@ -3,9 +3,9 @@
 
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { NewOrderModal } from './NewOrderModal';
-import { db } from '../../db/database';
+import { db } from '../../firebase/config';
 import type { FloorTable } from './types';
-import type { MenuItem } from '../../db/types';
+import type { MenuItem } from '../../firebase/types';
 
 const mockTable: FloorTable = {
   id: 1,
@@ -21,7 +21,7 @@ const mockMenuItems: MenuItem[] = [
     name: 'Tartare de Saumon',
     description: 'Saumon frais, avocat, citron vert',
     price: 14.50,
-    category: 'Entrées',
+    category: 'entree',
     isAvailable: 1,
     image: 'https://images.unsplash.com/photo-tartare',
   },
@@ -30,7 +30,7 @@ const mockMenuItems: MenuItem[] = [
     name: 'Burger de l\'Atelier',
     description: 'Burger délicieux',
     price: 19.50,
-    category: 'Plats',
+    category: 'plat',
     isAvailable: 1,
     image: 'https://images.unsplash.com/photo-burger',
   },
@@ -39,7 +39,7 @@ const mockMenuItems: MenuItem[] = [
     name: 'Café Gourmand',
     description: 'Café et mignardises',
     price: 8.50,
-    category: 'Desserts',
+    category: 'dessert',
     isAvailable: 1,
     image: 'https://images.unsplash.com/photo-cafe',
   },
@@ -48,7 +48,7 @@ const mockMenuItems: MenuItem[] = [
     name: 'Coca Cola',
     description: 'Boisson gazeuse 33cl',
     price: 4.50,
-    category: 'Boissons',
+    category: 'boisson',
     isAvailable: 1,
   },
 ];
@@ -112,10 +112,10 @@ describe('NewOrderModal', () => {
     );
 
     expect(screen.getByRole('button', { name: 'Tous' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Entrées' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Plats' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Desserts' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Boissons' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'entree' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'plat' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'dessert' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'boisson' })).toBeInTheDocument();
   });
 
   it('devrait filtrer les items par catégorie', async () => {
@@ -134,7 +134,7 @@ describe('NewOrderModal', () => {
     });
 
     // Filtrer par Entrées
-    fireEvent.click(screen.getByRole('button', { name: 'Entrées' }));
+    fireEvent.click(screen.getByRole('button', { name: 'entree' }));
     await waitFor(() => {
       expect(screen.getByText('Tartare de Saumon')).toBeInTheDocument();
       expect(screen.queryByText('Burger de l\'Atelier')).not.toBeInTheDocument();

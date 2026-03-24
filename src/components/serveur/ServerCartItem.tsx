@@ -2,6 +2,7 @@
 // Composant ligne de panier pour le serveur
 
 import type { ServerCartItem as ServerCartItemData } from '../../hooks/useServerCart';
+import { SUPPLEMENT_LABELS, SUPPLEMENT_PRICES } from '../../firebase/types';
 
 export interface ServerCartItemProps {
   item: ServerCartItemData;
@@ -16,7 +17,7 @@ export function ServerCartItem({
   onDecrement,
   onRemove,
 }: ServerCartItemProps): JSX.Element {
-  const supplementTotal = item.supplements?.reduce((acc, s) => acc + s.price, 0) || 0;
+  const supplementTotal = item.supplements?.reduce((acc, s) => acc + SUPPLEMENT_PRICES[s], 0) || 0;
   const itemTotal = (item.price + supplementTotal) * item.quantity;
 
   return (
@@ -31,14 +32,14 @@ export function ServerCartItem({
             {item.name}
           </h4>
         </div>
-        
+
         {/* Supplements */}
         {item.supplements && item.supplements.length > 0 && (
           <div className="mt-1 ml-10">
             <ul className="text-xs text-on-surface-variant">
               {item.supplements.map((supplement, index) => (
                 <li key={index}>
-                  + {supplement.name} (+€{supplement.price.toFixed(2)})
+                  + {SUPPLEMENT_LABELS[supplement]} (+€{SUPPLEMENT_PRICES[supplement].toFixed(2)})
                 </li>
               ))}
             </ul>

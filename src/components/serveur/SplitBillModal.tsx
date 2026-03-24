@@ -3,7 +3,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { cn } from '../../utils/cn';
-import type { OrderItem } from '../../db/types';
+import type { OrderItem } from '../../firebase/types';
 
 export interface SplitBillModalProps {
   isOpen: boolean;

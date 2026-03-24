@@ -1,10 +1,10 @@
 // src/views/Client/index.tsx
 // Vue Client - Menu interactif et commande avec personnalisation
 
-import { useState, useCallback } from 'react';
-import { useLiveQuery } from 'dexie-react-hooks';
-import { db } from '../../db/database';
-import type { MenuItem, MenuCategory, Supplement, CookingLevel } from '../../db/types';
+import { useState, useCallback, useEffect } from 'react';
+import { collection, query, where, onSnapshot, addDoc, Timestamp } from 'firebase/firestore';
+import { getDb } from '../../firebase/config';
+import type { MenuItem, MenuCategory, Supplement, CookingLevel } from '../../firebase/types';
 import { ClientLayout } from '../../components/layout/ClientLayout';
 import { MenuFilters } from '../../components/client/MenuFilters';
 import { MenuGrid } from '../../components/client/MenuGrid';
@@ -12,24 +12,40 @@ import { CustomizationModal } from '../../components/client/CustomizationModal';
 import { Cart } from '../../components/client/Cart';
 import { useCart } from '../../hooks/useCart';
 import { useToast } from '../../hooks/useToast';
-import { cn } from '../../utils/cn';
 
-const CATEGORIES: MenuCategory[] = ['Entrées', 'Plats', 'Desserts', 'Boissons'];
+const CATEGORIES: MenuCategory[] = ['entree', 'plat', 'dessert', 'boisson'];
 
 function ClientView(): JSX.Element {
   const [selectedCategory, setSelectedCategory] = useState<MenuCategory | 'Tous'>('Tous');
   const [isCustomizing, setIsCustomizing] = useState<MenuItem | null>(null);
+  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const { cart, addToCart, updateQuantity, removeFromCart, clearCart, subtotal, tax, total, orderType, setOrderType } = useCart();
   const { showToast } = useToast();
 
-  // Menu items depuis Dexie
-  const menuItems = useLiveQuery<MenuItem[]>(
-    () => db.menuItems.where('isAvailable').equals(1).toArray(),
-    []
-  );
+  // Menu items depuis Firebase
+  useEffect(() => {
+    const menuItemsRef = collection(getDb(), 'menuItems');
+    const q = query(menuItemsRef, where('isAvailable', '==', true));
+
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
+        const items = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+        } as MenuItem));
+        setMenuItems(items);
+      },
+      (error) => {
+        console.error('[Client] Error loading menu items:', error);
+      }
+    );
+
+    return () => unsubscribe();
+  }, []);
 
   // Filtrage par catégorie
-  const filteredItems = menuItems?.filter((item) => {
+  const filteredItems = menuItems.filter((item) => {
     if (selectedCategory === 'Tous') return true;
     return item.category === selectedCategory;
   });
@@ -37,7 +53,7 @@ function ClientView(): JSX.Element {
   // Ajouter au panier (avec personnalisation optionnelle)
   const handleAddToCart = useCallback((item: MenuItem, cookingLevel?: CookingLevel, supplements?: Supplement[]) => {
     const hasCustomization = item.customizationOptions && (
-      (item.customizationOptions.cooking && item.customizationOptions.cooking.length > 0) ||
+      (item.customizationOptions.cookingLevel && item.customizationOptions.cookingLevel.length > 0) ||
       (item.customizationOptions.supplements && item.customizationOptions.supplements.length > 0)
     );
 
@@ -62,23 +78,23 @@ function ClientView(): JSX.Element {
       const orderData = {
         tableId,
         customerName: 'Client',
-        status: 'en_attente' as const,
+        status: 'attente' as const,
         items: cart.map((item) => ({
+          id: crypto.randomUUID(),
           name: item.menuItem.name,
           quantity: item.quantity,
           customization: item.customizations?.join(', '),
           cookingLevel: item.cookingLevel,
-          supplements: item.supplements,
+          supplements: item.supplements?.map(s => s.name),
           station: item.menuItem.station,
+          price: item.menuItem.price,
         })),
         total,
         notes: `COMMANDE CLIENT - ${orderType === 'sur_place' ? 'SUR PLACE' : 'À EMPORTER'}`,
+        createdAt: Timestamp.now(),
       };
 
-      await db.orders.add({
-        ...orderData,
-        createdAt: Date.now(),
-      } as any);
+      await addDoc(collection(getDb(), 'orders'), orderData);
 
       showToast('Commande envoyée en cuisine !');
       clearCart();
@@ -110,7 +126,7 @@ function ClientView(): JSX.Element {
 
         {/* Menu grid */}
         <MenuGrid
-          items={filteredItems || []}
+          items={filteredItems}
           onAddToCart={handleAddToCart}
         />
       </div>

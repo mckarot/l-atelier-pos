@@ -1,5 +1,4 @@
 import { useCallback } from 'react';
-import { cn } from '../../utils/cn';
 
 export interface ClientHeaderProps {
   onLogout: () => void;

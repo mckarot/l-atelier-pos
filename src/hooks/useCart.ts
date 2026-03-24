@@ -2,7 +2,8 @@
 // Hook pour la gestion du panier client
 
 import { useState, useCallback, useMemo } from 'react';
-import type { MenuItem, Supplement, CookingLevel } from '../db/types';
+import type { MenuItem, Supplement, CookingLevel } from '../firebase/types';
+import { SUPPLEMENT_PRICES } from '../firebase/types';
 
 export interface CartItem {
   menuItem: MenuItem;
@@ -52,11 +53,11 @@ export function useCart() {
   ) => {
     setCart((prev) => {
       // Créer une clé unique basée sur l'item et ses personnalisations
-      const itemKey = `${menuItem.id}-${cookingLevel || ''}-${supplements?.map(s => s.name).sort().join(',') || ''}`;
-      
+      const itemKey = `${menuItem.id}-${cookingLevel || ''}-${supplements?.sort().join(',') || ''}`;
+
       // Vérifier si l'item existe déjà avec les mêmes personnalisations
       const existingIndex = prev.findIndex((item) => {
-        const existingKey = `${item.menuItem.id}-${item.cookingLevel || ''}-${item.supplements?.map(s => s.name).sort().join(',') || ''}`;
+        const existingKey = `${item.menuItem.id}-${item.cookingLevel || ''}-${item.supplements?.sort().join(',') || ''}`;
         return existingKey === itemKey;
       });
 
@@ -66,18 +67,18 @@ export function useCart() {
         newCart[existingIndex] = {
           ...newCart[existingIndex],
           quantity: newCart[existingIndex].quantity + 1,
-          subtotal: (newCart[existingIndex].quantity + 1) * (menuItem.price + (supplements?.reduce((sum, s) => sum + s.price, 0) || 0)),
+          subtotal: (newCart[existingIndex].quantity + 1) * (menuItem.price + (supplements?.reduce((sum, s) => sum + SUPPLEMENT_PRICES[s], 0) || 0)),
         };
         return newCart;
       }
 
       // Ajouter un nouvel item
-      const supplementPrice = supplements?.reduce((sum, s) => sum + s.price, 0) || 0;
+      const supplementPrice = supplements?.reduce((sum, s) => sum + SUPPLEMENT_PRICES[s], 0) || 0;
       const itemSubtotal = menuItem.price + supplementPrice;
 
       const customizations: string[] = [];
       if (cookingLevel) customizations.push(cookingLevel);
-      if (supplements) supplements.forEach(s => customizations.push(s.name));
+      if (supplements) supplements.forEach(s => customizations.push(s));
 
       return [
         ...prev,

@@ -1,10 +1,10 @@
 // src/hooks/useMenuEditor.ts
 // Hook personnalisé pour les opérations CRUD du menu
 
-import { useState, useCallback } from 'react';
-import { useLiveQuery } from 'dexie-react-hooks';
-import { db } from '../db/database';
-import type { MenuItem, MenuCategory, CreateMenuItemInput, StationType } from '../db/types';
+import { useState, useCallback, useEffect } from 'react';
+import { collection, query, orderBy, onSnapshot, addDoc, updateDoc, deleteDoc, doc, Timestamp } from 'firebase/firestore';
+import { getDb } from '../firebase/config';
+import type { MenuItem, MenuCategory, CreateMenuItemInput, StationType } from '../firebase/types';
 
 export interface MenuItemFormData {
   name: string;
@@ -14,7 +14,7 @@ export interface MenuItemFormData {
   image?: string;
   allergens?: string[];
   station?: StationType;
-  isAvailable: 0 | 1;
+  isAvailable: boolean; // Changed from 0 | 1 to boolean for Firestore
   customizationOptions?: CreateMenuItemInput['customizationOptions'];
 }
 
@@ -28,13 +28,13 @@ interface UseMenuEditorReturn {
   openEditModal: (item: MenuItem) => void;
   closeModal: () => void;
   addItem: (data: MenuItemFormData) => Promise<void>;
-  updateItem: (id: number, data: Partial<MenuItemFormData>) => Promise<void>;
-  deleteItem: (id: number) => Promise<void>;
-  toggleAvailability: (id: number, isAvailable: boolean) => Promise<void>;
+  updateItem: (id: string, data: Partial<MenuItemFormData>) => Promise<void>;
+  deleteItem: (id: string) => Promise<void>;
+  toggleAvailability: (id: string, isAvailable: boolean) => Promise<void>;
 }
 
-const CATEGORIES: MenuCategory[] = ['Entrées', 'Plats', 'Desserts', 'Boissons'];
-const STATIONS: StationType[] = ['GRILL', 'FROID', 'PATISSERIE'];
+const CATEGORIES: MenuCategory[] = ['entree', 'plat', 'dessert', 'boisson'];
+const STATIONS: StationType[] = ['FROID', 'GRILL', 'CHAUD', 'BAR', 'PIZZA'];
 
 export function useMenuEditor(): UseMenuEditorReturn {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -42,12 +42,35 @@ export function useMenuEditor(): UseMenuEditorReturn {
   const [error, setError] = useState<Error | null>(null);
 
   // Récupère tous les items du menu en temps réel
-  const menuItems = useLiveQuery<MenuItem[]>(
-    () => db.menuItems.orderBy('category').sortBy('name'),
-    []
-  );
+  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const isLoading = menuItems === undefined;
+  useEffect(() => {
+    setIsLoading(true);
+    setError(null);
+
+    const menuItemsRef = collection(getDb(), 'menuItems');
+    const q = query(menuItemsRef, orderBy('name', 'asc'));
+
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
+        const items = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+        } as MenuItem));
+        setMenuItems(items);
+        setIsLoading(false);
+      },
+      (err) => {
+        console.error('[useMenuEditor] Error:', err);
+        setError(err instanceof Error ? err : new Error('Erreur lors du chargement du menu'));
+        setIsLoading(false);
+      }
+    );
+
+    return () => unsubscribe();
+  }, []);
 
   const openAddModal = useCallback(() => {
     setEditingItem(null);
@@ -70,7 +93,7 @@ export function useMenuEditor(): UseMenuEditorReturn {
   const addItem = useCallback(async (data: MenuItemFormData): Promise<void> => {
     try {
       setError(null);
-      
+
       // Validation
       if (!data.name.trim()) {
         throw new Error('Le nom est obligatoire');
@@ -91,7 +114,10 @@ export function useMenuEditor(): UseMenuEditorReturn {
         customizationOptions: data.customizationOptions,
       };
 
-      await db.menuItems.add(newItem as MenuItem);
+      await addDoc(collection(getDb(), 'menuItems'), {
+        ...newItem,
+        createdAt: Timestamp.now(),
+      });
       closeModal();
     } catch (err) {
       setError(err instanceof Error ? err : new Error('Erreur lors de l\'ajout'));
@@ -100,12 +126,12 @@ export function useMenuEditor(): UseMenuEditorReturn {
   }, [closeModal]);
 
   const updateItem = useCallback(async (
-    id: number,
+    id: string,
     data: Partial<MenuItemFormData>
   ): Promise<void> => {
     try {
       setError(null);
-      
+
       // Validation
       if (data.name !== undefined && !data.name.trim()) {
         throw new Error('Le nom est obligatoire');
@@ -126,7 +152,8 @@ export function useMenuEditor(): UseMenuEditorReturn {
         ...(data.customizationOptions !== undefined && { customizationOptions: data.customizationOptions }),
       };
 
-      await db.menuItems.update(id, updateData);
+      const itemRef = doc(getDb(), 'menuItems', id);
+      await updateDoc(itemRef, updateData);
       closeModal();
     } catch (err) {
       setError(err instanceof Error ? err : new Error('Erreur lors de la modification'));
@@ -134,10 +161,11 @@ export function useMenuEditor(): UseMenuEditorReturn {
     }
   }, [closeModal]);
 
-  const deleteItem = useCallback(async (id: number): Promise<void> => {
+  const deleteItem = useCallback(async (id: string): Promise<void> => {
     try {
       setError(null);
-      await db.menuItems.delete(id);
+      const itemRef = doc(getDb(), 'menuItems', id);
+      await deleteDoc(itemRef);
     } catch (err) {
       setError(err instanceof Error ? err : new Error('Erreur lors de la suppression'));
       throw err;
@@ -145,11 +173,12 @@ export function useMenuEditor(): UseMenuEditorReturn {
   }, []);
 
   const toggleAvailability = useCallback(async (
-    id: number,
+    id: string,
     isAvailable: boolean
   ): Promise<void> => {
     try {
-      await db.menuItems.update(id, { isAvailable: isAvailable ? 1 : 0 });
+      const itemRef = doc(getDb(), 'menuItems', id);
+      await updateDoc(itemRef, { isAvailable });
     } catch (err) {
       setError(err instanceof Error ? err : new Error('Erreur lors de la mise à jour'));
       throw err;

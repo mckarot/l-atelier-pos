@@ -5,9 +5,9 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MenuFilters } from './MenuFilters';
-import type { MenuCategory } from '../../db/types';
+import type { MenuCategory } from '../../firebase/types';
 
-const categories: MenuCategory[] = ['Entrées', 'Plats', 'Desserts', 'Boissons'];
+const categories: MenuCategory[] = ['entree', 'plat', 'dessert', 'boisson'];
 
 describe('MenuFilters', () => {
   const mockOnSelectCategory = vi.fn();
@@ -42,10 +42,10 @@ describe('MenuFilters', () => {
       );
 
       // Assert
-      expect(screen.getByRole('tab', { name: 'Entrées' })).toBeInTheDocument();
-      expect(screen.getByRole('tab', { name: 'Plats' })).toBeInTheDocument();
-      expect(screen.getByRole('tab', { name: 'Desserts' })).toBeInTheDocument();
-      expect(screen.getByRole('tab', { name: 'Boissons' })).toBeInTheDocument();
+      expect(screen.getByRole('tab', { name: 'entree' })).toBeInTheDocument();
+      expect(screen.getByRole('tab', { name: 'plat' })).toBeInTheDocument();
+      expect(screen.getByRole('tab', { name: 'dessert' })).toBeInTheDocument();
+      expect(screen.getByRole('tab', { name: 'boisson' })).toBeInTheDocument();
     });
 
     it('devrait avoir un rôle tablist', () => {
@@ -92,7 +92,7 @@ describe('MenuFilters', () => {
       );
 
       // Assert
-      const platsButton = screen.getByRole('tab', { name: 'Plats' });
+      const platsButton = screen.getByRole('tab', { name: 'plat' });
       expect(platsButton).toHaveClass('bg-primary-container');
       expect(platsButton).toHaveAttribute('aria-selected', 'true');
     });
@@ -108,7 +108,7 @@ describe('MenuFilters', () => {
       );
 
       // Assert
-      const entreesButton = screen.getByRole('tab', { name: 'Entrées' });
+      const entreesButton = screen.getByRole('tab', { name: 'entree' });
       expect(entreesButton).toHaveClass('bg-surface-container-highest');
       expect(entreesButton).toHaveClass('text-on-surface-variant');
       expect(entreesButton).toHaveAttribute('aria-selected', 'false');
@@ -144,10 +144,10 @@ describe('MenuFilters', () => {
       );
 
       // Act
-      await userEvent.click(screen.getByRole('tab', { name: 'Desserts' }));
+      await userEvent.click(screen.getByRole('tab', { name: 'dessert' }));
 
       // Assert
-      expect(mockOnSelectCategory).toHaveBeenCalledWith('Desserts');
+      expect(mockOnSelectCategory).toHaveBeenCalledWith('dessert');
     });
 
     it('devrait être focusable au clavier', async () => {

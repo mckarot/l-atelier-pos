@@ -6,9 +6,9 @@
 // Authentification JWT réelle prévue en v1.1 — NE PAS UTILISER EN PRODUCTION
 
 import { useNavigate } from 'react-router-dom';
-import { useState, useCallback } from 'react';
+import { useState } from 'react';
 import { setUserRole } from '../../utils/roleGuard';
-import type { UserRole } from '../../db/types';
+import type { UserRole } from '../../firebase/types';
 import { cn, iconFilled } from '../../utils/cn';
 
 interface RoleCard {

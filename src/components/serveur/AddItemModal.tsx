@@ -7,7 +7,7 @@ import { useServerCart } from '../../hooks/useServerCart';
 import { useServerOrders } from '../../hooks/useServerOrders';
 import { ServerCartItem } from './ServerCartItem';
 import type { FloorTable } from './types';
-import type { MenuCategory } from '../../db/types';
+import type { MenuCategory } from '../../firebase/types';
 
 export interface AddItemModalProps {
   isOpen: boolean;
@@ -18,7 +18,7 @@ export interface AddItemModalProps {
 
 type CategoryFilter = 'Tous' | MenuCategory;
 
-const CATEGORIES: CategoryFilter[] = ['Tous', 'Entrées', 'Plats', 'Desserts', 'Boissons'];
+const CATEGORIES: CategoryFilter[] = ['Tous', 'entree', 'plat', 'dessert', 'boisson'];
 
 export function AddItemModal({
   isOpen,
@@ -35,24 +35,24 @@ export function AddItemModal({
   const { addItemsToOrder } = useServerOrders();
 
   // Récupérer les items du menu
-  const allMenuItems = useAvailableMenuItems();
-  const entreesItems = useMenuItemsByCategory('Entrées');
-  const platsItems = useMenuItemsByCategory('Plats');
-  const dessertsItems = useMenuItemsByCategory('Desserts');
-  const boissonsItems = useMenuItemsByCategory('Boissons');
+  const { items: allMenuItems } = useAvailableMenuItems();
+  const { items: entreesItems } = useMenuItemsByCategory('entree');
+  const { items: platsItems } = useMenuItemsByCategory('plat');
+  const { items: dessertsItems } = useMenuItemsByCategory('dessert');
+  const { items: boissonsItems } = useMenuItemsByCategory('boisson');
 
   // Filtrer les items par catégorie
   const filteredItems = useCallback(() => {
     if (!allMenuItems) return [];
 
     switch (selectedCategory) {
-      case 'Entrées':
+      case 'entree':
         return entreesItems || [];
-      case 'Plats':
+      case 'plat':
         return platsItems || [];
-      case 'Desserts':
+      case 'dessert':
         return dessertsItems || [];
-      case 'Boissons':
+      case 'boisson':
         return boissonsItems || [];
       default:
         return allMenuItems;
@@ -116,22 +116,22 @@ export function AddItemModal({
     }
   }, [isOpen, clearCart]);
 
-  const handleAddItem = (menuItemId: number) => {
+  const handleAddItem = (menuItemId: string) => {
     const menuItem = allMenuItems?.find((item) => item.id === menuItemId);
     if (menuItem) {
       addItem(menuItem);
     }
   };
 
-  const handleIncrement = (menuItemId: number) => {
+  const handleIncrement = (menuItemId: string) => {
     updateQuantity(menuItemId, 1);
   };
 
-  const handleDecrement = (menuItemId: number) => {
+  const handleDecrement = (menuItemId: string) => {
     updateQuantity(menuItemId, -1);
   };
 
-  const handleRemove = (menuItemId: number) => {
+  const handleRemove = (menuItemId: string) => {
     removeItem(menuItemId);
   };
 

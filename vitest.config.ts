@@ -51,7 +51,7 @@ export default defineConfig({
       output: {
         manualChunks: {
           'react-vendor': ['react', 'react-dom', 'react-router-dom'],
-          'dexie-vendor': ['dexie', 'dexie-react-hooks'],
+          'firebase-vendor': ['firebase/app', 'firebase/firestore', 'firebase/auth'],
         },
       },
     },

@@ -4,14 +4,14 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { MenuItemRow } from './MenuItemRow';
-import type { MenuItem } from '../../db/types';
+import type { MenuItem } from '../../firebase/types';
 
 const mockItem: MenuItem = {
   id: 1,
   name: 'Test Item',
   description: 'Test Description',
   price: 15.50,
-  category: 'Plats',
+  category: 'plat',
   isAvailable: 1,
   station: 'GRILL',
   allergens: ['gluten'],
@@ -42,7 +42,7 @@ describe('MenuItemRow', () => {
     expect(screen.getByText('Test Item')).toBeInTheDocument();
     expect(screen.getByText('Test Description')).toBeInTheDocument();
     expect(screen.getByText('15.50€')).toBeInTheDocument();
-    expect(screen.getByText('Plats')).toBeInTheDocument();
+    expect(screen.getByText('plat')).toBeInTheDocument();
     expect(screen.getByText('GRILL')).toBeInTheDocument();
   });
 

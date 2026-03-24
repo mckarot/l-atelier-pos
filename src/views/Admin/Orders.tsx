@@ -1,10 +1,10 @@
 // src/views/Admin/Orders.tsx
 // Gestion des commandes en direct - Vue Live Orders
 
-import { type JSX, useCallback, useState } from 'react';
-import { useLiveQuery } from 'dexie-react-hooks';
-import { db } from '../../db/database';
-import type { Order, OrderStatus } from '../../db/types';
+import { type JSX, useCallback, useState, useEffect } from 'react';
+import { collection, query, where, onSnapshot, type Timestamp } from 'firebase/firestore';
+import { getDb } from '../../firebase/config';
+import type { Order, OrderStatus } from '../../firebase/types';
 import { OrderFilters } from '../../components/admin/OrderFilters';
 import { OrdersTable } from '../../components/admin/OrdersTable';
 import { updateOrderStatus } from '../../hooks/useOrders';
@@ -21,28 +21,50 @@ export function AdminOrders(): JSX.Element {
   // États locaux pour les filtres
   const [selectedStatus, setSelectedStatus] = useState<OrderStatus | 'all'>('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [activeOrders, setActiveOrders] = useState<Order[]>([]);
 
-  // Récupération des commandes actives en temps réel avec useLiveQuery
-  const activeOrders = useLiveQuery<Order[]>(
-    () =>
-      db.orders
-        .where('status')
-        .anyOf(['en_attente', 'en_preparation', 'pret'])
-        .sortBy('createdAt'),
-    []
-  );
+  // Récupération des commandes actives en temps réel avec onSnapshot
+  useEffect(() => {
+    const ordersRef = collection(getDb(), 'orders');
+    const q = query(
+      ordersRef,
+      where('status', 'in', ['attente', 'preparation', 'pret'])
+    );
+
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
+        const orders = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+        } as Order));
+        // Sort by createdAt
+        orders.sort((a, b) => {
+          const aTime = a.createdAt instanceof Timestamp ? a.createdAt.toMillis() : a.createdAt;
+          const bTime = b.createdAt instanceof Timestamp ? b.createdAt.toMillis() : b.createdAt;
+          return aTime - bTime;
+        });
+        setActiveOrders(orders);
+      },
+      (error) => {
+        console.error('[AdminOrders] Error loading active orders:', error);
+      }
+    );
+
+    return () => unsubscribe();
+  }, []);
 
   // Gestionnaire de lancement de préparation
-  const handleLaunch = useCallback(async (orderId: number) => {
+  const handleLaunch = useCallback(async (orderId: string) => {
     try {
-      await updateOrderStatus({ id: orderId, status: 'en_preparation' });
+      await updateOrderStatus({ id: orderId, status: 'preparation' });
     } catch (error) {
       console.error('[AdminOrders] Error launching order:', error);
     }
   }, []);
 
   // Gestionnaire de fin de commande (marquer comme prêt)
-  const handleComplete = useCallback(async (orderId: number) => {
+  const handleComplete = useCallback(async (orderId: string) => {
     try {
       await updateOrderStatus({ id: orderId, status: 'pret' });
     } catch (error) {
@@ -61,7 +83,7 @@ export function AdminOrders(): JSX.Element {
   }, []);
 
   // Compteur de commandes actives
-  const ordersCount = activeOrders?.length ?? 0;
+  const ordersCount = activeOrders.length;
 
   return (
     <div>
@@ -95,7 +117,7 @@ export function AdminOrders(): JSX.Element {
 
       {/* Tableau des commandes */}
       <OrdersTable
-        orders={activeOrders || []}
+        orders={activeOrders}
         selectedStatus={selectedStatus}
         searchQuery={searchQuery}
         onLaunch={handleLaunch}

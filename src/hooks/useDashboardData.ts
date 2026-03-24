@@ -1,10 +1,10 @@
 // src/hooks/useDashboardData.ts
-// Hook Dexie pour récupérer les données du tableau de bord administrateur
+// Hook Firebase pour récupérer les données du tableau de bord administrateur
 
-import { useMemo } from 'react';
-import { useLiveQuery } from 'dexie-react-hooks';
-import { db } from '../db/database';
-import type { Order, OrderStatus } from '../db/types';
+import { useState, useEffect, useMemo } from 'react';
+import { collection, query, orderBy, onSnapshot, type Timestamp } from 'firebase/firestore';
+import { getDb } from '../firebase/config';
+import type { Order, OrderStatus } from '../firebase/types';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // INTERFACES TYPESCRIPT
@@ -19,7 +19,7 @@ export interface WeeklyDataPoint {
 
 /** Événement du flux live */
 export interface LiveEvent {
-  id: number;
+  id: string; // Firestore ID (string)
   type: 'payment' | 'order' | 'cancellation';
   title: string;
   amount?: number;
@@ -71,11 +71,12 @@ function formatTime(seconds: number): string {
 }
 
 /**
- * Calcule le temps écoulé depuis un timestamp
+ * Calcule le temps écoulé depuis un timestamp Firestore
  */
-function timeAgo(timestamp: number): string {
+function timeAgo(timestamp: Timestamp | number): string {
   const now = Date.now();
-  const diff = now - timestamp;
+  const ts = timestamp instanceof Timestamp ? timestamp.toMillis() : timestamp;
+  const diff = now - ts;
   const minutes = Math.floor(diff / 60000);
   const hours = Math.floor(diff / 3600000);
   const days = Math.floor(diff / 86400000);
@@ -113,7 +114,9 @@ function calculatePrepTime(order: Order): number {
   if (!order.servedAt || !order.createdAt) {
     return 0;
   }
-  return Math.floor((order.servedAt - order.createdAt) / 1000);
+  const servedMs = order.servedAt instanceof Timestamp ? order.servedAt.toMillis() : order.servedAt;
+  const createdMs = order.createdAt instanceof Timestamp ? order.createdAt.toMillis() : order.createdAt;
+  return Math.floor((servedMs - createdMs) / 1000);
 }
 
 /**
@@ -122,14 +125,16 @@ function calculatePrepTime(order: Order): number {
 function generateWeeklyData(orders: Order[]): WeeklyDataPoint[] {
   const now = new Date();
   const todayIndex = getFrenchDayIndex(now);
-  
+
   // Initialiser les données pour les 7 jours
   const dailyRevenue = new Array(7).fill(0);
-  
+
   // Agréger les revenus par jour de la semaine
   orders.forEach(order => {
-    if (order.status === 'paye') {
-      const orderDate = new Date(order.createdAt);
+    if (order.status === 'paid') {
+      const orderDate = order.createdAt instanceof Timestamp 
+        ? order.createdAt.toDate() 
+        : new Date(order.createdAt);
       const dayIndex = getFrenchDayIndex(orderDate);
       dailyRevenue[dayIndex] += calculateOrderTotal(order);
     }
@@ -159,15 +164,19 @@ function generateWeeklyData(orders: Order[]): WeeklyDataPoint[] {
  */
 function generateLiveEvents(orders: Order[]): LiveEvent[] {
   const events: LiveEvent[] = [];
-  
+
   // Trier les commandes par date de création (plus récentes en premier)
-  const sortedOrders = [...orders].sort((a, b) => b.createdAt - a.createdAt);
-  
+  const sortedOrders = [...orders].sort((a, b) => {
+    const aTime = a.createdAt instanceof Timestamp ? a.createdAt.toMillis() : a.createdAt;
+    const bTime = b.createdAt instanceof Timestamp ? b.createdAt.toMillis() : b.createdAt;
+    return bTime - aTime;
+  });
+
   // Prendre les 5 commandes les plus récentes
   sortedOrders.slice(0, 5).forEach(order => {
     let event: LiveEvent;
-    
-    if (order.status === 'paye') {
+
+    if (order.status === 'paid') {
       event = {
         id: order.id,
         type: 'payment',
@@ -186,7 +195,7 @@ function generateLiveEvents(orders: Order[]): LiveEvent[] {
         icon: 'cancel',
         color: 'text-error',
       };
-    } else if (order.status === 'servi' || order.status === 'pret') {
+    } else if (order.status === 'served' || order.status === 'pret') {
       event = {
         id: order.id,
         type: 'order',
@@ -206,7 +215,7 @@ function generateLiveEvents(orders: Order[]): LiveEvent[] {
         color: 'text-primary',
       };
     }
-    
+
     events.push(event);
   });
 
@@ -214,7 +223,7 @@ function generateLiveEvents(orders: Order[]): LiveEvent[] {
   if (events.length === 0) {
     return [
       {
-        id: 1,
+        id: '1',
         type: 'payment',
         title: 'Paiement Reçu - Table 14',
         amount: 124.50,
@@ -223,7 +232,7 @@ function generateLiveEvents(orders: Order[]): LiveEvent[] {
         color: 'text-tertiary',
       },
       {
-        id: 2,
+        id: '2',
         type: 'order',
         title: 'Commande Terminée - #842',
         timeAgo: 'Il y a 5 min',
@@ -231,7 +240,7 @@ function generateLiveEvents(orders: Order[]): LiveEvent[] {
         color: 'text-tertiary',
       },
       {
-        id: 3,
+        id: '3',
         type: 'cancellation',
         title: 'Annulation - Table 4',
         timeAgo: 'Il y a 12 min',
@@ -250,19 +259,44 @@ function generateLiveEvents(orders: Order[]): LiveEvent[] {
 
 /**
  * Hook pour récupérer les données du tableau de bord
- * Utilise useLiveQuery pour une mise à jour réactive
+ * Utilise onSnapshot pour une mise à jour réactive
  * @returns DashboardData | undefined
  */
 export function useDashboardData(): DashboardData | undefined {
-  // Récupérer toutes les commandes via Dexie
-  const allOrders = useLiveQuery(
-    () => db.orders.orderBy('createdAt').toArray(),
-    []
-  );
+  const [allOrders, setAllOrders] = useState<Order[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+
+  useEffect(() => {
+    setIsLoading(true);
+    setError(null);
+
+    const ordersRef = collection(getDb(), 'orders');
+    const q = query(ordersRef, orderBy('createdAt', 'asc'));
+
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
+        const orders = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+        } as Order));
+        setAllOrders(orders);
+        setIsLoading(false);
+      },
+      (err) => {
+        console.error('[useDashboardData] Error:', err);
+        setError(err instanceof Error ? err : new Error('Erreur Firestore'));
+        setIsLoading(false);
+      }
+    );
+
+    return () => unsubscribe();
+  }, []);
 
   // Calculer les données dérivées avec useMemo pour éviter les recalculs inutiles
   return useMemo(() => {
-    if (!allOrders) {
+    if (isLoading || error) {
       return undefined;
     }
 
@@ -274,14 +308,19 @@ export function useDashboardData(): DashboardData | undefined {
     // 1. REVENU QUOTIDIEN
     // ────────────────────────────────────────────────────────────────────────
     // Filtrer les commandes payées du jour
-    const todayPaidOrders = allOrders.filter(order => 
-      order.status === 'paye' && 
-      order.createdAt >= startOfDay && 
-      order.createdAt < endOfDay
-    );
-    
+    const todayPaidOrders = allOrders.filter(order => {
+      const orderTime = order.createdAt instanceof Timestamp 
+        ? order.createdAt.toMillis() 
+        : order.createdAt;
+      return (
+        order.status === 'paid' &&
+        orderTime >= startOfDay &&
+        orderTime < endOfDay
+      );
+    });
+
     const revenue = todayPaidOrders.reduce((sum, order) => sum + calculateOrderTotal(order), 0);
-    
+
     // Simulation de la variation (dans une implémentation réelle, comparer avec la veille)
     const revenueChange = revenue > 0 ? 12.4 : 0;
 
@@ -289,12 +328,17 @@ export function useDashboardData(): DashboardData | undefined {
     // 2. COMMANDES
     // ────────────────────────────────────────────────────────────────────────
     // Toutes les commandes du jour (hors annulées)
-    const todayOrders = allOrders.filter(order => 
-      order.createdAt >= startOfDay && 
-      order.createdAt < endOfDay &&
-      order.status !== 'annule'
-    );
-    
+    const todayOrders = allOrders.filter(order => {
+      const orderTime = order.createdAt instanceof Timestamp 
+        ? order.createdAt.toMillis() 
+        : order.createdAt;
+      return (
+        orderTime >= startOfDay &&
+        orderTime < endOfDay &&
+        order.status !== 'annule'
+      );
+    });
+
     const ordersCount = todayOrders.length;
     const ordersChange = ordersCount > 0 ? 5 : 0;
 
@@ -302,10 +346,10 @@ export function useDashboardData(): DashboardData | undefined {
     // 3. TEMPS DE PRÉPARATION MOYEN
     // ────────────────────────────────────────────────────────────────────────
     // Calculer le temps de préparation pour les commandes servies
-    const servedOrders = allOrders.filter(order => 
-      order.status === 'servi' && order.servedAt && order.createdAt
+    const servedOrders = allOrders.filter(order =>
+      order.status === 'served' && order.servedAt && order.createdAt
     );
-    
+
     let avgPrepTime = 0;
     if (servedOrders.length > 0) {
       const totalPrepTime = servedOrders.reduce((sum, order) => sum + calculatePrepTime(order), 0);
@@ -314,7 +358,7 @@ export function useDashboardData(): DashboardData | undefined {
       // Valeur par défaut si aucune commande servie
       avgPrepTime = 18 * 60 + 45; // 18:45
     }
-    
+
     const prepTimeObjective = 15 * 60; // 15:00
     const prepTimeChange = avgPrepTime - prepTimeObjective; // positif = plus lent, négatif = plus rapide
 
@@ -349,7 +393,7 @@ export function useDashboardData(): DashboardData | undefined {
       weeklyData,
       liveEvents,
     };
-  }, [allOrders]);
+  }, [allOrders, isLoading, error]);
 }
 
 /**

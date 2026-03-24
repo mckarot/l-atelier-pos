@@ -2,7 +2,7 @@
 // Error Boundary pour les erreurs au niveau des features
 
 import { Component, type ErrorInfo, type ReactNode } from 'react';
-import { categorizeDexieError } from '../../utils/errorUtils';
+import { categorizeFirebaseError } from '../../utils/errorUtils';
 
 interface ErrorBoundaryProps {
   children: ReactNode;
@@ -53,7 +53,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     }
 
     // Catégorisation de l'erreur pour un message adapté
-    const { category, message } = categorizeDexieError(this.state.error);
+    const { category, message } = categorizeFirebaseError(this.state.error);
 
     return (
       <div
@@ -72,28 +72,26 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
               Une erreur est survenue
             </h2>
             <p className="text-sm text-on-surface-variant mb-4">{message}</p>
-            
-            {category === 'quota' && (
+
+            {category === 'permission' && (
               <div className="bg-surface-container-high rounded-lg p-3 mb-4">
                 <p className="text-xs text-on-surface-variant">
-                  Solution : Allez dans les paramètres de votre navigateur et augmentez 
-                  l'espace de stockage IndexedDB, ou videz le cache.
+                  Solution : Vérifiez que vous êtes connecté avec les bons identifiants.
                 </p>
               </div>
             )}
-            
-            {category === 'privateBrowsing' && (
+
+            {category === 'network' && (
               <div className="bg-surface-container-high rounded-lg p-3 mb-4">
                 <p className="text-xs text-on-surface-variant">
-                  Solution : Désactivez la navigation privée ou utilisez un navigateur 
-                  standard pour accéder à toutes les fonctionnalités.
+                  Solution : Vérifiez votre connexion Internet ou rechargez la page.
                 </p>
               </div>
             )}
 
             <button
               onClick={this.handleReset}
-              className="w-full bg-primary text-on-primary font-bold py-2.5 px-4 rounded-lg 
+              className="w-full bg-primary text-on-primary font-bold py-2.5 px-4 rounded-lg
                          hover:brightness-110 active:scale-[0.98] transition-all text-sm"
             >
               Réessayer

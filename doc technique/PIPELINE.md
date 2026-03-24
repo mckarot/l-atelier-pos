@@ -1,5 +1,5 @@
 # L'Atelier POS — Pipeline de développement IA
-> Version 1.1 — Orchestration des agents pour Claude Code / Cursor
+> Version 1.2 — Orchestration des agents pour Claude Code / Cursor
 
 Ce fichier définit l'ordre d'exécution des agents pour chaque user story. **Respecter cette séquence sans exception.** Un agent ne doit jamais démarrer sans que le précédent ait terminé et validé son livrable.
 
@@ -339,4 +339,40 @@ Chaque US est traitée séquentiellement dans la pipeline — ne pas parallélis
 
 ---
 
-*L'Atelier POS — PIPELINE v1.0 — Document destiné au développement IA autonome*
+---
+
+## 📝 Commit et Push — Instructions
+
+### ⚠️ IMPORTANT — Aucun commit/push automatique
+
+**Règle absolue :** L'IA ne doit **JAMAIS** exécuter de commit ou push Git automatiquement à la fin d'une user story.
+
+**Pourquoi :**
+- L'utilisateur veut réviser les changements avant de committer
+- Plusieurs US peuvent être regroupées en un seul commit
+- L'utilisateur veut contrôler le message de commit
+
+**Ce que l'IA doit faire à la fin d'une US :**
+1. ✅ Produire un rapport de synthèse (fichiers créés/modifiés, tests, coverage)
+2. ✅ Afficher la commande `git status` pour voir les changements
+3. ✅ **Attendre l'instruction explicite de l'utilisateur** pour commit/push
+
+**Commandes à NE PAS exécuter automatiquement :**
+```bash
+❌ git add -A
+❌ git commit -m "..."
+❌ git push origin main
+```
+
+**Commandes à exécuter uniquement sur demande explicite :**
+```bash
+✅ git add -A          # Seulement si l'utilisateur dit "commit les changements"
+✅ git commit -m "..." # Seulement si l'utilisateur dit "commit avec ce message"
+✅ git push            # Seulement si l'utilisateur dit "push vers GitHub"
+```
+
+**Exception :** Si l'utilisateur demande explicitement "commit et push" à la fin de l'US, alors l'IA peut le faire.
+
+---
+
+*L'Atelier POS — PIPELINE v1.1 — Document destiné au développement IA autonome*

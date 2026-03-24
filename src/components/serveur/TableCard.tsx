@@ -22,7 +22,7 @@ export function TableCard({ table, isSelected, onClick }: TableCardProps): JSX.E
         return 'border-primary bg-primary/10 text-primary';
       case 'pret':
         return 'border-blue-500 bg-blue-500/10 text-blue-500';
-      case 'reserve':
+      case 'reservation':
         return 'border-purple-500 bg-purple-500/10 text-purple-500';
       default:
         return 'border-outline bg-surface-container text-on-surface-variant';
@@ -102,7 +102,7 @@ export function TableCard({ table, isSelected, onClick }: TableCardProps): JSX.E
         <>
           <div className="space-y-1 mb-6">
             <p className="text-on-surface-variant italic text-sm">
-              {table.status === 'reserve' ? 'Réservée' : 'Prête pour dressage'}
+              {table.status === 'reservation' ? 'Réservée' : 'Prête pour dressage'}
             </p>
             <p className="text-on-surface-variant text-xs flex items-center gap-1">
               <span className="material-symbols-outlined text-xs">group</span>

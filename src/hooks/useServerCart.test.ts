@@ -10,7 +10,7 @@ const mockMenuItem: MenuItem = {
   name: 'Burger de l\'Atelier',
   description: 'Burger délicieux',
   price: 19.50,
-  category: 'Plats',
+  category: 'plat',
   isAvailable: 1,
 };
 
@@ -19,7 +19,7 @@ const mockMenuItem2: MenuItem = {
   name: 'Café Gourmand',
   description: 'Café et mignardises',
   price: 8.50,
-  category: 'Desserts',
+  category: 'dessert',
   isAvailable: 1,
 };
 

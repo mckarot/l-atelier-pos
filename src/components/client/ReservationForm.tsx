@@ -3,7 +3,7 @@
 
 import { useCallback } from 'react';
 import { cn, iconFilled } from '../../utils/cn';
-import type { Reservation } from '../../db/types';
+import type { Reservation } from '../../firebase/types';
 
 interface DateStepProps {
   data: Partial<Reservation>;

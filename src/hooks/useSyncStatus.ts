@@ -1,9 +1,9 @@
 // src/hooks/useSyncStatus.ts
 // Hook personnalisé pour détecter l'état de synchronisation et la connexion réseau
 
-import { useState, useEffect, useCallback } from 'react';
-import { useLiveQuery } from 'dexie-react-hooks';
-import { db } from '../db/database';
+import { useState, useEffect } from 'react';
+import { collection, onSnapshot } from 'firebase/firestore';
+import { getDb } from '../firebase/config';
 
 export type SyncStatus = 'connected' | 'disconnected' | 'syncing';
 
@@ -17,19 +17,18 @@ export interface UseSyncStatusReturn {
 /**
  * Hook pour surveiller l'état de synchronisation
  * - Détecte la connexion réseau via window.online/offline
- * - Surveille les mutations Dexie via lastSync
+ * - Surveille les mutations Firestore via onSnapshot
  * - Met à jour le statut en temps réel
  */
 export function useSyncStatus(): UseSyncStatusReturn {
   const [isOnline, setIsOnline] = useState<boolean>(navigator.onLine);
   const [lastSync, setLastSync] = useState<Date | null>(new Date());
 
-  // Surveillance des mutations via une requête qui se met à jour
-  // On utilise le comptage des tables comme proxy de mutation
-  const ordersCount = useLiveQuery<number>(() => db.orders.count(), []);
-  const menuItemsCount = useLiveQuery<number>(() => db.menuItems.count(), []);
-  const tablesCount = useLiveQuery<number>(() => db.restaurantTables.count(), []);
-  const reservationsCount = useLiveQuery<number>(() => db.reservations.count(), []);
+  // Surveillance des collections Firestore via onSnapshot
+  const [ordersCount, setOrdersCount] = useState<number>(0);
+  const [menuItemsCount, setMenuItemsCount] = useState<number>(0);
+  const [tablesCount, setTablesCount] = useState<number>(0);
+  const [reservationsCount, setReservationsCount] = useState<number>(0);
 
   // Détection online/offline
   useEffect(() => {
@@ -48,6 +47,61 @@ export function useSyncStatus(): UseSyncStatusReturn {
     return () => {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
+
+  // Surveillance des collections Firestore
+  useEffect(() => {
+    const ordersRef = collection(getDb(), 'orders');
+    const menuItemsRef = collection(getDb(), 'menuItems');
+    const tablesRef = collection(getDb(), 'restaurantTables');
+    const reservationsRef = collection(getDb(), 'reservations');
+
+    const unsubscribeOrders = onSnapshot(
+      ordersRef,
+      (snapshot) => {
+        setOrdersCount(snapshot.size);
+      },
+      (error) => {
+        console.error('[useSyncStatus] Error monitoring orders:', error);
+      }
+    );
+
+    const unsubscribeMenuItems = onSnapshot(
+      menuItemsRef,
+      (snapshot) => {
+        setMenuItemsCount(snapshot.size);
+      },
+      (error) => {
+        console.error('[useSyncStatus] Error monitoring menuItems:', error);
+      }
+    );
+
+    const unsubscribeTables = onSnapshot(
+      tablesRef,
+      (snapshot) => {
+        setTablesCount(snapshot.size);
+      },
+      (error) => {
+        console.error('[useSyncStatus] Error monitoring tables:', error);
+      }
+    );
+
+    const unsubscribeReservations = onSnapshot(
+      reservationsRef,
+      (snapshot) => {
+        setReservationsCount(snapshot.size);
+      },
+      (error) => {
+        console.error('[useSyncStatus] Error monitoring reservations:', error);
+      }
+    );
+
+    return () => {
+      unsubscribeOrders();
+      unsubscribeMenuItems();
+      unsubscribeTables();
+      unsubscribeReservations();
     };
   }, []);
 

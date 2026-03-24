@@ -49,13 +49,12 @@ export function SyncIndicator({
   showDetails = true,
 }: SyncIndicatorProps): JSX.Element {
   const isDisconnected = status === 'disconnected';
-  
+
   const label = isDisconnected
     ? 'HORS LIGNE — Données sauvegardées localement'
     : 'DEXIE.JS CONNECTÉ';
 
   const icon = isDisconnected ? 'cloud_off' : 'cloud_done';
-  const colorClass = isDisconnected ? 'error' : 'tertiary';
   const borderClass = isDisconnected ? 'border-error' : 'border-tertiary';
 
   return (

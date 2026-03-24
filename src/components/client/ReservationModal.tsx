@@ -8,7 +8,7 @@ import { ReservationForm } from './ReservationForm';
 import { ReservationConfirmation } from './ReservationConfirmation';
 import { useToast } from '../../hooks/useToast';
 import { createReservation } from '../../hooks/useReservations';
-import type { Reservation } from '../../db/types';
+import type { Reservation } from '../../firebase/types';
 
 export type ReservationStep = 'DATE' | 'DETAILS' | 'CONFIRMATION';
 
@@ -65,7 +65,7 @@ export function ReservationModal({ isOpen, onClose }: ReservationModalProps): JS
         date: reservationData.date!,
         time: reservationData.time!,
         guests: reservationData.guests!,
-        status: 'en_attente',
+        status: 'attente',
         notes: reservationData.notes,
       });
 

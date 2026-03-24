@@ -3,7 +3,7 @@
 
 import { type JSX, useId } from 'react';
 import { cn } from '../../utils/cn';
-import type { TimeSlot } from '../../db/types';
+import type { TimeSlot } from '../../firebase/types';
 
 export interface TimeSlotSelectProps {
   /** Valeur sélectionnée */

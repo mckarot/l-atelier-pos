@@ -7,8 +7,8 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { createMemoryRouter, RouterProvider, type RouteObject } from 'react-router-dom';
 import { AdminKitchen } from './Kitchen';
-import { db } from '../../db/database';
-import type { Order } from '../../db/types';
+import { db } from '../../firebase/config';
+import type { Order } from '../../firebase/types';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // HELPERS DE ROUTING
@@ -36,7 +36,7 @@ const seedOrders = async (orders: Partial<Order>[]): Promise<void> => {
     id: i + 1,
     tableId: order.tableId ?? (i % 16) + 1,
     customerName: order.customerName ?? `Client ${i + 1}`,
-    status: order.status ?? 'en_attente',
+    status: order.status ?? 'attente',
     items: order.items ?? [{ name: `Item ${i + 1}`, quantity: 1, station: 'FROID' }],
     total: order.total ?? 20,
     createdAt: order.createdAt ?? now - (i + 1) * 5 * 60 * 1000,
@@ -114,9 +114,9 @@ describe('AdminKitchen - Integration', () => {
     it('devrait afficher les compteurs de commandes par colonne', async () => {
       // Arrange
       await seedOrders([
-        { id: 1, status: 'en_attente' },
-        { id: 2, status: 'en_attente' },
-        { id: 3, status: 'en_preparation' },
+        { id: 1, status: 'attente' },
+        { id: 2, status: 'attente' },
+        { id: 3, status: 'preparation' },
         { id: 4, status: 'pret' },
         { id: 5, status: 'pret' },
         { id: 6, status: 'pret' },
@@ -149,8 +149,8 @@ describe('AdminKitchen - Integration', () => {
     it('devrait afficher les commandes en_attente dans la colonne "À PRÉPARER"', async () => {
       // Arrange
       await seedOrders([
-        { id: 1, status: 'en_attente', customerName: 'Pierre', tableId: 5 },
-        { id: 2, status: 'en_preparation', customerName: 'Marie' },
+        { id: 1, status: 'attente', customerName: 'Pierre', tableId: 5 },
+        { id: 2, status: 'preparation', customerName: 'Marie' },
         { id: 3, status: 'pret', customerName: 'Jean' },
       ]);
 
@@ -167,8 +167,8 @@ describe('AdminKitchen - Integration', () => {
     it('devrait afficher les commandes en_preparation dans la colonne "EN COURS"', async () => {
       // Arrange
       await seedOrders([
-        { id: 1, status: 'en_attente' },
-        { id: 2, status: 'en_preparation', customerName: 'Marie', tableId: 8 },
+        { id: 1, status: 'attente' },
+        { id: 2, status: 'preparation', customerName: 'Marie', tableId: 8 },
         { id: 3, status: 'pret' },
       ]);
 
@@ -185,8 +185,8 @@ describe('AdminKitchen - Integration', () => {
     it('devrait afficher les commandes pret dans la colonne "PRÊT / ENVOYÉ"', async () => {
       // Arrange
       await seedOrders([
-        { id: 1, status: 'en_attente' },
-        { id: 2, status: 'en_preparation' },
+        { id: 1, status: 'attente' },
+        { id: 2, status: 'preparation' },
         { id: 3, status: 'pret', customerName: 'Jean', tableId: 12 },
       ]);
 
@@ -205,7 +205,7 @@ describe('AdminKitchen - Integration', () => {
       await seedOrders([
         {
           id: 1,
-          status: 'en_attente',
+          status: 'attente',
           items: [
             { name: 'Tartare de Saumon', quantity: 2, station: 'FROID' },
             { name: 'Filet de Boeuf', quantity: 1, station: 'GRILL' },
@@ -230,7 +230,7 @@ describe('AdminKitchen - Integration', () => {
       await seedOrders([
         {
           id: 1,
-          status: 'en_attente',
+          status: 'attente',
           items: [
             { name: 'Tartare de Saumon', quantity: 1, station: 'FROID', customization: 'Sans citron' },
           ],
@@ -257,7 +257,7 @@ describe('AdminKitchen - Integration', () => {
       await seedOrders([
         {
           id: 1,
-          status: 'en_attente',
+          status: 'attente',
           createdAt: now - 5 * 60 * 1000 - 30 * 1000,
         },
       ]);
@@ -277,7 +277,7 @@ describe('AdminKitchen - Integration', () => {
       await seedOrders([
         {
           id: 1,
-          status: 'en_attente',
+          status: 'attente',
           createdAt: now - 10 * 60 * 1000,
         },
       ]);
@@ -301,7 +301,7 @@ describe('AdminKitchen - Integration', () => {
       await seedOrders([
         {
           id: 1,
-          status: 'en_attente',
+          status: 'attente',
           createdAt: now - 5 * 60 * 1000,
         },
       ]);
@@ -334,7 +334,7 @@ describe('AdminKitchen - Integration', () => {
         },
         {
           id: 2,
-          status: 'servi',
+          status: 'served',
           createdAt: Date.now() - 50 * 60 * 1000,
           updatedAt: Date.now() - 30 * 60 * 1000, // 20 min
         },
@@ -362,7 +362,7 @@ describe('AdminKitchen - Integration', () => {
     it('devrait afficher les boutons DÉTAILS et LANCER pour le mode attente', async () => {
       // Arrange
       await seedOrders([
-        { id: 1, status: 'en_attente' },
+        { id: 1, status: 'attente' },
       ]);
 
       // Act
@@ -378,7 +378,7 @@ describe('AdminKitchen - Integration', () => {
     it('devrait afficher les boutons AIDE et TERMINER pour le mode preparation', async () => {
       // Arrange
       await seedOrders([
-        { id: 1, status: 'en_preparation' },
+        { id: 1, status: 'preparation' },
       ]);
 
       // Act
@@ -394,7 +394,7 @@ describe('AdminKitchen - Integration', () => {
     it('devrait lancer la préparation au clic sur LANCER', async () => {
       // Arrange
       await seedOrders([
-        { id: 42, status: 'en_attente', customerName: 'Test' },
+        { id: 42, status: 'attente', customerName: 'Test' },
       ]);
 
       // Act
@@ -417,13 +417,13 @@ describe('AdminKitchen - Integration', () => {
 
       // Vérifier le statut en DB
       const order = await db.orders.get(42);
-      expect(order?.status).toBe('en_preparation');
+      expect(order?.status).toBe('preparation');
     });
 
     it('devrait terminer la préparation au clic sur TERMINER', async () => {
       // Arrange
       await seedOrders([
-        { id: 99, status: 'en_preparation', customerName: 'Test' },
+        { id: 99, status: 'preparation', customerName: 'Test' },
       ]);
 
       // Act
@@ -477,7 +477,7 @@ describe('AdminKitchen - Integration', () => {
       expect(screen.getByText('00')).toBeInTheDocument();
 
       // Act - Ajouter une commande
-      await seedOrders([{ id: 1, status: 'en_attente' }]);
+      await seedOrders([{ id: 1, status: 'attente' }]);
 
       // Assert - Mise à jour réactive
       await waitFor(() => {
@@ -488,7 +488,7 @@ describe('AdminKitchen - Integration', () => {
 
     it('devrait mettre à jour l\'affichage quand une commande change de statut', async () => {
       // Arrange
-      await seedOrders([{ id: 1, status: 'en_attente' }]);
+      await seedOrders([{ id: 1, status: 'attente' }]);
       renderWithRouter();
 
       await waitFor(() => {
@@ -496,7 +496,7 @@ describe('AdminKitchen - Integration', () => {
       });
 
       // Act - Changer le statut
-      await db.orders.update(1, { status: 'en_preparation' });
+      await db.orders.update(1, { status: 'preparation' });
 
       // Assert - La commande devrait être dans la colonne EN COURS
       await waitFor(() => {
@@ -508,7 +508,7 @@ describe('AdminKitchen - Integration', () => {
 
     it('devrait mettre à jour l\'affichage quand une commande est supprimée', async () => {
       // Arrange
-      await seedOrders([{ id: 1, status: 'en_attente' }]);
+      await seedOrders([{ id: 1, status: 'attente' }]);
       renderWithRouter();
 
       await waitFor(() => {
@@ -546,7 +546,7 @@ describe('AdminKitchen - Integration', () => {
 
     it('devrait avoir aria-live sur les timers', async () => {
       // Arrange
-      await seedOrders([{ id: 1, status: 'en_attente' }]);
+      await seedOrders([{ id: 1, status: 'attente' }]);
 
       // Act
       renderWithRouter();
@@ -560,7 +560,7 @@ describe('AdminKitchen - Integration', () => {
 
     it('devrait avoir des aria-label sur les boutons LANCER', async () => {
       // Arrange
-      await seedOrders([{ id: 1, status: 'en_attente' }]);
+      await seedOrders([{ id: 1, status: 'attente' }]);
 
       // Act
       renderWithRouter();
@@ -576,7 +576,7 @@ describe('AdminKitchen - Integration', () => {
 
     it('devrait avoir des aria-label sur les boutons TERMINER', async () => {
       // Arrange
-      await seedOrders([{ id: 1, status: 'en_preparation' }]);
+      await seedOrders([{ id: 1, status: 'preparation' }]);
 
       // Act
       renderWithRouter();

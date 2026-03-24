@@ -18,7 +18,7 @@ function createOrder(overrides: Partial<Order> = {}): Omit<Order, 'id'> {
   return {
     tableId: 1,
     customerName: 'Test Customer',
-    status: 'en_attente',
+    status: 'attente',
     items: [{ name: 'Test Item', quantity: 1 }],
     total: 50,
     createdAt: now,
@@ -59,14 +59,14 @@ describe('useActiveTables Hook', () => {
         ...createOrder(),
         id: 100,
         tableId: 20,
-        status: 'paye',
+        status: 'paid',
         createdAt: now,
       });
       await db.orders.add({
         ...createOrder(),
         id: 101,
         tableId: 21,
-        status: 'servi',
+        status: 'served',
         createdAt: now,
       });
       await db.orders.add({
@@ -123,7 +123,7 @@ describe('useActiveTables Hook', () => {
         ...createOrder(),
         id: 200,
         tableId: 8,
-        status: 'en_attente',
+        status: 'attente',
         createdAt: now,
       });
 
@@ -160,7 +160,7 @@ describe('useActiveTables Hook', () => {
         ...createOrder(),
         id: 300,
         tableId: 30,
-        status: 'en_preparation',
+        status: 'preparation',
         items: [
           { name: 'Item 1', quantity: 2, customization: 'Bien cuit', station: 'GRILL' },
           { name: 'Item 2', quantity: 1, done: true, station: 'FROID' },
@@ -193,7 +193,7 @@ describe('useActiveTables Hook', () => {
         ...createOrder(),
         id: 400,
         tableId: 40,
-        status: 'en_preparation',
+        status: 'preparation',
         createdAt: twentyFiveMinAgo,
       });
 
@@ -216,7 +216,7 @@ describe('useActiveTables Hook', () => {
         ...createOrder(),
         id: 500,
         tableId: 50,
-        status: 'en_attente',
+        status: 'attente',
         createdAt: fiveMinAgo,
       });
 
@@ -239,7 +239,7 @@ describe('useActiveTables Hook', () => {
         ...createOrder(),
         id: 600,
         tableId: 60,
-        status: 'en_preparation',
+        status: 'preparation',
         createdAt: tenMinAgo,
       });
 
@@ -252,7 +252,7 @@ describe('useActiveTables Hook', () => {
       }, { timeout: 2000 });
 
       const table = result.current!.find(t => t.orderId === 600);
-      expect(table?.status).toBe('en_preparation');
+      expect(table?.status).toBe('preparation');
     });
   });
 
@@ -267,21 +267,21 @@ describe('useActiveTables Hook', () => {
         ...createOrder(),
         id: 701,
         tableId: 71,
-        status: 'en_preparation',
+        status: 'preparation',
         createdAt: tenMinAgo,
       });
       await db.orders.add({
         ...createOrder(),
         id: 702,
         tableId: 72,
-        status: 'en_preparation',
+        status: 'preparation',
         createdAt: twentyFiveMinAgo, // retard
       });
       await db.orders.add({
         ...createOrder(),
         id: 703,
         tableId: 73,
-        status: 'en_attente',
+        status: 'attente',
         createdAt: now,
       });
 
@@ -316,14 +316,14 @@ describe('useActiveTables Hook', () => {
         ...createOrder(),
         id: 801,
         tableId: 81,
-        status: 'en_preparation',
+        status: 'preparation',
         createdAt: fiveMinAgo,
       });
       await db.orders.add({
         ...createOrder(),
         id: 802,
         tableId: 82,
-        status: 'en_preparation',
+        status: 'preparation',
         createdAt: fifteenMinAgo,
       });
 
@@ -357,7 +357,7 @@ describe('useActiveTables Hook', () => {
         ...createOrder(),
         id: 900,
         tableId: 90,
-        status: 'en_preparation',
+        status: 'preparation',
         createdAt: twelveMinAgo,
       });
 
@@ -381,7 +381,7 @@ describe('useActiveTables Hook', () => {
         ...createOrder(),
         id: 950,
         tableId: 95,
-        status: 'en_attente',
+        status: 'attente',
         createdAt: now,
       });
 
@@ -431,7 +431,7 @@ describe('useActiveTables Hook', () => {
         ...createOrder(),
         id: 1000,
         tableId: 100,
-        status: 'en_preparation',
+        status: 'preparation',
         createdAt: twentyFiveMinAgo,
       });
 
@@ -452,7 +452,7 @@ describe('useActiveTables Hook', () => {
         ...createOrder(),
         id: 1050,
         tableId: 105,
-        status: 'en_attente',
+        status: 'attente',
         createdAt: now,
       });
 
@@ -483,7 +483,7 @@ describe('useActiveTables Hook', () => {
         ...createOrder(),
         id: 1100,
         tableId: 110,
-        status: 'en_attente',
+        status: 'attente',
         createdAt: now,
       });
 
@@ -500,7 +500,7 @@ describe('useActiveTables Hook', () => {
         ...createOrder(),
         id: 1200,
         tableId: 120,
-        status: 'en_attente',
+        status: 'attente',
         createdAt: now,
       });
 
@@ -513,8 +513,8 @@ describe('useActiveTables Hook', () => {
       const initialTable = result.current!.find(t => t.orderId === 1200);
       expect(initialTable).toBeDefined();
 
-      // Act - Changer le statut à 'paye' (devrait disparaître)
-      await db.orders.update(1200, { status: 'paye' });
+      // Act - Changer le statut à 'paid' (devrait disparaître)
+      await db.orders.update(1200, { status: 'paid' });
 
       // Assert
       await waitFor(() => {

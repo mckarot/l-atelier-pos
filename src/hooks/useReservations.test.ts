@@ -222,7 +222,7 @@ describe('useReservations Hooks', () => {
 
     it('devrait retourner les réservations avec le statut "en_attente"', async () => {
       // Arrange & Act
-      const { result } = renderHook(() => useReservationsByStatus('en_attente'));
+      const { result } = renderHook(() => useReservationsByStatus('attente'));
 
       // Assert
       await waitFor(() => {
@@ -232,7 +232,7 @@ describe('useReservations Hooks', () => {
       const reservations = result.current!;
       expect(reservations.length).toBeGreaterThan(0);
       reservations.forEach(reservation => {
-        expect(reservation.status).toBe('en_attente');
+        expect(reservation.status).toBe('attente');
       });
     });
 
@@ -329,7 +329,7 @@ describe('useReservations Hooks', () => {
         date: today,
         time: '21:00',
         guests: 3,
-        status: 'en_attente' as const,
+        status: 'attente' as const,
       };
 
       // Act
@@ -344,7 +344,7 @@ describe('useReservations Hooks', () => {
       expect(createdReservation!.customerName).toBe('Nouveau Client');
       expect(createdReservation!.email).toBe('nouveau@client.com');
       expect(createdReservation!.guests).toBe(3);
-      expect(createdReservation!.status).toBe('en_attente');
+      expect(createdReservation!.status).toBe('attente');
     });
 
     it('devrait créer une réservation avec des notes', async () => {
@@ -395,7 +395,7 @@ describe('useReservations Hooks', () => {
         date: today,
         time: '19:00',
         guests: 2,
-        status: 'en_attente' as const,
+        status: 'attente' as const,
       };
 
       // Act
@@ -425,7 +425,7 @@ describe('useReservations Hooks', () => {
 
     it('devrait changer le statut de "en_attente" à "confirme"', async () => {
       // Arrange
-      const reservation = await db.reservations.where('status').equals('en_attente').first();
+      const reservation = await db.reservations.where('status').equals('attente').first();
       expect(reservation).toBeDefined();
 
       // Act
@@ -479,7 +479,7 @@ describe('useReservations Hooks', () => {
 
     it('devrait pouvoir annuler une réservation en attente', async () => {
       // Arrange
-      const reservation = await db.reservations.where('status').equals('en_attente').first();
+      const reservation = await db.reservations.where('status').equals('attente').first();
       expect(reservation).toBeDefined();
 
       // Act

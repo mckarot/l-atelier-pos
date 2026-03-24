@@ -4,7 +4,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { ReservationRow } from './ReservationRow';
-import type { Reservation } from '../../../../db/types';
+import type { Reservation } from '../../../../firebase/types';
 
 const mockReservation: Reservation = {
   id: 1,
@@ -60,7 +60,7 @@ describe('ReservationRow', () => {
   it('affiche le statut en attente', () => {
     const reservationEnAttente: Reservation = {
       ...mockReservation,
-      status: 'en_attente',
+      status: 'attente',
     };
 
     render(
@@ -141,7 +141,7 @@ describe('ReservationRow', () => {
   it('n affiche pas le bouton Marquer comme arrivé pour un autre statut', () => {
     const reservationEnAttente: Reservation = {
       ...mockReservation,
-      status: 'en_attente',
+      status: 'attente',
     };
 
     render(

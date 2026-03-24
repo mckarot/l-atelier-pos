@@ -2,7 +2,7 @@
 // Tableau des commandes pour la vue Live Orders
 
 import { type JSX, useMemo } from 'react';
-import type { Order, OrderStatus } from '../../db/types';
+import type { Order, OrderStatus } from '../../firebase/types';
 import { OrderRow } from './OrderRow';
 
 // ─────────────────────────────────────────────────────────────────────────────

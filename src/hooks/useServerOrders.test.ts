@@ -56,7 +56,7 @@ describe('useServerOrders', () => {
       expect(order).toBeDefined();
       expect(order?.tableId).toBe(1);
       expect(order?.customerName).toBe('Commande');
-      expect(order?.status).toBe('en_attente');
+      expect(order?.status).toBe('attente');
       expect(order?.items).toHaveLength(1);
       expect(order?.items[0].name).toBe('Burger de l\'Atelier');
       expect(order?.items[0].quantity).toBe(2);
@@ -332,7 +332,7 @@ describe('useServerOrders', () => {
       });
 
       const order = await db.orders.get(orderId!);
-      expect(order?.status).toBe('paye');
+      expect(order?.status).toBe('paid');
       expect(order?.paymentMethod).toBe('cb');
     });
 

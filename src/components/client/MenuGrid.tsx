@@ -1,9 +1,9 @@
 // src/components/client/MenuGrid.tsx
 // Grille des plats du menu
 
-import type { MenuItem } from '../../db/types';
+import type { MenuItem } from '../../firebase/types';
 import { MenuCard } from './MenuCard';
-import type { Supplement, CookingLevel } from '../../db/types';
+import type { Supplement, CookingLevel } from '../../firebase/types';
 
 interface MenuGridProps {
   items: MenuItem[];

@@ -2,14 +2,14 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { OrderCard } from './OrderCard';
-import type { Order } from '../../../db/types';
+import type { Order } from '../../../firebase/types';
 
 describe('OrderCard component', () => {
   const mockOrder: Order = {
     id: 42,
     tableId: 7,
     customerName: 'Pierre D.',
-    status: 'en_attente',
+    status: 'attente',
     items: [
       { name: 'Tartare de Saumon', quantity: 2, customization: 'Sans citron' },
       { name: 'Filet de Boeuf', quantity: 1 },
@@ -229,7 +229,7 @@ describe('OrderCard component', () => {
   describe('action buttons - mode preparation', () => {
     const orderInPreparation: Order = {
       ...mockOrder,
-      status: 'en_preparation',
+      status: 'preparation',
     };
 
     it('devrait afficher le bouton "AIDE" en mode preparation', () => {
@@ -444,7 +444,7 @@ describe('OrderCard component', () => {
       // Arrange
       const orderInPreparation: Order = {
         ...mockOrder,
-        status: 'en_preparation',
+        status: 'preparation',
       };
 
       // Act
@@ -468,7 +468,7 @@ describe('OrderCard component', () => {
       // Arrange
       const orderInPreparation: Order = {
         ...mockOrder,
-        status: 'en_preparation',
+        status: 'preparation',
       };
 
       // Act
@@ -554,7 +554,7 @@ describe('OrderCard component', () => {
       // Arrange
       const orderInPreparation: Order = {
         ...mockOrder,
-        status: 'en_preparation',
+        status: 'preparation',
       };
 
       // Act

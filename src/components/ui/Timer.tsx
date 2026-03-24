@@ -28,7 +28,6 @@ export interface TimerProps {
 export function Timer({
   createdAt,
   className,
-  showElapsedOnly = false,
   onStatusChange,
 }: TimerProps): JSX.Element {
   const [currentTime, setCurrentTime] = useState<number>(Date.now());

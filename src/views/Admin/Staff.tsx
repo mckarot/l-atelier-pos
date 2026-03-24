@@ -1,23 +1,43 @@
 // src/views/Admin/Staff.tsx
 // Gestion du personnel - CRUD minimaliste
 
-import { useState } from 'react';
-import { useLiveQuery } from 'dexie-react-hooks';
-import { db } from '../../db/database';
-import type { User, UserRole } from '../../db/types';
+import { useState, useEffect } from 'react';
+import { collection, query, orderBy, onSnapshot, addDoc, updateDoc, deleteDoc, doc, Timestamp } from 'firebase/firestore';
+import { getDb } from '../../firebase/config';
+import type { User, UserRole } from '../../firebase/types';
 
 export default function AdminStaff(): JSX.Element {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [users, setUsers] = useState<User[]>([]);
 
   // Formulaire state
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [role, setRole] = useState<UserRole>('serveur');
-  const [isActive, setIsActive] = useState(1);
+  const [isActive, setIsActive] = useState(true);
 
-  // Charger les utilisateurs depuis Dexie
-  const users = useLiveQuery(() => db.users.toArray(), []);
+  // Charger les utilisateurs depuis Firebase
+  useEffect(() => {
+    const usersRef = collection(getDb(), 'users');
+    const q = query(usersRef, orderBy('name', 'asc'));
+
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
+        const usersList = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+        } as User));
+        setUsers(usersList);
+      },
+      (error) => {
+        console.error('[AdminStaff] Error loading users:', error);
+      }
+    );
+
+    return () => unsubscribe();
+  }, []);
 
   // Ouvrir le modal pour un nouvel utilisateur
   const handleOpenCreate = () => {
@@ -25,7 +45,7 @@ export default function AdminStaff(): JSX.Element {
     setName('');
     setEmail('');
     setRole('serveur');
-    setIsActive(1);
+    setIsActive(true);
     setIsModalOpen(true);
   };
 
@@ -42,42 +62,57 @@ export default function AdminStaff(): JSX.Element {
   // Créer ou mettre à jour
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!name || !email) return;
 
-    if (editingUser) {
-      // Mise à jour
-      await db.users.update(editingUser.id, {
-        name,
-        email,
-        role,
-        isActive,
-      });
-    } else {
-      // Création
-      await db.users.add({
-        name,
-        email,
-        role,
-        isActive,
-        createdAt: Date.now(),
-      });
-    }
+    try {
+      if (editingUser) {
+        // Mise à jour
+        const userRef = doc(getDb(), 'users', editingUser.id);
+        await updateDoc(userRef, {
+          name,
+          email,
+          role,
+          isActive,
+        });
+      } else {
+        // Création
+        await addDoc(collection(getDb(), 'users'), {
+          name,
+          email,
+          role,
+          isActive,
+          createdAt: Timestamp.now(),
+        });
+      }
 
-    setIsModalOpen(false);
+      setIsModalOpen(false);
+    } catch (error) {
+      console.error('[AdminStaff] Error saving user:', error);
+    }
   };
 
   // Supprimer
-  const handleDelete = async (id: number, userName: string) => {
+  const handleDelete = async (id: string, userName: string) => {
     if (!confirm(`Supprimer ${userName} ?`)) return;
-    await db.users.delete(id);
+    try {
+      const userRef = doc(getDb(), 'users', id);
+      await deleteDoc(userRef);
+    } catch (error) {
+      console.error('[AdminStaff] Error deleting user:', error);
+    }
   };
 
   // Toggle status
   const handleToggleStatus = async (user: User) => {
-    await db.users.update(user.id, {
-      isActive: user.isActive ? 0 : 1,
-    });
+    try {
+      const userRef = doc(getDb(), 'users', user.id);
+      await updateDoc(userRef, {
+        isActive: !user.isActive,
+      });
+    } catch (error) {
+      console.error('[AdminStaff] Error toggling user status:', error);
+    }
   };
 
   return (
@@ -124,7 +159,7 @@ export default function AdminStaff(): JSX.Element {
             </tr>
           </thead>
           <tbody className="divide-y divide-outline-variant/10">
-            {users?.map((user) => (
+            {users.map((user) => (
               <tr key={user.id} className="hover:bg-surface-container-high/50 transition-colors">
                 <td className="px-6 py-4">
                   <span className="font-body text-sm text-on-surface font-medium">
@@ -152,8 +187,8 @@ export default function AdminStaff(): JSX.Element {
                     onClick={() => handleToggleStatus(user)}
                     className={`
                       font-mono text-xs font-bold px-3 py-1 rounded
-                      ${user.isActive 
-                        ? 'bg-tertiary/20 text-tertiary hover:bg-tertiary/30' 
+                      ${user.isActive
+                        ? 'bg-tertiary/20 text-tertiary hover:bg-tertiary/30'
                         : 'bg-surface-container-highest text-on-surface-variant hover:bg-surface-container-high'}
                       transition-colors
                     `}
@@ -188,7 +223,7 @@ export default function AdminStaff(): JSX.Element {
           </tbody>
         </table>
 
-        {(!users || users.length === 0) && (
+        {users.length === 0 && (
           <div className="text-center py-12">
             <span className="material-symbols-outlined text-on-surface-variant/40 text-4xl mb-4">
               group
@@ -270,7 +305,7 @@ export default function AdminStaff(): JSX.Element {
                 <div className="flex gap-3">
                   <button
                     type="button"
-                    onClick={() => setIsActive(1)}
+                    onClick={() => setIsActive(true)}
                     className={`flex-1 py-3 rounded-lg font-bold transition-colors ${
                       isActive
                         ? 'bg-tertiary/20 text-tertiary border-2 border-tertiary'
@@ -281,7 +316,7 @@ export default function AdminStaff(): JSX.Element {
                   </button>
                   <button
                     type="button"
-                    onClick={() => setIsActive(0)}
+                    onClick={() => setIsActive(false)}
                     className={`flex-1 py-3 rounded-lg font-bold transition-colors ${
                       !isActive
                         ? 'bg-surface-container-highest text-on-surface border-2 border-on-surface'

@@ -1,8 +1,8 @@
 // src/components/client/MenuFilters.tsx
 // Filtres de catégorie pour le menu
 
-import { cn, iconFilled } from '../../utils/cn';
-import type { MenuCategory } from '../../db/types';
+import { cn } from '../../utils/cn';
+import type { MenuCategory } from '../../firebase/types';
 
 interface MenuFiltersProps {
   categories: MenuCategory[];

@@ -65,12 +65,12 @@ export function KitchenMonitor({
   };
 
   // Obtenir le label de statut
-  const getStatusLabel = (status: 'en_preparation' | 'retard'): string => {
+  const getStatusLabel = (status: 'preparation' | 'retard'): string => {
     return status === 'retard' ? 'RETARDÉ' : 'EN PRÉPARATION';
   };
 
   // Obtenir la classe de style du badge de statut
-  const getStatusBadgeClass = (status: 'en_preparation' | 'retard'): string => {
+  const getStatusBadgeClass = (status: 'preparation' | 'retard'): string => {
     if (status === 'retard') {
       return 'bg-error/20 text-error';
     }

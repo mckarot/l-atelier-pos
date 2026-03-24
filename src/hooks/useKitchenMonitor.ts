@@ -1,10 +1,10 @@
 // src/hooks/useKitchenMonitor.ts
-// Hook Dexie pour récupérer les commandes cuisine et les alertes stock
+// Hook Firebase pour récupérer les commandes cuisine et les alertes stock
 
-import { useMemo } from 'react';
-import { useLiveQuery } from 'dexie-react-hooks';
-import { db } from '../db/database';
-import type { Order, OrderStatus } from '../db/types';
+import { useState, useEffect, useMemo } from 'react';
+import { collection, query, orderBy, onSnapshot, type Timestamp } from 'firebase/firestore';
+import { getDb } from '../firebase/config';
+import type { Order, OrderStatus, MenuItem } from '../firebase/types';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // INTERFACES TYPESCRIPT
@@ -18,11 +18,11 @@ export interface KitchenOrderItem {
 
 /** Commande cuisine en cours de préparation */
 export interface KitchenOrder {
-  id: number;
+  id: string; // Firestore ID (string)
   tableId: number;
   items: KitchenOrderItem[];
   elapsedTime: number; // en secondes
-  status: 'en_preparation' | 'retard';
+  status: 'preparation' | 'retard';
 }
 
 /** Alerte de stock critique */
@@ -40,8 +40,8 @@ const RETARD_THRESHOLD_SECONDS = 20 * 60;
 
 /** Statuts de commande considérés comme "en cuisine" */
 const KITCHEN_ORDER_STATUSES: OrderStatus[] = [
-  'en_attente',
-  'en_preparation',
+  'attente',
+  'preparation',
   'pret',
 ];
 
@@ -54,7 +54,10 @@ const KITCHEN_ORDER_STATUSES: OrderStatus[] = [
  */
 function calculateElapsedTime(order: Order): number {
   const now = Date.now();
-  const diffMs = now - order.createdAt;
+  const createdMs = order.createdAt instanceof Timestamp 
+    ? order.createdAt.toMillis() 
+    : order.createdAt;
+  const diffMs = now - createdMs;
   return Math.floor(diffMs / 1000); // Convertir en secondes
 }
 
@@ -65,7 +68,7 @@ function determineOrderStatus(elapsedSeconds: number): KitchenOrder['status'] {
   if (elapsedSeconds >= RETARD_THRESHOLD_SECONDS) {
     return 'retard';
   }
-  return 'en_preparation';
+  return 'preparation';
 }
 
 /**
@@ -81,8 +84,10 @@ function convertOrderItems(items: Order['items']): KitchenOrderItem[] {
 /**
  * Formate le numéro de commande (ex: "#ORD-2841")
  */
-function formatOrderId(orderId: number): string {
-  return `#ORD-${orderId.toString().padStart(4, '0')}`;
+function formatOrderId(orderId: string): string {
+  // Pour les IDs Firestore (strings), on prend les 4 derniers caractères
+  const numericPart = orderId.slice(-4);
+  return `#ORD-${numericPart.padStart(4, '0')}`;
 }
 
 /**
@@ -112,20 +117,45 @@ function sortKitchenOrders(orders: KitchenOrder[]): KitchenOrder[] {
 
 /**
  * Hook pour récupérer les commandes cuisine en direct
- * Utilise useLiveQuery pour une mise à jour réactive
+ * Utilise onSnapshot pour une mise à jour réactive
  *
  * @returns Tableau de KitchenOrder trié par priorité (retard en premier)
  */
 export function useKitchenOrders(): KitchenOrder[] | undefined {
-  // Récupérer toutes les commandes via Dexie
-  const allOrders = useLiveQuery(
-    () => db.orders.orderBy('createdAt').toArray(),
-    []
-  );
+  const [allOrders, setAllOrders] = useState<Order[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+
+  useEffect(() => {
+    setIsLoading(true);
+    setError(null);
+
+    const ordersRef = collection(getDb(), 'orders');
+    const q = query(ordersRef, orderBy('createdAt', 'asc'));
+
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
+        const orders = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+        } as Order));
+        setAllOrders(orders);
+        setIsLoading(false);
+      },
+      (err) => {
+        console.error('[useKitchenOrders] Error:', err);
+        setError(err instanceof Error ? err : new Error('Erreur Firestore'));
+        setIsLoading(false);
+      }
+    );
+
+    return () => unsubscribe();
+  }, []);
 
   // Calculer les données dérivées avec useMemo
   return useMemo(() => {
-    if (!allOrders) {
+    if (isLoading || error) {
       return undefined;
     }
 
@@ -149,7 +179,7 @@ export function useKitchenOrders(): KitchenOrder[] | undefined {
 
     // Trier par statut (retard en premier) puis par temps écoulé
     return sortKitchenOrders(orders);
-  }, [allOrders]);
+  }, [allOrders, isLoading, error]);
 }
 
 /**
@@ -184,34 +214,67 @@ export function useFormattedKitchenOrders(): Array<
 }
 
 /**
+ * Hook pour récupérer les articles du menu
+ */
+export function useMenuItems(): MenuItem[] | undefined {
+  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+
+  useEffect(() => {
+    setIsLoading(true);
+    setError(null);
+
+    const menuItemsRef = collection(getDb(), 'menuItems');
+    const q = query(menuItemsRef, orderBy('name', 'asc'));
+
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
+        const items = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+        } as MenuItem));
+        setMenuItems(items);
+        setIsLoading(false);
+      },
+      (err) => {
+        console.error('[useMenuItems] Error:', err);
+        setError(err instanceof Error ? err : new Error('Erreur Firestore'));
+        setIsLoading(false);
+      }
+    );
+
+    return () => unsubscribe();
+  }, []);
+
+  return isLoading || error ? undefined : menuItems;
+}
+
+/**
  * Hook pour récupérer l'alerte de stock critique
- * Basé sur les articles du menu avec isAvailable = 0 (épuisés) ou faible stock
+ * Basé sur les articles du menu avec isAvailable = false (épuisés) ou faible stock
  *
  * @returns StockAlert | undefined
  */
 export function useStockAlert(): StockAlert | undefined {
-  // Récupérer tous les articles du menu
-  const allMenuItems = useLiveQuery(
-    () => db.menuItems.toArray(),
-    []
-  );
+  const allMenuItems = useMenuItems();
 
   return useMemo(() => {
     if (!allMenuItems) {
       return undefined;
     }
 
-    // Compter les articles épuisés (isAvailable = 0)
-    const depletedCount = allMenuItems.filter(item => item.isAvailable === 0).length;
+    // Compter les articles épuisés (isAvailable = false)
+    const depletedCount = allMenuItems.filter(item => item.isAvailable === false).length;
 
     // Compter les articles en dessous du seuil de sécurité
     // Dans cette implémentation, on simule le seuil de sécurité
     // En production, cela viendrait d'un champ stockQuantity dans MenuItem
     const lowStockCount = allMenuItems.filter(item => {
       // Simulation: on considère qu'un article est en stock faible
-      // s'il est disponible mais que son nom contient certains mots-clés
-      // Dans une vraie implémentation, on aurait un champ stockQuantity
-      return item.isAvailable === 1 && item.price < 15; // Exemple arbitraire
+      // s'il est disponible mais que son prix est bas (arbitraire)
+      return item.isAvailable === true && item.price < 15;
     }).length;
 
     return {

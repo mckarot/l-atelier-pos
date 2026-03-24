@@ -2,8 +2,8 @@
 // Header du KDS avec compteur LIVE et horloge
 
 import { type JSX, useEffect, useState, useMemo } from 'react';
-import { useLiveQuery } from 'dexie-react-hooks';
-import { db } from '../../../db/database';
+import { collection, query, where, onSnapshot } from 'firebase/firestore';
+import { getDb } from '../../../firebase/config';
 import { formatTime } from '../../../utils/timer';
 import { cn } from '../../../utils/cn';
 
@@ -27,6 +27,7 @@ export function KDSHeader({
 }: KDSHeaderProps): JSX.Element {
   // Horloge temps réel
   const [currentTime, setCurrentTime] = useState<number>(Date.now());
+  const [activeOrdersCount, setActiveOrdersCount] = useState<number>(0);
 
   useEffect(() => {
     const intervalId = setInterval(() => {
@@ -39,14 +40,25 @@ export function KDSHeader({
   }, []);
 
   // Compteur de commandes actives
-  const activeOrdersCount = useLiveQuery<number>(
-    () =>
-      db.orders
-        .where('status')
-        .anyOf(['en_attente', 'en_preparation', 'pret'])
-        .count(),
-    []
-  );
+  useEffect(() => {
+    const ordersRef = collection(getDb(), 'orders');
+    const q = query(
+      ordersRef,
+      where('status', 'in', ['attente', 'preparation', 'pret'])
+    );
+
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
+        setActiveOrdersCount(snapshot.size);
+      },
+      (error) => {
+        console.error('[KDSHeader] Error monitoring active orders:', error);
+      }
+    );
+
+    return () => unsubscribe();
+  }, []);
 
   // Formatage mémorisé
   const formattedTime = useMemo(
@@ -55,7 +67,7 @@ export function KDSHeader({
   );
 
   const formattedCount = useMemo(
-    () => (activeOrdersCount || 0).toString().padStart(2, '0'),
+    () => activeOrdersCount.toString().padStart(2, '0'),
     [activeOrdersCount]
   );
 
@@ -75,7 +87,7 @@ export function KDSHeader({
             'flex items-center gap-2 px-3 py-1.5 rounded-full font-mono text-sm font-bold',
             'bg-surface-container-high text-on-surface',
             'transition-all duration-300',
-            activeOrdersCount && activeOrdersCount > 0 && 'animate-pulse'
+            activeOrdersCount > 0 && 'animate-pulse'
           )}
           role="status"
           aria-label={`${activeOrdersCount} commandes actives`}
@@ -84,7 +96,7 @@ export function KDSHeader({
           <span
             className={cn(
               'w-2 h-2 rounded-full',
-              activeOrdersCount && activeOrdersCount > 0
+              activeOrdersCount > 0
                 ? 'bg-tertiary'
                 : 'bg-on-surface-variant'
             )}

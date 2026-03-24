@@ -4,7 +4,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import type { Reservation } from '../../db/types';
+import type { Reservation } from '../../firebase/types';
 import { ReservationCard } from './ReservationCard';
 
 const createMockReservation = (overrides?: Partial<Reservation>): Reservation => ({
@@ -68,7 +68,7 @@ describe('ReservationCard', () => {
     });
 
     it('devrait afficher EN ATTENTE pour le statut en_attente', () => {
-      const reservation = createMockReservation({ status: 'en_attente' });
+      const reservation = createMockReservation({ status: 'attente' });
       render(<ReservationCard reservation={reservation} />);
       expect(screen.getByText('EN ATTENTE')).toBeInTheDocument();
     });

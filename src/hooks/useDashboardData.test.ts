@@ -13,7 +13,7 @@ function createOrder(overrides: Partial<Order> = {}): Omit<Order, 'id'> {
   return {
     tableId: 1,
     customerName: 'Test Customer',
-    status: 'en_attente',
+    status: 'attente',
     items: [{ name: 'Test Item', quantity: 1 }],
     total: 50,
     createdAt: now,
@@ -36,7 +36,7 @@ describe('useDashboardData', () => {
       await db.orders.add({
         ...createOrder(),
         id: 1,
-        status: 'paye',
+        status: 'paid',
         total: 100,
         createdAt: startOfDay + 1000, // Aujourd'hui
       });
@@ -44,7 +44,7 @@ describe('useDashboardData', () => {
       await db.orders.add({
         ...createOrder(),
         id: 2,
-        status: 'paye',
+        status: 'paid',
         total: 150,
         createdAt: startOfDay + 2000, // Aujourd'hui
       });
@@ -67,7 +67,7 @@ describe('useDashboardData', () => {
       await db.orders.add({
         ...createOrder(),
         id: 1,
-        status: 'en_preparation',
+        status: 'preparation',
         total: 100,
         createdAt: startOfDay + 1000,
       });
@@ -75,7 +75,7 @@ describe('useDashboardData', () => {
       await db.orders.add({
         ...createOrder(),
         id: 2,
-        status: 'paye',
+        status: 'paid',
         total: 150,
         createdAt: startOfDay + 2000,
       });
@@ -98,7 +98,7 @@ describe('useDashboardData', () => {
       await db.orders.add({
         ...createOrder(),
         id: 1,
-        status: 'paye',
+        status: 'paid',
         total: 100,
         createdAt: yesterday, // Hier
       });
@@ -106,7 +106,7 @@ describe('useDashboardData', () => {
       await db.orders.add({
         ...createOrder(),
         id: 2,
-        status: 'paye',
+        status: 'paid',
         total: 150,
         createdAt: startOfDay + 1000, // Aujourd'hui
       });
@@ -181,7 +181,7 @@ describe('useDashboardData', () => {
       await db.orders.add({
         ...createOrder(),
         id: 2,
-        status: 'en_preparation',
+        status: 'preparation',
         createdAt: startOfDay + 2000,
       });
 
@@ -233,7 +233,7 @@ describe('useDashboardData', () => {
       await db.orders.add({
         ...createOrder(),
         id: 1,
-        status: 'servi',
+        status: 'served',
         createdAt,
         servedAt,
       });
@@ -340,7 +340,7 @@ describe('useDashboardData', () => {
       await db.orders.add({
         ...createOrder(),
         id: 1,
-        status: 'paye',
+        status: 'paid',
         total: 100,
       });
 
@@ -358,7 +358,7 @@ describe('useDashboardData', () => {
       await db.orders.add({
         ...createOrder(),
         id: 1,
-        status: 'paye',
+        status: 'paid',
         total: 100,
       });
 
@@ -427,7 +427,7 @@ describe('useDashboardData', () => {
       await db.orders.add({
         ...createOrder(),
         id: 1,
-        status: 'paye',
+        status: 'paid',
         total: 100,
         createdAt: startOfDay + 1000,
       });

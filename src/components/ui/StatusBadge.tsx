@@ -3,7 +3,7 @@
 
 import { type JSX } from 'react';
 import { cn } from '../../utils/cn';
-import type { OrderStatus } from '../../db/types';
+import type { OrderStatus } from '../../firebase/types';
 
 export interface StatusBadgeProps {
   /** Statut de la commande */

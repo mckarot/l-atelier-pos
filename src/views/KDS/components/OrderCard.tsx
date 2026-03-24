@@ -2,7 +2,7 @@
 // Carte de commande pour le KDS
 
 import { type JSX, useCallback, useMemo } from 'react';
-import type { Order } from '../../../db/types';
+import type { Order } from '../../../firebase/types';
 import { Timer } from '../../../components/ui/Timer';
 import { cn } from '../../../utils/cn';
 import { getTimerAlertStatus, type TimerAlertStatus } from '../../../utils/timer';

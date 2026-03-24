@@ -2,8 +2,8 @@
 // Section "Services Actifs" avec toggle Cuisine/Service et cartes de tables
 
 import { useState, useMemo } from 'react';
-import { TableCard } from './TableCard';
-import { useActiveTables, type TableService } from '../../hooks/useActiveTables';
+import { useActiveTables } from '../../hooks/useActiveTables';
+import type { TableRecord } from '../../firebase/types';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // TYPES
@@ -44,12 +44,6 @@ const TOGGLE_COLORS: Record<ServiceView, string> = {
 
 /**
  * Section "Services Actifs" avec toggle Cuisine/Service
- *
- * Design system conforme aux maquettes PNG:
- * - Titre: "Services Actifs" + sous-titre
- * - Toggle: "Cuisine" (vert) + "Service" (orange)
- * - Layout: 3 cartes côte à côte (~350px chacune)
- * - Cartes triées par statut (retard en premier)
  */
 export function ActiveServices({
   title = 'Services Actifs',
@@ -61,31 +55,38 @@ export function ActiveServices({
   const [activeView, setActiveView] = useState<ServiceView>('cuisine');
 
   // Récupérer les tables actives
-  const tables = useActiveTables();
+  const { activeTables, isLoading, error } = useActiveTables();
 
   // Filtrer les tables selon la vue active
   const filteredTables = useMemo(() => {
-    if (!tables) return [];
+    if (isLoading || error || !activeTables) return [];
 
-    // Pour la vue "Cuisine", on montre toutes les tables actives
-    // Pour la vue "Service", on pourrait filtrer uniquement les tables prêtes à servir
-    // Ici on montre toutes les tables pour les deux vues (à adapter selon les besoins)
     if (activeView === 'cuisine') {
-      return tables.slice(0, maxCards);
+      return activeTables.slice(0, maxCards);
     }
 
-    // Vue Service: montrer les tables avec items prêts ou en retard
-    const serviceTables = tables.filter(
-      t => t.status === 'retard' || t.items.some(i => i.status === 'pret')
+    // Vue Service: montrer les tables occupées
+    const serviceTables = activeTables.filter(
+      t => t.status === 'occupee'
     );
     return serviceTables.slice(0, maxCards);
-  }, [tables, activeView, maxCards]);
+  }, [activeTables, isLoading, error, activeView, maxCards]);
 
-  // Compter les tables en retard
-  const retardCount = useMemo(() => {
-    if (!tables) return 0;
-    return tables.filter(t => t.status === 'retard').length;
-  }, [tables]);
+  // Compter les tables en maintenance (comme proxy de "retard")
+  const maintenanceCount = useMemo(() => {
+    if (!activeTables) return 0;
+    return activeTables.filter(t => t.status === 'maintenance').length;
+  }, [activeTables]);
+
+  if (isLoading) {
+    return (
+      <div className={`rounded-xl border border-outline-variant/10 bg-surface-container p-6 ${className}`}>
+        <div className="flex items-center justify-center py-12">
+          <span className="material-symbols-outlined text-on-surface-variant animate-spin">progress_activity</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -133,12 +134,12 @@ export function ActiveServices({
         </div>
       </div>
 
-      {/* Indicateur de retard */}
-      {retardCount > 0 && (
+      {/* Indicateur de maintenance */}
+      {maintenanceCount > 0 && (
         <div
           className="flex items-center gap-2 mb-4 px-3 py-2 rounded-lg bg-error/10"
           role="alert"
-          aria-label={`${retardCount} table(s) en retard`}
+          aria-label={`${maintenanceCount} table(s) en maintenance`}
         >
           <span
             className="material-symbols-outlined text-error text-sm"
@@ -147,7 +148,7 @@ export function ActiveServices({
             warning
           </span>
           <span className="font-label text-sm font-bold text-error">
-            {retardCount} table(s) en retard
+            {maintenanceCount} table(s) en maintenance
           </span>
         </div>
       )}
@@ -159,8 +160,29 @@ export function ActiveServices({
         aria-label="Tables actives"
       >
         {filteredTables.length > 0 ? (
-          filteredTables.map(service => (
-            <TableCard key={service.orderId} service={service} />
+          filteredTables.map((table: TableRecord) => (
+            <div
+              key={table.id}
+              className="flex flex-col w-[350px] rounded-xl border border-outline-variant/10 bg-surface-container p-4"
+            >
+              <div className="flex items-center justify-between mb-2">
+                <span className="font-headline text-lg font-bold text-on-surface">
+                  {table.name}
+                </span>
+                <span className={`font-mono text-xs font-bold px-2 py-1 rounded uppercase ${
+                  table.status === 'occupee' ? 'bg-tertiary/20 text-tertiary' :
+                  table.status === 'reservation' ? 'bg-primary/20 text-primary' :
+                  'bg-surface-container-highest text-on-surface-variant'
+                }`}>
+                  {table.status}
+                </span>
+              </div>
+              {table.capacity && (
+                <p className="font-label text-sm text-on-surface-variant">
+                  Capacité: {table.capacity} personnes
+                </p>
+              )}
+            </div>
           ))
         ) : (
           <div className="flex flex-col items-center justify-center w-full py-12 text-center">
@@ -181,10 +203,10 @@ export function ActiveServices({
       </div>
 
       {/* Indicateur de scroll si plus de cartes */}
-      {tables && tables.length > maxCards && (
+      {activeTables && activeTables.length > maxCards && (
         <div className="flex items-center justify-center gap-2 mt-4 text-on-surface-variant">
           <span className="font-label text-xs">
-            {tables.length - maxCards} autre(s) table(s)
+            {activeTables.length - maxCards} autre(s) table(s)
           </span>
           <span
             className="material-symbols-outlined text-sm"

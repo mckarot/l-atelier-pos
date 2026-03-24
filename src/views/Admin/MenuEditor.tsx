@@ -6,7 +6,7 @@ import { cn, iconFilled } from '../../utils/cn';
 import { useMenuEditor, CATEGORIES } from '../../hooks/useMenuEditor';
 import { MenuItemRow } from '../../components/admin/MenuItemRow';
 import { MenuItemForm } from '../../components/admin/MenuItemForm';
-import type { MenuItem, MenuCategory } from '../../db/types';
+import type { MenuItem, MenuCategory } from '../../firebase/types';
 
 export function MenuEditor(): JSX.Element {
   const {

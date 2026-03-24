@@ -2,7 +2,7 @@
 // Hook personnalisé pour la gestion du rôle utilisateur
 
 import { useState, useCallback } from 'react';
-import type { UserRole } from '../db/types';
+import type { UserRole } from '../firebase/types';
 import { getUserRole, setUserRole, clearUserRole, getRedirectPathForRole } from '../utils/roleGuard';
 
 interface UseRoleReturn {

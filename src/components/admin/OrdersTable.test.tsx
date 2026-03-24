@@ -6,7 +6,7 @@ import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import { OrdersTable, type OrdersTableProps } from './OrdersTable';
-import type { Order } from '../../db/types';
+import type { Order } from '../../firebase/types';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // HELPERS DE CRÉATION DE DONNÉES
@@ -18,7 +18,7 @@ const createMockOrders = (count: number): Order[] => {
     id: i + 1,
     tableId: (i % 16) + 1,
     customerName: `Client ${i + 1}`,
-    status: (['en_attente', 'en_preparation', 'pret'] as const)[i % 3],
+    status: (['attente', 'preparation', 'pret'] as const)[i % 3],
     items: [
       { name: `Item ${i + 1}`, quantity: (i % 3) + 1, station: 'FROID' },
     ],
@@ -128,13 +128,13 @@ describe('OrdersTable', () => {
     it('devrait filtrer et afficher uniquement les commandes en_attente', () => {
       // Arrange
       const orders: Order[] = [
-        { id: 1, tableId: 1, customerName: 'Test 1', status: 'en_attente', items: [], total: 10, createdAt: Date.now() },
-        { id: 2, tableId: 2, customerName: 'Test 2', status: 'en_preparation', items: [], total: 20, createdAt: Date.now() },
+        { id: 1, tableId: 1, customerName: 'Test 1', status: 'attente', items: [], total: 10, createdAt: Date.now() },
+        { id: 2, tableId: 2, customerName: 'Test 2', status: 'preparation', items: [], total: 20, createdAt: Date.now() },
         { id: 3, tableId: 3, customerName: 'Test 3', status: 'pret', items: [], total: 30, createdAt: Date.now() },
       ];
 
       // Act
-      renderOrdersTable({ orders, selectedStatus: 'en_attente' });
+      renderOrdersTable({ orders, selectedStatus: 'attente' });
 
       // Assert
       expect(screen.getByText('#ORD-0001')).toBeInTheDocument();
@@ -145,13 +145,13 @@ describe('OrdersTable', () => {
     it('devrait filtrer et afficher uniquement les commandes en_preparation', () => {
       // Arrange
       const orders: Order[] = [
-        { id: 1, tableId: 1, customerName: 'Test 1', status: 'en_attente', items: [], total: 10, createdAt: Date.now() },
-        { id: 2, tableId: 2, customerName: 'Test 2', status: 'en_preparation', items: [], total: 20, createdAt: Date.now() },
+        { id: 1, tableId: 1, customerName: 'Test 1', status: 'attente', items: [], total: 10, createdAt: Date.now() },
+        { id: 2, tableId: 2, customerName: 'Test 2', status: 'preparation', items: [], total: 20, createdAt: Date.now() },
         { id: 3, tableId: 3, customerName: 'Test 3', status: 'pret', items: [], total: 30, createdAt: Date.now() },
       ];
 
       // Act
-      renderOrdersTable({ orders, selectedStatus: 'en_preparation' });
+      renderOrdersTable({ orders, selectedStatus: 'preparation' });
 
       // Assert
       expect(screen.queryByText('#ORD-0001')).not.toBeInTheDocument();
@@ -162,8 +162,8 @@ describe('OrdersTable', () => {
     it('devrait filtrer et afficher uniquement les commandes pret', () => {
       // Arrange
       const orders: Order[] = [
-        { id: 1, tableId: 1, customerName: 'Test 1', status: 'en_attente', items: [], total: 10, createdAt: Date.now() },
-        { id: 2, tableId: 2, customerName: 'Test 2', status: 'en_preparation', items: [], total: 20, createdAt: Date.now() },
+        { id: 1, tableId: 1, customerName: 'Test 1', status: 'attente', items: [], total: 10, createdAt: Date.now() },
+        { id: 2, tableId: 2, customerName: 'Test 2', status: 'preparation', items: [], total: 20, createdAt: Date.now() },
         { id: 3, tableId: 3, customerName: 'Test 3', status: 'pret', items: [], total: 30, createdAt: Date.now() },
       ];
 
@@ -181,8 +181,8 @@ describe('OrdersTable', () => {
     it('devrait rechercher par numéro de commande', () => {
       // Arrange
       const orders: Order[] = [
-        { id: 123, tableId: 1, customerName: 'Test 1', status: 'en_attente', items: [], total: 10, createdAt: Date.now() },
-        { id: 456, tableId: 2, customerName: 'Test 2', status: 'en_attente', items: [], total: 20, createdAt: Date.now() },
+        { id: 123, tableId: 1, customerName: 'Test 1', status: 'attente', items: [], total: 10, createdAt: Date.now() },
+        { id: 456, tableId: 2, customerName: 'Test 2', status: 'attente', items: [], total: 20, createdAt: Date.now() },
       ];
 
       // Act
@@ -196,8 +196,8 @@ describe('OrdersTable', () => {
     it('devrait rechercher par numéro de table', () => {
       // Arrange
       const orders: Order[] = [
-        { id: 1, tableId: 5, customerName: 'Test 1', status: 'en_attente', items: [], total: 10, createdAt: Date.now() },
-        { id: 2, tableId: 12, customerName: 'Test 2', status: 'en_attente', items: [], total: 20, createdAt: Date.now() },
+        { id: 1, tableId: 5, customerName: 'Test 1', status: 'attente', items: [], total: 10, createdAt: Date.now() },
+        { id: 2, tableId: 12, customerName: 'Test 2', status: 'attente', items: [], total: 20, createdAt: Date.now() },
       ];
 
       // Act
@@ -211,8 +211,8 @@ describe('OrdersTable', () => {
     it('devrait rechercher par nom de client', () => {
       // Arrange
       const orders: Order[] = [
-        { id: 1, tableId: 1, customerName: 'Pierre Dupont', status: 'en_attente', items: [], total: 10, createdAt: Date.now() },
-        { id: 2, tableId: 2, customerName: 'Marie Laurent', status: 'en_attente', items: [], total: 20, createdAt: Date.now() },
+        { id: 1, tableId: 1, customerName: 'Pierre Dupont', status: 'attente', items: [], total: 10, createdAt: Date.now() },
+        { id: 2, tableId: 2, customerName: 'Marie Laurent', status: 'attente', items: [], total: 20, createdAt: Date.now() },
       ];
 
       // Act
@@ -230,7 +230,7 @@ describe('OrdersTable', () => {
           id: 1,
           tableId: 1,
           customerName: 'Test 1',
-          status: 'en_attente',
+          status: 'attente',
           items: [{ name: 'Tartare de Saumon', quantity: 1, station: 'FROID' }],
           total: 10,
           createdAt: Date.now(),
@@ -239,7 +239,7 @@ describe('OrdersTable', () => {
           id: 2,
           tableId: 2,
           customerName: 'Test 2',
-          status: 'en_attente',
+          status: 'attente',
           items: [{ name: 'Filet de Boeuf', quantity: 1, station: 'GRILL' }],
           total: 20,
           createdAt: Date.now(),
@@ -257,7 +257,7 @@ describe('OrdersTable', () => {
     it('devrait être case-insensitive', () => {
       // Arrange
       const orders: Order[] = [
-        { id: 1, tableId: 1, customerName: 'PIERRE', status: 'en_attente', items: [], total: 10, createdAt: Date.now() },
+        { id: 1, tableId: 1, customerName: 'PIERRE', status: 'attente', items: [], total: 10, createdAt: Date.now() },
       ];
 
       // Act
@@ -270,8 +270,8 @@ describe('OrdersTable', () => {
     it('devrait afficher le compteur filtré après recherche', () => {
       // Arrange
       const orders: Order[] = [
-        { id: 1, tableId: 1, customerName: 'Pierre', status: 'en_attente', items: [], total: 10, createdAt: Date.now() },
-        { id: 2, tableId: 2, customerName: 'Marie', status: 'en_attente', items: [], total: 20, createdAt: Date.now() },
+        { id: 1, tableId: 1, customerName: 'Pierre', status: 'attente', items: [], total: 10, createdAt: Date.now() },
+        { id: 2, tableId: 2, customerName: 'Marie', status: 'attente', items: [], total: 20, createdAt: Date.now() },
       ];
 
       // Act
@@ -287,9 +287,9 @@ describe('OrdersTable', () => {
       // Arrange
       const now = Date.now();
       const orders: Order[] = [
-        { id: 1, tableId: 1, customerName: 'Ancienne', status: 'en_attente', items: [], total: 10, createdAt: now - 30 * 60 * 1000 },
-        { id: 2, tableId: 2, customerName: 'Récente', status: 'en_attente', items: [], total: 20, createdAt: now - 5 * 60 * 1000 },
-        { id: 3, tableId: 3, customerName: 'Intermédiaire', status: 'en_attente', items: [], total: 30, createdAt: now - 15 * 60 * 1000 },
+        { id: 1, tableId: 1, customerName: 'Ancienne', status: 'attente', items: [], total: 10, createdAt: now - 30 * 60 * 1000 },
+        { id: 2, tableId: 2, customerName: 'Récente', status: 'attente', items: [], total: 20, createdAt: now - 5 * 60 * 1000 },
+        { id: 3, tableId: 3, customerName: 'Intermédiaire', status: 'attente', items: [], total: 30, createdAt: now - 15 * 60 * 1000 },
       ];
 
       // Act
@@ -321,7 +321,7 @@ describe('OrdersTable', () => {
     it('devrait afficher "Aucune commande ne correspond aux filtres" avec filtre de statut', () => {
       // Arrange
       const orders: Order[] = [
-        { id: 1, tableId: 1, customerName: 'Test', status: 'en_attente', items: [], total: 10, createdAt: Date.now() },
+        { id: 1, tableId: 1, customerName: 'Test', status: 'attente', items: [], total: 10, createdAt: Date.now() },
       ];
 
       // Act
@@ -334,7 +334,7 @@ describe('OrdersTable', () => {
     it('devrait afficher "Aucune commande ne correspond aux filtres" avec recherche', () => {
       // Arrange
       const orders: Order[] = [
-        { id: 1, tableId: 1, customerName: 'Pierre', status: 'en_attente', items: [], total: 10, createdAt: Date.now() },
+        { id: 1, tableId: 1, customerName: 'Pierre', status: 'attente', items: [], total: 10, createdAt: Date.now() },
       ];
 
       // Act
@@ -360,7 +360,7 @@ describe('OrdersTable', () => {
       const user = userEvent.setup();
       const onLaunch = vi.fn();
       const orders: Order[] = [
-        { id: 42, tableId: 1, customerName: 'Test', status: 'en_attente', items: [], total: 10, createdAt: Date.now() },
+        { id: 42, tableId: 1, customerName: 'Test', status: 'attente', items: [], total: 10, createdAt: Date.now() },
       ];
 
       // Act
@@ -378,7 +378,7 @@ describe('OrdersTable', () => {
       const user = userEvent.setup();
       const onComplete = vi.fn();
       const orders: Order[] = [
-        { id: 99, tableId: 1, customerName: 'Test', status: 'en_preparation', items: [], total: 10, createdAt: Date.now() },
+        { id: 99, tableId: 1, customerName: 'Test', status: 'preparation', items: [], total: 10, createdAt: Date.now() },
       ];
 
       // Act

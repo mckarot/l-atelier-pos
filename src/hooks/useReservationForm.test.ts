@@ -227,7 +227,7 @@ describe('useReservationForm', () => {
       date: '2024-03-25',
       time: '19:30',
       guests: 4,
-      status: 'en_attente',
+      status: 'attente',
       notes: undefined,
     });
     

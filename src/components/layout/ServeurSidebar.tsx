@@ -7,10 +7,9 @@ import { cn } from '../../utils/cn';
 
 export interface ServeurSidebarProps {
   onLogout: () => void;
-  currentPath: string;
 }
 
-export function ServeurSidebar({ onLogout, currentPath }: ServeurSidebarProps): JSX.Element {
+export function ServeurSidebar({ onLogout }: ServeurSidebarProps): JSX.Element {
   const location = useLocation();
 
   const navItems = [

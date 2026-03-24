@@ -2,7 +2,7 @@
 // Filtres et barre de recherche pour la vue Live Orders
 
 import { type JSX, useCallback } from 'react';
-import type { OrderStatus } from '../../db/types';
+import type { OrderStatus } from '../../firebase/types';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // TYPES
@@ -25,8 +25,8 @@ export interface OrderFiltersProps {
 
 const STATUS_OPTIONS: Array<{ value: OrderStatus | 'all'; label: string }> = [
   { value: 'all', label: 'Toutes les commandes' },
-  { value: 'en_attente', label: 'En attente' },
-  { value: 'en_preparation', label: 'En préparation' },
+  { value: 'attente', label: 'En attente' },
+  { value: 'preparation', label: 'En préparation' },
   { value: 'pret', label: 'Prêt' },
 ];
 

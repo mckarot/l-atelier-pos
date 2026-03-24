@@ -2,7 +2,6 @@
 // Planning des réservations du jour
 
 import { useTodayReservations, useOccupancyStats, useUpcomingArrivals } from '../../hooks/useReservationsPlanning';
-import { TableOccupancy } from './TableOccupancy';
 import { ReservationCard } from './ReservationCard';
 
 export interface ReservationsPlanningProps {
@@ -135,7 +134,7 @@ export function ReservationsPlanning({ onCheckIn, onCancel }: ReservationsPlanni
                         className={cn(
                           'text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider',
                           reservation.status === 'confirme' && 'bg-tertiary/10 text-tertiary',
-                          reservation.status === 'en_attente' && 'bg-primary/10 text-primary',
+                          reservation.status === 'attente' && 'bg-primary/10 text-primary',
                           reservation.status === 'arrive' && 'bg-blue-500/10 text-blue-500',
                           reservation.status === 'annule' && 'bg-error/10 text-error'
                         )}

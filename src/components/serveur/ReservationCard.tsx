@@ -2,7 +2,7 @@
 // Carte de réservation pour le planning
 
 import { cn } from '../../utils/cn';
-import type { Reservation as ReservationType } from '../../db/types';
+import type { Reservation as ReservationType } from '../../firebase/types';
 
 export interface ReservationCardProps {
   reservation: ReservationType;
@@ -23,7 +23,7 @@ export function ReservationCard({
         return 'bg-tertiary/10 text-tertiary border-tertiary';
       case 'arrive':
         return 'bg-primary/10 text-primary border-primary';
-      case 'en_attente':
+      case 'attente':
         return 'bg-surface-container-high text-on-surface-variant border-outline-variant';
       case 'annule':
         return 'bg-error/10 text-error border-error';
@@ -48,7 +48,6 @@ export function ReservationCard({
   };
 
   const time = parseTime(reservation.time);
-  const isLate = new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }) > reservation.time;
 
   if (compact) {
     return (

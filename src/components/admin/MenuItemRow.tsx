@@ -3,13 +3,13 @@
 
 import { useCallback } from 'react';
 import { cn, iconFilled } from '../../utils/cn';
-import type { MenuItem } from '../../db/types';
+import type { MenuItem } from '../../firebase/types';
 
 export interface MenuItemRowProps {
   item: MenuItem;
   onEdit: (item: MenuItem) => void;
-  onDelete: (id: number) => void;
-  onToggleAvailability: (id: number, isAvailable: boolean) => void;
+  onDelete: (id: string) => void;
+  onToggleAvailability: (id: string, isAvailable: boolean) => void;
 }
 
 export function MenuItemRow({
@@ -19,7 +19,7 @@ export function MenuItemRow({
   onToggleAvailability,
 }: MenuItemRowProps): JSX.Element {
   const handleToggle = useCallback(() => {
-    onToggleAvailability(item.id, item.isAvailable === 0);
+    onToggleAvailability(item.id, !item.isAvailable);
   }, [item.id, item.isAvailable, onToggleAvailability]);
 
   const handleEdit = useCallback(() => {
@@ -37,7 +37,7 @@ export function MenuItemRow({
       className={cn(
         'flex items-center gap-4 p-4 rounded-lg border',
         'bg-surface-container-low border-outline-variant/10',
-        item.isAvailable === 0 && 'opacity-60'
+        !item.isAvailable && 'opacity-60'
       )}
       role="row"
       aria-rowindex={item.id}
@@ -69,7 +69,7 @@ export function MenuItemRow({
           <h3 className="font-headline font-bold text-on-surface truncate">
             {item.name}
           </h3>
-          {item.isAvailable === 1 ? (
+          {item.isAvailable ? (
             <span
               className={cn(
                 'px-2 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider',
@@ -121,18 +121,18 @@ export function MenuItemRow({
         onClick={handleToggle}
         className={cn(
           'relative inline-flex h-6 w-11 items-center rounded-full transition-colors',
-          item.isAvailable === 1
+          item.isAvailable
             ? 'bg-tertiary'
             : 'bg-on-surface-variant/30'
         )}
         role="switch"
-        aria-checked={item.isAvailable === 1}
+        aria-checked={item.isAvailable}
         aria-label={`Basculer la disponibilité de ${item.name}`}
       >
         <span
           className={cn(
             'inline-block h-4 w-4 transform rounded-full bg-on-primary-container transition-transform',
-            item.isAvailable === 1
+            item.isAvailable
               ? 'translate-x-6'
               : 'translate-x-1'
           )}

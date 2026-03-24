@@ -26,8 +26,8 @@ export function FloorPlan({ onTableSelect, selectedTableId }: FloorPlanProps): J
   const stats = useMemo(() => ({
     free: tables.filter((t) => t.status === 'libre').length,
     occupied: tables.filter((t) => t.status === 'occupee').length,
-    reserved: tables.filter((t) => t.status === 'reserve').length,
-    ready: tables.filter((t) => t.status === 'pret').length,
+    reserved: tables.filter((t) => t.status === 'reservation').length,
+    ready: tables.filter((t) => t.status === 'maintenance').length,
   }), [tables]);
 
   const handleTableClick = (tableId: number) => {

@@ -2,7 +2,7 @@
 // Carte de plat pour le menu
 
 import { cn, iconFilled } from '../../utils/cn';
-import type { MenuItem } from '../../db/types';
+import type { MenuItem } from '../../firebase/types';
 
 interface MenuCardProps {
   item: MenuItem;
@@ -11,8 +11,8 @@ interface MenuCardProps {
 
 export function MenuCard({ item, onAddToCart }: MenuCardProps): JSX.Element {
   const hasCustomization = item.customizationOptions && (
-    (item.customizationOptions.cooking && item.customizationOptions.cooking.length > 0) ||
-    (item.customizationOptions.supplements && item.customizationOptions.supplements.length > 0)
+    (item.customizationOptions.cookingLevel) ||
+    (item.customizationOptions.extra && item.customizationOptions.extra.length > 0)
   );
 
   return (

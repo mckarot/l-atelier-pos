@@ -33,7 +33,7 @@ describe('useMenuEditor', () => {
         name: 'Test Item',
         description: 'Test Description',
         price: 15.50,
-        category: 'Plats',
+        category: 'plat',
         isAvailable: 1,
         station: 'GRILL',
       });
@@ -47,7 +47,7 @@ describe('useMenuEditor', () => {
     expect(item).toBeDefined();
     expect(item?.name).toBe('Test Item');
     expect(item?.price).toBe(15.50);
-    expect(item?.category).toBe('Plats');
+    expect(item?.category).toBe('plat');
   });
 
   it('should validate name is required', async () => {
@@ -58,7 +58,7 @@ describe('useMenuEditor', () => {
         name: '',
         description: 'Test',
         price: 10,
-        category: 'Plats',
+        category: 'plat',
         isAvailable: 1,
       })
     ).rejects.toThrow('Le nom est obligatoire');
@@ -72,7 +72,7 @@ describe('useMenuEditor', () => {
         name: 'Test',
         description: 'Test',
         price: 0,
-        category: 'Plats',
+        category: 'plat',
         isAvailable: 1,
       })
     ).rejects.toThrow('Le prix doit être supérieur à 0');
@@ -82,7 +82,7 @@ describe('useMenuEditor', () => {
         name: 'Test',
         description: 'Test',
         price: -5,
-        category: 'Plats',
+        category: 'plat',
         isAvailable: 1,
       })
     ).rejects.toThrow('Le prix doit être supérieur à 0');
@@ -97,7 +97,7 @@ describe('useMenuEditor', () => {
         name: 'Original Item',
         description: 'Original Description',
         price: 10,
-        category: 'Entrées',
+        category: 'entree',
         isAvailable: 1,
       });
     });
@@ -134,7 +134,7 @@ describe('useMenuEditor', () => {
         name: 'To Delete',
         description: 'Will be deleted',
         price: 10,
-        category: 'Desserts',
+        category: 'dessert',
         isAvailable: 1,
       });
     });
@@ -167,7 +167,7 @@ describe('useMenuEditor', () => {
         name: 'Toggle Item',
         description: 'Test',
         price: 10,
-        category: 'Plats',
+        category: 'plat',
         isAvailable: 1,
       });
     });
@@ -231,7 +231,7 @@ describe('useMenuEditor', () => {
         name: 'Edit Test',
         description: 'Test',
         price: 10,
-        category: 'Plats',
+        category: 'plat',
         isAvailable: 1,
       });
     });
@@ -263,21 +263,21 @@ describe('useMenuEditor', () => {
         name: 'Entrée Item',
         description: 'Test',
         price: 10,
-        category: 'Entrées',
+        category: 'entree',
         isAvailable: 1,
       });
       await result.current.addItem({
         name: 'Plat Item',
         description: 'Test',
         price: 20,
-        category: 'Plats',
+        category: 'plat',
         isAvailable: 1,
       });
       await result.current.addItem({
         name: 'Dessert Item',
         description: 'Test',
         price: 8,
-        category: 'Desserts',
+        category: 'dessert',
         isAvailable: 1,
       });
     });
@@ -287,9 +287,9 @@ describe('useMenuEditor', () => {
     });
 
     const items = result.current.menuItems;
-    const entrees = items?.filter((i) => i.category === 'Entrées');
-    const plats = items?.filter((i) => i.category === 'Plats');
-    const desserts = items?.filter((i) => i.category === 'Desserts');
+    const entrees = items?.filter((i) => i.category === 'entree');
+    const plats = items?.filter((i) => i.category === 'plat');
+    const desserts = items?.filter((i) => i.category === 'dessert');
 
     expect(entrees).toHaveLength(1);
     expect(plats).toHaveLength(1);

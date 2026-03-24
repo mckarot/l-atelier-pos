@@ -37,7 +37,7 @@ describe('useOrders Hooks', () => {
 
       // Vérifier que toutes les commandes retournées sont actives
       const orders = result.current!;
-      const activeStatuses = ['en_attente', 'en_preparation', 'pret', 'servi'];
+      const activeStatuses = ['attente', 'preparation', 'pret', 'served'];
       orders.forEach(order => {
         expect(activeStatuses).toContain(order.status);
       });
@@ -152,7 +152,7 @@ describe('useOrders Hooks', () => {
       const newOrderData = {
         tableId: 5,
         customerName: 'Client Test',
-        status: 'en_attente' as const,
+        status: 'attente' as const,
         items: [{ name: 'Nouveau Item', quantity: 2 }],
         total: 25.00,
       };
@@ -167,7 +167,7 @@ describe('useOrders Hooks', () => {
       const createdOrder = await db.orders.get(orderId);
       expect(createdOrder).toBeDefined();
       expect(createdOrder!.tableId).toBe(5);
-      expect(createdOrder!.status).toBe('en_attente');
+      expect(createdOrder!.status).toBe('attente');
       expect(createdOrder!.items).toHaveLength(1);
       expect(createdOrder!.items[0].name).toBe('Nouveau Item');
       expect(createdOrder!.total).toBe(25.00);
@@ -179,7 +179,7 @@ describe('useOrders Hooks', () => {
       const newOrderData = {
         tableId: 7,
         customerName: 'Client Test',
-        status: 'en_attente' as const,
+        status: 'attente' as const,
         items: [
           { name: 'Item 1', quantity: 1, station: 'GRILL' as const },
           { name: 'Item 2', quantity: 2, station: 'FROID' as const },
@@ -202,7 +202,7 @@ describe('useOrders Hooks', () => {
       const newOrderData = {
         tableId: 9,
         customerName: 'Client Test',
-        status: 'en_attente' as const,
+        status: 'attente' as const,
         items: [{ name: 'Test', quantity: 1 }],
         total: 15.00,
         notes: 'Allergie aux arachides',
@@ -224,7 +224,7 @@ describe('useOrders Hooks', () => {
       const orderId = await createOrder({
         tableId: 10,
         customerName: 'Client Test',
-        status: 'en_attente' as const,
+        status: 'attente' as const,
         items: [{ name: 'Test', quantity: 1 }],
         total: 10.00,
       });
@@ -242,17 +242,17 @@ describe('useOrders Hooks', () => {
       const orderId = await createOrder({
         tableId: 1,
         customerName: 'Client Test',
-        status: 'en_attente',
+        status: 'attente',
         items: [{ name: 'Test', quantity: 1 }],
         total: 10.00,
       });
 
       // Act
-      await updateOrderStatus({ id: orderId, status: 'en_preparation' });
+      await updateOrderStatus({ id: orderId, status: 'preparation' });
 
       // Assert
       const updatedOrder = await db.orders.get(orderId);
-      expect(updatedOrder!.status).toBe('en_preparation');
+      expect(updatedOrder!.status).toBe('preparation');
       expect(updatedOrder!.updatedAt).toBeDefined();
     });
 
@@ -261,7 +261,7 @@ describe('useOrders Hooks', () => {
       const orderId = await createOrder({
         tableId: 1,
         customerName: 'Client Test',
-        status: 'en_attente',
+        status: 'attente',
         items: [{ name: 'Test', quantity: 1 }],
         total: 10.00,
       });
@@ -282,17 +282,17 @@ describe('useOrders Hooks', () => {
       const orderId = await createOrder({
         tableId: 1,
         customerName: 'Client Test',
-        status: 'en_attente',
+        status: 'attente',
         items: [{ name: 'Test', quantity: 1 }],
         total: 10.00,
       });
 
-      // Act - Passer directement à 'servi'
-      await updateOrderStatus({ id: orderId, status: 'servi' });
+      // Act - Passer directement à 'served'
+      await updateOrderStatus({ id: orderId, status: 'served' });
 
       // Assert
       const updatedOrder = await db.orders.get(orderId);
-      expect(updatedOrder!.status).toBe('servi');
+      expect(updatedOrder!.status).toBe('served');
       expect(updatedOrder!.servedAt).toBeDefined();
     });
 
@@ -301,13 +301,13 @@ describe('useOrders Hooks', () => {
       const orderId = await createOrder({
         tableId: 1,
         customerName: 'Client Test',
-        status: 'en_attente',
+        status: 'attente',
         items: [{ name: 'Test', quantity: 1 }],
         total: 10.00,
       });
 
       // Act
-      await updateOrderStatus({ id: orderId, status: 'en_preparation' });
+      await updateOrderStatus({ id: orderId, status: 'preparation' });
 
       // Assert
       const updatedOrder = await db.orders.get(orderId);
@@ -328,7 +328,7 @@ describe('useOrders Hooks', () => {
       const orderId = await createOrder({
         tableId: 1,
         customerName: 'Client Test',
-        status: 'en_attente',
+        status: 'attente',
         items: [{ name: 'Test', quantity: 1 }],
         total: 10.00,
       });
@@ -346,7 +346,7 @@ describe('useOrders Hooks', () => {
       const orderId = await createOrder({
         tableId: 1,
         customerName: 'Client Test',
-        status: 'en_attente',
+        status: 'attente',
         items: [{ name: 'Test', quantity: 1 }],
         total: 10.00,
       });
@@ -367,7 +367,7 @@ describe('useOrders Hooks', () => {
       const orderId = await createOrder({
         tableId: 1,
         customerName: 'Client Test',
-        status: 'en_preparation',
+        status: 'preparation',
         items: [{ name: 'Test', quantity: 1 }],
         total: 10.00,
       });
@@ -384,7 +384,7 @@ describe('useOrders Hooks', () => {
   describe('useOrdersByStatus', () => {
     it('devrait retourner les commandes avec le statut "en_attente"', async () => {
       // Arrange & Act
-      const { result } = renderHook(() => useOrdersByStatus('en_attente'));
+      const { result } = renderHook(() => useOrdersByStatus('attente'));
 
       // Assert
       await waitFor(() => {
@@ -394,13 +394,13 @@ describe('useOrders Hooks', () => {
       const orders = result.current!;
       expect(orders.length).toBeGreaterThan(0);
       orders.forEach(order => {
-        expect(order.status).toBe('en_attente');
+        expect(order.status).toBe('attente');
       });
     });
 
     it('devrait retourner les commandes avec le statut "en_preparation"', async () => {
       // Arrange & Act
-      const { result } = renderHook(() => useOrdersByStatus('en_preparation'));
+      const { result } = renderHook(() => useOrdersByStatus('preparation'));
 
       // Assert
       await waitFor(() => {
@@ -409,7 +409,7 @@ describe('useOrders Hooks', () => {
 
       const orders = result.current!;
       orders.forEach(order => {
-        expect(order.status).toBe('en_preparation');
+        expect(order.status).toBe('preparation');
       });
     });
 
@@ -430,7 +430,7 @@ describe('useOrders Hooks', () => {
 
     it('devrait retourner un tableau vide pour un statut sans commandes', async () => {
       // Arrange & Act
-      const { result } = renderHook(() => useOrdersByStatus('servi'));
+      const { result } = renderHook(() => useOrdersByStatus('served'));
 
       // Assert
       await waitFor(() => {
@@ -441,7 +441,7 @@ describe('useOrders Hooks', () => {
 
     it('devrait retourner les commandes triées par createdAt', async () => {
       // Arrange & Act
-      const { result } = renderHook(() => useOrdersByStatus('en_attente'));
+      const { result } = renderHook(() => useOrdersByStatus('attente'));
 
       // Assert
       await waitFor(() => {

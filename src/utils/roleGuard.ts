@@ -1,7 +1,7 @@
 // src/utils/roleGuard.ts
 // Gardes d'authentification par rôle
 
-import type { UserRole } from '../db/types';
+import type { UserRole } from '../firebase/types';
 
 const STORAGE_KEY = 'atelier_role';
 

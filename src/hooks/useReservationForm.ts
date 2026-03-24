@@ -3,7 +3,7 @@
 
 import { useState, useCallback } from 'react';
 import { createReservation } from './useReservations';
-import type { CreateReservationInput } from '../db/types';
+import type { CreateReservationInput } from '../firebase/types';
 
 /** Données de date et heure */
 interface DateTimeData {
@@ -23,7 +23,7 @@ interface CustomerData {
 /** Confirmation de réservation */
 interface ReservationConfirmation {
   referenceNumber: string;
-  reservationId: number;
+  reservationId: string;
 }
 
 /** État complet du formulaire */
@@ -82,29 +82,27 @@ const INITIAL_STATE: ReservationFormState = {
 
 /**
  * Hook de gestion du formulaire de réservation
- * - 3 étapes : Date/Heure, Détails client, Confirmation
- * - Validation par étape
- * - Génération du numéro de référence
+ * Gère les 3 étapes : Date/Heure → Détails client → Confirmation
  */
 export function useReservationForm(): UseReservationFormReturn {
   const [state, setState] = useState<ReservationFormState>(INITIAL_STATE);
 
-  /** Navigation vers une étape spécifique */
+  /** Aller à une étape spécifique */
   const goToStep = useCallback((step: number) => {
     setState((prev) => ({ ...prev, currentStep: step, errors: {} }));
   }, []);
 
   /** Étape suivante */
   const nextStep = useCallback(() => {
-    setState((prev) => ({ ...prev, currentStep: Math.min(prev.currentStep + 1, 2) }));
+    setState((prev) => ({ ...prev, currentStep: prev.currentStep + 1 }));
   }, []);
 
   /** Étape précédente */
   const previousStep = useCallback(() => {
-    setState((prev) => ({ ...prev, currentStep: Math.max(prev.currentStep - 1, 0) }));
+    setState((prev) => ({ ...prev, currentStep: Math.max(0, prev.currentStep - 1) }));
   }, []);
 
-  /** Mise à jour des données date/heure */
+  /** Mettre à jour les données de date/heure */
   const updateDateTime = useCallback((data: Partial<DateTimeData>) => {
     setState((prev) => ({
       ...prev,
@@ -112,7 +110,7 @@ export function useReservationForm(): UseReservationFormReturn {
     }));
   }, []);
 
-  /** Mise à jour des données client */
+  /** Mettre à jour les données client */
   const updateCustomer = useCallback((data: Partial<CustomerData>) => {
     setState((prev) => ({
       ...prev,
@@ -120,62 +118,77 @@ export function useReservationForm(): UseReservationFormReturn {
     }));
   }, []);
 
-  /** Validation d'une étape */
+  /** Valider une étape */
   const validateStep = useCallback((step: number): boolean => {
-    const errors: Record<string, string> = {};
-    let isValid = true;
+    const newErrors: Record<string, string> = {};
 
     if (step === 0) {
+      // Validation étape 1 : Date, Heure, Couverts
       if (!state.dateTime.date) {
-        errors.date = 'La date est obligatoire';
-        isValid = false;
+        newErrors.date = 'Date requise';
+      } else {
+        const selectedDate = new Date(state.dateTime.date);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        if (selectedDate < today) {
+          newErrors.date = 'La date doit être >= aujourd\'hui';
+        }
       }
+
       if (!state.dateTime.time) {
-        errors.time = "L'heure est obligatoire";
-        isValid = false;
+        newErrors.time = 'Heure requise';
       }
-      if (state.dateTime.guests < 1 || state.dateTime.guests > 10) {
-        errors.guests = 'Le nombre de couverts doit être entre 1 et 10';
-        isValid = false;
+
+      if (state.dateTime.guests < 1 || state.dateTime.guests > 20) {
+        newErrors.guests = '1-20 convives';
       }
     } else if (step === 1) {
+      // Validation étape 2 : Nom client
       if (!state.customer.customerName.trim()) {
-        errors.customerName = 'Le nom du client est obligatoire';
-        isValid = false;
+        newErrors.customerName = 'Nom requis';
+      }
+
+      if (
+        state.customer.email &&
+        !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(state.customer.email)
+      ) {
+        newErrors.email = 'Email invalide';
       }
     }
 
-    if (!isValid) {
-      setState((prev) => ({ ...prev, errors }));
-    }
-    return isValid;
+    setState((prev) => ({ ...prev, errors: newErrors }));
+    return Object.keys(newErrors).length === 0;
   }, [state.dateTime, state.customer]);
 
-  /** Réinitialisation du formulaire */
+  /** Réinitialiser le formulaire */
   const resetForm = useCallback(() => {
     setState(INITIAL_STATE);
   }, []);
 
-  /** Soumission de la réservation */
+  /** Soumettre la réservation */
   const submitReservation = useCallback(async () => {
     setState((prev) => ({ ...prev, isSubmitting: true, errors: {} }));
 
     try {
-      const now = Date.now();
-      const referenceNumber = `RES-${now}-${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`;
+      // Générer un numéro de référence
+      const referenceNumber = `RES-${Date.now()}-${Math.random()
+        .toString(36)
+        .substr(2, 9)}`;
 
-      const reservationData: CreateReservationInput = {
-        customerName: state.customer.customerName.trim(),
-        email: state.customer.email.trim() || undefined,
-        phone: state.customer.phone.trim() || undefined,
+      // Créer la réservation
+      const input: CreateReservationInput = {
+        customerName: state.customer.customerName,
+        email: state.customer.email || undefined,
+        phone: state.customer.phone || undefined,
         date: state.dateTime.date,
         time: state.dateTime.time,
         guests: state.dateTime.guests,
-        status: 'en_attente',
-        notes: state.customer.notes.trim() || undefined,
+        notes: state.customer.notes || undefined,
+        status: 'attente',
+        referenceNumber,
       };
 
-      const reservationId = await createReservation(reservationData);
+      const reservationId = await createReservation(input);
 
       setState((prev) => ({
         ...prev,
@@ -184,19 +197,22 @@ export function useReservationForm(): UseReservationFormReturn {
           reservationId,
         },
         isSubmitting: false,
+        currentStep: 2, // Étape confirmation
       }));
-
-      setState((prev) => ({ ...prev, currentStep: 2 }));
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Une erreur est survenue';
+      console.error('[submitReservation] Error:', error);
       setState((prev) => ({
         ...prev,
-        errors: { submit: errorMessage },
         isSubmitting: false,
+        errors: {
+          submit:
+            error instanceof Error
+              ? error.message
+              : 'Erreur lors de la création',
+        },
       }));
-      throw error;
     }
-  }, [state.dateTime, state.customer]);
+  }, [state.customer, state.dateTime]);
 
   return {
     currentStep: state.currentStep,
@@ -215,5 +231,3 @@ export function useReservationForm(): UseReservationFormReturn {
     submitReservation,
   };
 }
-
-export default useReservationForm;

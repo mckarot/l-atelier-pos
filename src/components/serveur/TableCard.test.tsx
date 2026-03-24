@@ -44,7 +44,7 @@ describe('TableCard', () => {
     });
 
     it('devrait afficher le statut RÉSERVÉE', () => {
-      const table = createMockTable({ status: 'reserve' });
+      const table = createMockTable({ status: 'reservation' });
       render(<TableCard table={table} />);
       expect(screen.getByText('RÉSERVÉE')).toBeInTheDocument();
     });
@@ -123,13 +123,13 @@ describe('TableCard', () => {
 
   describe('Table réservée', () => {
     it('devrait afficher "Réservée"', () => {
-      const table = createMockTable({ status: 'reserve' });
+      const table = createMockTable({ status: 'reservation' });
       render(<TableCard table={table} />);
       expect(screen.getByText('Réservée')).toBeInTheDocument();
     });
 
     it('devrait avoir une bordure purple-500', () => {
-      const table = createMockTable({ status: 'reserve' });
+      const table = createMockTable({ status: 'reservation' });
       render(<TableCard table={table} />);
       const card = screen.getByText('T.01').closest('div');
       expect(card).toHaveClass('border-purple-500');

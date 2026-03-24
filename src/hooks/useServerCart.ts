@@ -2,11 +2,12 @@
 // Hook pour la gestion du panier serveur (éphémère, non persisté en Dexie)
 
 import { useState, useCallback, useMemo } from 'react';
-import type { MenuItem, Supplement } from '../db/types';
+import type { MenuItem, Supplement } from '../firebase/types';
+import { SUPPLEMENT_PRICES } from '../firebase/types';
 
 /** Item du panier serveur */
 export interface ServerCartItem {
-  menuItemId: number;
+  menuItemId: string;
   name: string;
   price: number;
   quantity: number;
@@ -20,8 +21,8 @@ export interface UseServerCartReturn {
   total: number;
   itemCount: number;
   addItem: (menuItem: MenuItem, supplements?: Supplement[], notes?: string) => void;
-  removeItem: (menuItemId: number) => void;
-  updateQuantity: (menuItemId: number, delta: number) => void;
+  removeItem: (menuItemId: string) => void;
+  updateQuantity: (menuItemId: string, delta: number) => void;
   clearCart: () => void;
 }
 
@@ -41,7 +42,7 @@ export function useServerCart(): UseServerCartReturn {
   // Calcul du total du panier
   const total = useMemo(() => {
     return items.reduce((sum, item) => {
-      const supplementTotal = item.supplements?.reduce((acc, s) => acc + s.price, 0) || 0;
+      const supplementTotal = item.supplements?.reduce((sum, s) => sum + SUPPLEMENT_PRICES[s], 0) || 0;
       return sum + (item.price + supplementTotal) * item.quantity;
     }, 0);
   }, [items]);
@@ -56,16 +57,16 @@ export function useServerCart(): UseServerCartReturn {
       // Vérifier si l'item existe déjà avec les mêmes supplements
       const existingIndex = prev.findIndex((item) => {
         if (item.menuItemId !== menuItem.id) return false;
-        
+
         // Comparer les supplements
         const prevSupplements = item.supplements || [];
         const newSupplements = supplements || [];
-        
+
         if (prevSupplements.length !== newSupplements.length) return false;
-        
-        const prevNames = prevSupplements.map(s => s.name).sort().join(',');
-        const newNames = newSupplements.map(s => s.name).sort().join(',');
-        
+
+        const prevNames = prevSupplements.sort().join(',');
+        const newNames = newSupplements.sort().join(',');
+
         return prevNames === newNames;
       });
 
@@ -95,12 +96,12 @@ export function useServerCart(): UseServerCartReturn {
   }, []);
 
   // Supprimer un item du panier
-  const removeItem = useCallback((menuItemId: number) => {
+  const removeItem = useCallback((menuItemId: string) => {
     setItems((prev) => prev.filter((item) => item.menuItemId !== menuItemId));
   }, []);
 
   // Mettre à jour la quantité d'un item
-  const updateQuantity = useCallback((menuItemId: number, delta: number) => {
+  const updateQuantity = useCallback((menuItemId: string, delta: number) => {
     setItems((prev) => {
       return prev
         .map((item) => {

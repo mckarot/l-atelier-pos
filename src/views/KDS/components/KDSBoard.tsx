@@ -1,10 +1,10 @@
 // src/views/KDS/components/KDSBoard.tsx
 // Board KDS avec 3 colonnes (À préparer, En préparation, Prêt)
 
-import { type JSX, useCallback, useMemo } from 'react';
-import { useLiveQuery } from 'dexie-react-hooks';
-import { db } from '../../../db/database';
-import type { Order } from '../../../db/types';
+import { type JSX, useCallback, useMemo, useEffect, useState } from 'react';
+import { collection, query, where, onSnapshot, updateDoc, doc, Timestamp } from 'firebase/firestore';
+import { getDb } from '../../../firebase/config';
+import type { Order } from '../../../firebase/types';
 import { KDSColumn } from './KDSColumn';
 import { OrderCard } from './OrderCard';
 import { calculateAveragePrepTime } from '../../../utils/timer';
@@ -21,45 +21,78 @@ interface UseKDSOrdersReturn {
 }
 
 function useKDSOrders(): UseKDSOrdersReturn {
-  // Commandes actives (en_attente, en_preparation, pret)
-  const activeOrders = useLiveQuery<Order[]>(
-    () =>
-      db.orders
-        .where('status')
-        .anyOf(['en_attente', 'en_preparation', 'pret'])
-        .sortBy('createdAt'),
-    []
-  );
+  const [activeOrders, setActiveOrders] = useState<Order[]>([]);
+  const [completedOrders, setCompletedOrders] = useState<Order[]>([]);
+
+  // Commandes actives (attente, preparation, pret)
+  useEffect(() => {
+    const ordersRef = collection(getDb(), 'orders');
+    const q = query(
+      ordersRef,
+      where('status', 'in', ['attente', 'preparation', 'pret'])
+    );
+
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
+        const orders = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+        } as Order));
+        setActiveOrders(orders);
+      },
+      (error) => {
+        console.error('[KDSBoard] Error loading active orders:', error);
+      }
+    );
+
+    return () => unsubscribe();
+  }, []);
 
   // Commandes terminées pour le calcul du temps moyen
-  const completedOrders = useLiveQuery<Order[]>(
-    () =>
-      db.orders
-        .where('status')
-        .anyOf(['pret', 'servi', 'paye'])
-        .sortBy('createdAt'),
-    []
-  );
+  useEffect(() => {
+    const ordersRef = collection(getDb(), 'orders');
+    const q = query(
+      ordersRef,
+      where('status', 'in', ['pret', 'served', 'paid'])
+    );
+
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
+        const orders = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+        } as Order));
+        setCompletedOrders(orders);
+      },
+      (error) => {
+        console.error('[KDSBoard] Error loading completed orders:', error);
+      }
+    );
+
+    return () => unsubscribe();
+  }, []);
 
   // Calcul du temps moyen avec la fonction utilitaire
   const avgPrepTime = useMemo(
-    () => calculateAveragePrepTime(completedOrders || []),
+    () => calculateAveragePrepTime(completedOrders),
     [completedOrders]
   );
 
-  // Séparation par statut - gérer le cas où activeOrders est undefined
+  // Séparation par statut
   const ordersEnAttente = useMemo(
-    () => (activeOrders || []).filter((o) => o.status === 'en_attente'),
+    () => activeOrders.filter((o) => o.status === 'attente'),
     [activeOrders]
   );
 
   const ordersEnPreparation = useMemo(
-    () => (activeOrders || []).filter((o) => o.status === 'en_preparation'),
+    () => activeOrders.filter((o) => o.status === 'preparation'),
     [activeOrders]
   );
 
   const ordersPret = useMemo(
-    () => (activeOrders || []).filter((o) => o.status === 'pret'),
+    () => activeOrders.filter((o) => o.status === 'pret'),
     [activeOrders]
   );
 
@@ -70,27 +103,29 @@ function useKDSOrders(): UseKDSOrdersReturn {
  * Handlers pour les actions sur les commandes
  */
 interface UseKDSActionsReturn {
-  handleLaunch: (orderId: number) => Promise<void>;
-  handleComplete: (orderId: number) => Promise<void>;
+  handleLaunch: (orderId: string) => Promise<void>;
+  handleComplete: (orderId: string) => Promise<void>;
 }
 
 function useKDSActions(): UseKDSActionsReturn {
-  const handleLaunch = useCallback(async (orderId: number) => {
+  const handleLaunch = useCallback(async (orderId: string) => {
     try {
-      await db.orders.update(orderId, {
-        status: 'en_preparation',
-        updatedAt: Date.now(),
+      const orderRef = doc(getDb(), 'orders', orderId);
+      await updateDoc(orderRef, {
+        status: 'preparation',
+        updatedAt: Timestamp.now(),
       });
     } catch (error) {
       console.error('[KDS] Error launching order:', error);
     }
   }, []);
 
-  const handleComplete = useCallback(async (orderId: number) => {
+  const handleComplete = useCallback(async (orderId: string) => {
     try {
-      await db.orders.update(orderId, {
+      const orderRef = doc(getDb(), 'orders', orderId);
+      await updateDoc(orderRef, {
         status: 'pret',
-        updatedAt: Date.now(),
+        updatedAt: Timestamp.now(),
       });
     } catch (error) {
       console.error('[KDS] Error completing order:', error);

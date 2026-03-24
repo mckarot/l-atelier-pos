@@ -11,7 +11,7 @@ const mockMenuItem: MenuItem = {
   name: 'Burger de l\'Atelier',
   description: 'Boeuf charolais, cheddar affiné',
   price: 19.50,
-  category: 'Plats',
+  category: 'plat',
   isAvailable: 1,
   customizationOptions: {
     cooking: ['Bleu', 'Saignant', 'À Point', 'Bien Cuit'],

@@ -3,8 +3,8 @@
 
 import { describe, it, expect, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
-import { db, seedDatabase } from '../../db/database';
-import type { Order } from '../../db/types';
+import { db, seedDatabase } from '../../firebase/config';
+import type { Order } from '../../firebase/types';
 import { ActiveServices } from './ActiveServices';
 
 // Helper pour créer une commande
@@ -13,7 +13,7 @@ function createOrder(overrides: Partial<Order> = {}): Omit<Order, 'id'> {
   return {
     tableId: 1,
     customerName: 'Test Customer',
-    status: 'en_attente',
+    status: 'attente',
     items: [{ name: 'Test Item', quantity: 1 }],
     total: 50,
     createdAt: now,
@@ -190,7 +190,7 @@ describe('ActiveServices', () => {
         ...createOrder(),
         id: 100,
         tableId: 20,
-        status: 'en_preparation',
+        status: 'preparation',
         createdAt: twentyFiveMinAgo,
       });
 
@@ -210,7 +210,7 @@ describe('ActiveServices', () => {
         ...createOrder(),
         id: 101,
         tableId: 21,
-        status: 'en_preparation',
+        status: 'preparation',
         createdAt: twentyFiveMinAgo,
       });
 
@@ -235,7 +235,7 @@ describe('ActiveServices', () => {
         ...createOrder(),
         id: 102,
         tableId: 22,
-        status: 'en_attente',
+        status: 'attente',
         createdAt: now,
       });
 
@@ -301,7 +301,7 @@ describe('ActiveServices', () => {
           ...createOrder(),
           id: i,
           tableId: i,
-          status: 'en_attente',
+          status: 'attente',
           createdAt: now,
         });
       }
@@ -324,7 +324,7 @@ describe('ActiveServices', () => {
           ...createOrder(),
           id: i,
           tableId: i,
-          status: 'en_attente',
+          status: 'attente',
           createdAt: now,
         });
       }
@@ -347,7 +347,7 @@ describe('ActiveServices', () => {
           ...createOrder(),
           id: i,
           tableId: i,
-          status: 'en_attente',
+          status: 'attente',
           createdAt: now,
         });
       }
@@ -482,7 +482,7 @@ describe('ActiveServices', () => {
         ...createOrder(),
         id: 600,
         tableId: 60,
-        status: 'en_attente',
+        status: 'attente',
         createdAt: now,
       });
 
@@ -498,7 +498,7 @@ describe('ActiveServices', () => {
         ...createOrder(),
         id: 601,
         tableId: 61,
-        status: 'en_attente',
+        status: 'attente',
         createdAt: now + 1000,
       });
 

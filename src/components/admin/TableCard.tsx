@@ -1,7 +1,7 @@
 // src/components/admin/TableCard.tsx
-// Carte individuelle pour une table active dans la section "Services Actifs"
+// Carte individuelle pour une table active
 
-import type { TableService, TableServiceItem } from '../../hooks/useActiveTables';
+import type { TableRecord } from '../../firebase/types';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // TYPES
@@ -9,7 +9,7 @@ import type { TableService, TableServiceItem } from '../../hooks/useActiveTables
 
 export interface TableCardProps {
   /** Données de la table */
-  service: TableService;
+  table: TableRecord;
   /** Classe CSS personnalisée */
   className?: string;
 }
@@ -19,39 +19,27 @@ export interface TableCardProps {
 // ─────────────────────────────────────────────────────────────────────────────
 
 /** Couleurs de bordure gauche selon le statut */
-const BORDER_COLORS: Record<TableService['status'], string> = {
-  retard: 'border-error',
-  en_preparation: 'border-tertiary',
-  nouveau: 'border-primary',
+const BORDER_COLORS: Record<TableRecord['status'], string> = {
+  libre: 'border-outline-variant',
+  occupee: 'border-tertiary',
+  reservation: 'border-primary',
+  maintenance: 'border-error',
 };
 
 /** Couleurs de badge selon le statut */
-const BADGE_COLORS: Record<TableService['status'], string> = {
-  retard: 'bg-error/20 text-error',
-  en_preparation: 'bg-tertiary/10 text-tertiary',
-  nouveau: 'bg-primary/10 text-primary',
+const BADGE_COLORS: Record<TableRecord['status'], string> = {
+  libre: 'bg-surface-container-highest text-on-surface-variant',
+  occupee: 'bg-tertiary/10 text-tertiary',
+  reservation: 'bg-primary/10 text-primary',
+  maintenance: 'bg-error/20 text-error',
 };
 
 /** Labels de statut affichés */
-const STATUS_LABELS: Record<TableService['status'], string> = {
-  retard: 'RETARD',
-  en_preparation: 'EN PRÉPARATION',
-  nouveau: 'NOUVEAU',
-};
-
-/** Couleurs de texte pour le statut des items */
-const ITEM_STATUS_COLORS: Record<TableServiceItem['status'], string> = {
-  retard: 'text-error',
-  pret: 'text-tertiary',
-  preparation: 'text-primary',
-  attente: 'text-on-surface-variant',
-};
-
-/** Labels de statut des items */
-const ITEM_STATUS_LABELS: Record<TableServiceItem['status'], string> = {
-  attente: 'ATTENTE',
-  pret: 'PRÊT',
-  preparation: 'EN CUISINE',
+const STATUS_LABELS: Record<TableRecord['status'], string> = {
+  libre: 'LIBRE',
+  occupee: 'OCCUPÉE',
+  reservation: 'RÉSERVÉE',
+  maintenance: 'MAINTENANCE',
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -60,50 +48,27 @@ const ITEM_STATUS_LABELS: Record<TableServiceItem['status'], string> = {
 
 /**
  * Carte de table individuelle pour la section "Services Actifs"
- *
- * Design system conforme aux maquettes PNG:
- * - Fond: bg-surface-container
- * - Largeur: ~350px
- * - Bordure gauche: border-l-4 avec couleur selon statut
- * - Numéro commande: font-mono text-lg font-bold text-primary
- * - Badge statut: bg-tertiary/10 text-tertiary ou bg-error/20 text-error
- * - Items: liste avec quantité en text-primary font-bold
- * - Statut items: texte coloré à droite
- * - Temps d'attente: font-mono
- * - Total: font-mono font-bold
  */
-export function TableCard({ service, className = '' }: TableCardProps): JSX.Element {
-  // Formater le total en euros
-  const formatTotal = (total: number): string => {
-    return `${total.toFixed(2)} €`;
-  };
-
-  // Obtenir la couleur de texte pour le temps d'attente
-  const getWaitTimeColor = (status: TableService['status'], waitTime: number): string => {
-    if (status === 'retard') return 'text-error';
-    if (waitTime > 15) return 'text-error';
-    return 'text-on-surface-variant';
-  };
-
+export function TableCard({ table, className = '' }: TableCardProps): JSX.Element {
   return (
     <div
-      className={`flex flex-col w-[350px] rounded-xl border border-outline-variant/10 bg-surface-container border-l-4 ${BORDER_COLORS[service.status]} ${className}`}
+      className={`flex flex-col w-[350px] rounded-xl border border-outline-variant/10 bg-surface-container border-l-4 ${BORDER_COLORS[table.status]} ${className}`}
       role="article"
-      aria-label={`Commande ${service.orderId} - ${service.tableName}`}
+      aria-label={`Table ${table.name}`}
     >
       {/* En-tête de la carte */}
       <div className="flex items-start justify-between p-4 border-b border-outline-variant/10">
-        {/* Numéro de commande */}
+        {/* Nom de la table */}
         <div>
-          <p className="font-mono text-lg font-bold text-primary">
-            #{service.orderId}
+          <p className="font-headline font-bold text-lg text-on-surface">
+            {table.name}
           </p>
 
           {/* Badge de statut */}
           <span
-            className={`inline-flex items-center gap-1 mt-1 px-2 py-0.5 rounded text-xs font-bold uppercase tracking-wider ${BADGE_COLORS[service.status]}`}
+            className={`inline-flex items-center gap-1 mt-1 px-2 py-0.5 rounded text-xs font-bold uppercase tracking-wider ${BADGE_COLORS[table.status]}`}
           >
-            {service.status === 'retard' && (
+            {table.status === 'maintenance' && (
               <span
                 className="material-symbols-outlined text-xs"
                 aria-hidden="true"
@@ -111,114 +76,39 @@ export function TableCard({ service, className = '' }: TableCardProps): JSX.Elem
                 warning
               </span>
             )}
-            {STATUS_LABELS[service.status]}
+            {STATUS_LABELS[table.status]}
           </span>
         </div>
 
-        {/* Nom de la table */}
-        <div className="text-right">
-          <p className="font-headline font-bold text-lg text-on-surface">
-            {service.tableName}
-          </p>
-        </div>
-      </div>
-
-      {/* Informations sur le service */}
-      <div className="flex items-center justify-between px-4 py-3 bg-surface-variant/30">
-        {/* Nombre de personnes */}
-        <div className="flex items-center gap-2">
-          <span
-            className="material-symbols-outlined text-on-surface-variant text-sm"
-            aria-hidden="true"
-          >
-            people
-          </span>
-          <span className="font-label text-sm text-on-surface-variant">
-            {service.guests} Personnes
-          </span>
-        </div>
-
-        {/* Serveur */}
-        <div className="flex items-center gap-2">
-          <span
-            className="material-symbols-outlined text-on-surface-variant text-sm"
-            aria-hidden="true"
-          >
-            person
-          </span>
-          <span className="font-label text-sm text-on-surface-variant">
-            Serveur: {service.server}
-          </span>
-        </div>
-      </div>
-
-      {/* Liste des items */}
-      <div className="flex-1 p-4 space-y-3 overflow-y-auto" style={{ maxHeight: '200px' }}>
-        {service.items.map((item, index) => (
-          <div
-            key={`${item.name}-${index}`}
-            className="flex items-start justify-between gap-2"
-          >
-            {/* Quantité et nom de l'item */}
-            <div className="flex items-start gap-2 flex-1 min-w-0">
-              <span className="font-mono font-bold text-primary flex-shrink-0">
-                {item.quantity}x
-              </span>
-              <span className="font-label text-sm text-on-surface truncate">
-                {item.name}
-              </span>
-            </div>
-
-            {/* Statut de l'item */}
+        {/* Capacité */}
+        {table.capacity && (
+          <div className="flex items-center gap-1 text-on-surface-variant">
             <span
-              className={`flex-shrink-0 font-label text-xs font-bold uppercase ${ITEM_STATUS_COLORS[item.status]}`}
-            >
-              {ITEM_STATUS_LABELS[item.status]}
-            </span>
-          </div>
-        ))}
-
-        {service.items.length === 0 && (
-          <div className="flex flex-col items-center justify-center py-4 text-center">
-            <span
-              className="material-symbols-outlined text-on-surface-variant text-2xl mb-2"
+              className="material-symbols-outlined text-sm"
               aria-hidden="true"
             >
-              restaurant
+              people
             </span>
-            <p className="font-label text-sm text-on-surface-variant">
-              Aucun item
-            </p>
+            <span className="font-mono text-sm">{table.capacity}</span>
           </div>
         )}
       </div>
 
-      {/* Pied de carte - Temps d'attente et total */}
-      <div className="flex items-center justify-between px-4 py-3 border-t border-outline-variant/10 bg-surface-variant/30">
-        {/* Temps d'attente */}
-        <div className="flex items-center gap-2">
-          <span
-            className={`material-symbols-outlined text-sm ${getWaitTimeColor(service.status, service.waitTime)}`}
-            aria-hidden="true"
-          >
-            schedule
-          </span>
-          <span
-            className={`font-mono font-bold ${getWaitTimeColor(service.status, service.waitTime)}`}
-          >
-            {service.waitTime}min
-          </span>
-        </div>
-
-        {/* Total */}
-        <div className="flex items-center gap-1">
-          <span className="font-label text-xs text-on-surface-variant">
-            Total:
-          </span>
-          <span className="font-mono font-bold text-primary">
-            {formatTotal(service.total)}
-          </span>
-        </div>
+      {/* Informations sur la table */}
+      <div className="flex-1 p-4">
+        {table.currentOrderId && (
+          <div className="flex items-center gap-2">
+            <span
+              className="material-symbols-outlined text-on-surface-variant text-sm"
+              aria-hidden="true"
+            >
+              receipt_long
+            </span>
+            <span className="font-label text-sm text-on-surface-variant">
+              Commande: #{table.currentOrderId}
+            </span>
+          </div>
+        )}
       </div>
     </div>
   );

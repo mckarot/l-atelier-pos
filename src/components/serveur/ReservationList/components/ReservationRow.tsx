@@ -3,7 +3,7 @@
 
 import { type JSX } from 'react';
 import { cn } from '../../../../utils/cn';
-import type { Reservation } from '../../../../db/types';
+import type { Reservation } from '../../../../firebase/types';
 
 export interface ReservationRowProps {
   /** Réservation à afficher */

@@ -3,9 +3,9 @@
 
 import { describe, it, expect, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
-import { db } from '../../db/database';
+import { db } from '../../firebase/config';
 import { AdminDashboard } from './Dashboard';
-import type { Order } from '../../db/types';
+import type { Order } from '../../firebase/types';
 
 // Helper pour créer une commande
 function createOrder(overrides: Partial<Order> = {}): Omit<Order, 'id'> {
@@ -13,7 +13,7 @@ function createOrder(overrides: Partial<Order> = {}): Omit<Order, 'id'> {
   return {
     tableId: 1,
     customerName: 'Test Customer',
-    status: 'en_attente',
+    status: 'attente',
     items: [{ name: 'Test Item', quantity: 1 }],
     total: 50,
     createdAt: now,
@@ -83,7 +83,7 @@ describe('AdminDashboard', () => {
       await db.orders.add({
         ...createOrder(),
         id: 1,
-        status: 'paye',
+        status: 'paid',
         total: 2485,
         createdAt: startOfDay + 1000,
       });
@@ -293,7 +293,7 @@ describe('AdminDashboard', () => {
       await db.orders.add({
         ...createOrder(),
         id: 1,
-        status: 'paye',
+        status: 'paid',
         total: 100,
         createdAt: startOfDay + 1000,
       });

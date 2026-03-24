@@ -6,7 +6,7 @@ import userEvent from '@testing-library/user-event';
 import { render, screen, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { OrderRow, type OrderRowProps } from './OrderRow';
-import type { Order } from '../../db/types';
+import type { Order } from '../../firebase/types';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // HELPERS DE CREATION DE DONNÉES
@@ -16,7 +16,7 @@ const createMockOrder = (overrides: Partial<Order> = {}): Order => ({
   id: 1,
   tableId: 5,
   customerName: 'Jean Dupont',
-  status: 'en_attente',
+  status: 'attente',
   items: [
     { name: 'Tartare de Saumon', quantity: 2, station: 'FROID' },
     { name: 'Filet de Boeuf', quantity: 1, station: 'GRILL', customization: 'À point' },
@@ -128,7 +128,7 @@ describe('OrderRow', () => {
   describe('Affichage du statut', () => {
     it('devrait afficher le badge "EN ATTENTE" pour le statut en_attente', () => {
       // Arrange & Act
-      renderOrderRow({ order: createMockOrder({ status: 'en_attente' }) });
+      renderOrderRow({ order: createMockOrder({ status: 'attente' }) });
 
       // Assert
       expect(screen.getByText('EN ATTENTE')).toBeInTheDocument();
@@ -136,7 +136,7 @@ describe('OrderRow', () => {
 
     it('devrait afficher le badge "EN PRÉPARATION" pour le statut en_preparation', () => {
       // Arrange & Act
-      renderOrderRow({ order: createMockOrder({ status: 'en_preparation' }) });
+      renderOrderRow({ order: createMockOrder({ status: 'preparation' }) });
 
       // Assert
       expect(screen.getByText('EN PRÉPARATION')).toBeInTheDocument();
@@ -152,7 +152,7 @@ describe('OrderRow', () => {
 
     it('devrait avoir un indicateur coloré (point) dans le badge de statut', () => {
       // Arrange & Act
-      renderOrderRow({ order: createMockOrder({ status: 'en_attente' }) });
+      renderOrderRow({ order: createMockOrder({ status: 'attente' }) });
 
       // Assert - Le badge contient un point indicateur
       const badge = document.querySelector('[role="status"]');
@@ -236,7 +236,7 @@ describe('OrderRow', () => {
     describe('Bouton LANCER (statut en_attente)', () => {
       it('devrait afficher le bouton LANCER pour une commande en_attente', () => {
         // Arrange & Act
-        renderOrderRow({ order: createMockOrder({ status: 'en_attente' }) });
+        renderOrderRow({ order: createMockOrder({ status: 'attente' }) });
 
         // Assert
         expect(screen.getByRole('button', { name: /lancer la préparation/i })).toBeInTheDocument();
@@ -248,7 +248,7 @@ describe('OrderRow', () => {
         const user = userEvent.setup();
         const onLaunch = vi.fn();
         renderOrderRow({
-          order: createMockOrder({ id: 42, status: 'en_attente' }),
+          order: createMockOrder({ id: 42, status: 'attente' }),
           onLaunch,
         });
 
@@ -262,7 +262,7 @@ describe('OrderRow', () => {
 
       it('devrait avoir le bouton LANCER avec la classe bg-primary-container', () => {
         // Arrange & Act
-        renderOrderRow({ order: createMockOrder({ status: 'en_attente' }) });
+        renderOrderRow({ order: createMockOrder({ status: 'attente' }) });
 
         // Assert
         const button = screen.getByText('Lancer');
@@ -273,7 +273,7 @@ describe('OrderRow', () => {
     describe('Bouton TERMINER (statut en_preparation)', () => {
       it('devrait afficher le bouton TERMINER pour une commande en_preparation', () => {
         // Arrange & Act
-        renderOrderRow({ order: createMockOrder({ status: 'en_preparation' }) });
+        renderOrderRow({ order: createMockOrder({ status: 'preparation' }) });
 
         // Assert
         expect(screen.getByRole('button', { name: /marquer la commande.*comme prête/i })).toBeInTheDocument();
@@ -285,7 +285,7 @@ describe('OrderRow', () => {
         const user = userEvent.setup();
         const onComplete = vi.fn();
         renderOrderRow({
-          order: createMockOrder({ id: 99, status: 'en_preparation' }),
+          order: createMockOrder({ id: 99, status: 'preparation' }),
           onComplete,
         });
 
@@ -299,7 +299,7 @@ describe('OrderRow', () => {
 
       it('devrait avoir le bouton TERMINER avec la classe bg-tertiary-container', () => {
         // Arrange & Act
-        renderOrderRow({ order: createMockOrder({ status: 'en_preparation' }) });
+        renderOrderRow({ order: createMockOrder({ status: 'preparation' }) });
 
         // Assert
         const button = screen.getByText('Terminer');
@@ -339,7 +339,7 @@ describe('OrderRow', () => {
 
     it('devrait avoir un aria-label sur le bouton LANCER', () => {
       // Arrange & Act
-      renderOrderRow({ order: createMockOrder({ id: 5, status: 'en_attente' }) });
+      renderOrderRow({ order: createMockOrder({ id: 5, status: 'attente' }) });
 
       // Assert
       const button = screen.getByRole('button', { name: /lancer la préparation de la commande 5/i });
@@ -348,7 +348,7 @@ describe('OrderRow', () => {
 
     it('devrait avoir un aria-label sur le bouton TERMINER', () => {
       // Arrange & Act
-      renderOrderRow({ order: createMockOrder({ id: 5, status: 'en_preparation' }) });
+      renderOrderRow({ order: createMockOrder({ id: 5, status: 'preparation' }) });
 
       // Assert
       const button = screen.getByRole('button', { name: /marquer la commande 5 comme prête/i });

@@ -1,9 +1,9 @@
 // src/components/layout/AdminLayout.tsx
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
-import { useLiveQuery } from 'dexie-react-hooks';
-import { db } from '../../db/database';
-import type { Order } from '../../db/types';
+import { collection, query, where, onSnapshot, Timestamp } from 'firebase/firestore';
+import { getDb } from '../../firebase/config';
+import type { Order } from '../../firebase/types';
 import { AdminSidebar } from './AdminSidebar';
 import { AdminTopBar } from './AdminTopBar';
 import { SyncIndicator } from './SyncIndicator';
@@ -16,14 +16,37 @@ export function AdminLayout(): JSX.Element {
   const { status, lastSync } = useSyncStatus();
 
   // Commandes actives pour le compteur
-  const activeOrders = useLiveQuery<Order[]>(
-    () =>
-      db.orders
-        .where('status')
-        .anyOf(['en_attente', 'en_preparation', 'pret'])
-        .sortBy('createdAt'),
-    []
-  );
+  const [activeOrders, setActiveOrders] = useState<Order[]>([]);
+
+  useEffect(() => {
+    const ordersRef = collection(getDb(), 'orders');
+    const q = query(
+      ordersRef,
+      where('status', 'in', ['attente', 'preparation', 'pret'])
+    );
+
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
+        const orders = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+        } as Order));
+        // Sort by createdAt
+        orders.sort((a, b) => {
+          const aTime = a.createdAt instanceof Timestamp ? a.createdAt.toMillis() : a.createdAt;
+          const bTime = b.createdAt instanceof Timestamp ? b.createdAt.toMillis() : b.createdAt;
+          return aTime - bTime;
+        });
+        setActiveOrders(orders);
+      },
+      (error) => {
+        console.error('[AdminLayout] Error monitoring active orders:', error);
+      }
+    );
+
+    return () => unsubscribe();
+  }, []);
 
   const handleLogout = useCallback(() => {
     navigate('/login');
@@ -34,7 +57,7 @@ export function AdminLayout(): JSX.Element {
     // TODO: Implémenter la logique de recherche globale
   }, []);
 
-  const activeOrdersCount = activeOrders?.length ?? 0;
+  const activeOrdersCount = activeOrders.length;
 
   return (
     <div className="flex h-screen bg-background overflow-hidden">
@@ -66,7 +89,7 @@ export function AdminLayout(): JSX.Element {
                 database
               </span>
               <span className="text-[10px] font-mono text-on-surface-variant uppercase tracking-tighter">
-                Dexie.js IndexedDB
+                Firebase Firestore
               </span>
             </div>
           </div>

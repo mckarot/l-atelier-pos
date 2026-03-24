@@ -1,8 +1,8 @@
 // src/utils/timer.ts
 // Fonctions pures pour le calcul et le formatage des timers KDS
 
-import type { Order } from '../db/types';
-import type { OrderStatus } from '../db/types';
+import type { Order, OrderStatus } from '../firebase/types';
+import type { Timestamp } from 'firebase/firestore';
 
 /**
  * Seuils d'alerte pour les timers (en millisecondes)
@@ -18,6 +18,16 @@ export const TIMER_THRESHOLDS = {
  * Statut d'alerte du timer
  */
 export type TimerAlertStatus = 'normal' | 'warning' | 'danger';
+
+/**
+ * Helper to convert Timestamp to milliseconds
+ */
+function toMillis(timestamp: Timestamp | number): number {
+  if (typeof timestamp === 'number') {
+    return timestamp;
+  }
+  return timestamp.toMillis();
+}
 
 /**
  * Calcule le temps écoulé depuis un timestamp
@@ -87,7 +97,7 @@ export function isTimerWarning(elapsedMs: number): boolean {
  * Options pour le calcul du temps moyen
  */
 export interface AveragePrepTimeOptions {
-  /** Statuts à inclure dans le calcul (par défaut: ['pret', 'servi', 'paye']) */
+  /** Statuts à inclure dans le calcul (par défaut: ['pret', 'served', 'paid']) */
   completedStatuses?: OrderStatus[];
   /** Nombre minimum de commandes pour calculer (par défaut: 1) */
   minOrders?: number;
@@ -95,8 +105,8 @@ export interface AveragePrepTimeOptions {
 
 /**
  * Calcule le temps moyen de préparation en minutes
- * Basé sur les commandes terminées (status: 'pret', 'servi', 'paye')
- * 
+ * Basé sur les commandes terminées (status: 'pret', 'served', 'paid')
+ *
  * @param orders - Liste des commandes
  * @param options - Options de calcul
  * @returns Temps moyen en minutes (arrondi), ou 0 si pas assez de données
@@ -106,7 +116,7 @@ export function calculateAveragePrepTime(
   options: AveragePrepTimeOptions = {}
 ): number {
   const {
-    completedStatuses = ['pret', 'servi', 'paye'],
+    completedStatuses = ['pret', 'served', 'paid'],
     minOrders = 1,
   } = options;
 
@@ -119,8 +129,9 @@ export function calculateAveragePrepTime(
   }
 
   const totalTime = completedOrders.reduce((sum, order) => {
-    const endTime = order.updatedAt || order.createdAt;
-    const prepTime = endTime - order.createdAt;
+    const startTime = toMillis(order.createdAt);
+    const endTime = order.updatedAt ? toMillis(order.updatedAt) : startTime;
+    const prepTime = endTime - startTime;
     return sum + prepTime;
   }, 0);
 

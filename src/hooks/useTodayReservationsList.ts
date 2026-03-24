@@ -1,10 +1,16 @@
 // src/hooks/useTodayReservationsList.ts
-// Hook pour la liste des réservations du jour
+// Hook Firestore pour la liste des réservations du jour
 
-import { useCallback, useState } from 'react';
-import { useLiveQuery } from 'dexie-react-hooks';
-import { db } from '../db/database';
-import type { Reservation } from '../db/types';
+import { useState, useEffect, useCallback } from 'react';
+import {
+  collection,
+  query,
+  where,
+  orderBy,
+  onSnapshot,
+} from 'firebase/firestore';
+import { db } from '../firebase/config';
+import type { Reservation } from '../firebase/types';
 
 /** Retour du hook */
 interface UseTodayReservationsListReturn {
@@ -20,30 +26,51 @@ interface UseTodayReservationsListReturn {
 
 /**
  * Hook pour récupérer la liste des réservations du jour
- * - Utilise useLiveQuery pour la réactivité
+ * - Utilise onSnapshot pour le temps réel
  * - Gère les états loading, error, data
  * - Fournit une fonction de rafraîchissement
  */
 export function useTodayReservationsList(): UseTodayReservationsListReturn {
+  const [reservations, setReservations] = useState<Reservation[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   // Date du jour au format YYYY-MM-DD
   const today = new Date().toISOString().split('T')[0];
 
-  // Requête Dexie avec useLiveQuery
-  const reservations = useLiveQuery<Reservation[]>(
-    () => {
-      return db.reservations
-        .where('date')
-        .equals(today)
-        .sortBy('time');
-    },
-    [today, refreshTrigger]
-  );
+  useEffect(() => {
+    setIsLoading(true);
+    setError(null);
 
-  // Loading state based on data presence
-  const isLoading = !reservations;
-  const error: Error | null = null; // useLiveQuery doesn't expose errors directly
+    const q = query(
+      collection(db, 'reservations'),
+      where('date', '==', today),
+      orderBy('time', 'asc')
+    );
+
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
+        const fetchedReservations = snapshot.docs.map(
+          (doc) =>
+            ({
+              id: doc.id,
+              ...doc.data(),
+            }) as Reservation
+        );
+        setReservations(fetchedReservations);
+        setIsLoading(false);
+      },
+      (err) => {
+        console.error('[useTodayReservationsList] Error:', err);
+        setError(err instanceof Error ? err : new Error('Erreur Firestore'));
+        setIsLoading(false);
+      }
+    );
+
+    return () => unsubscribe();
+  }, [today, refreshTrigger]);
 
   /** Fonction de rafraîchissement */
   const refresh = useCallback(async () => {
@@ -51,11 +78,9 @@ export function useTodayReservationsList(): UseTodayReservationsListReturn {
   }, []);
 
   return {
-    reservations: reservations ?? [],
+    reservations,
     isLoading,
     error,
     refresh,
   };
 }
-
-export default useTodayReservationsList;
